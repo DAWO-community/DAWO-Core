@@ -4,8 +4,11 @@
 }:
 {
   flake.modules.nixos.profiles-dawo-generic =
-    { ... }:
+    { lib, ... }:
     {
+      # Auto-update on by default; a workplace overrides repoUrl to its overlay.
+      dawo.autoUpdate.enable = lib.mkDefault true;
+
       imports = with config.flake.modules.nixos; [
 
         # Desktop
@@ -34,7 +37,7 @@
         programs-firefox
 
         # Services
-        services-comin
+        services-auto-update
         services-flatpak
 
         # Users
