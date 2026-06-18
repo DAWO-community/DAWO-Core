@@ -3,6 +3,10 @@
 
 This repository contains the core NixOS configurations for the DAWO infrastructure. It utilizes a flake-based build system to provide reproducible and modular environment definitions across various hosts and services.
 
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md).
+
 ## Key Concepts
 - **Flakes**: The foundation of the repo, used for pinning inputs and defining outputs.
 - **Modules**: The primary way configurations are organized, allowing for composable building blocks.
