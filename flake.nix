@@ -43,7 +43,8 @@
       inputs.home-manager.follows = "home-manager";
     };
     lanzaboote = {
-      url = "github:nix-community/lanzaboote/v1.0.0";
+      # master: v1.0.0 still sets boot.bootspec.enable, removed in nixpkgs 26.05.
+      url = "github:nix-community/lanzaboote";
       # Optional but recommended to limit the size of your system closure.
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.rust-overlay.follows = "rust-overlay";
