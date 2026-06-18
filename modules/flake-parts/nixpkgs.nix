@@ -39,6 +39,14 @@
               inherit system;
             };
           })
+          (final: _prev: {
+            # Pull a single package from unstable when a newer version is needed:
+            #   environment.systemPackages = [ pkgs.unstable.<name> ];
+            unstable = import inputs.nixpkgs-unstable {
+              inherit (final) config;
+              inherit system;
+            };
+          })
         ];
       };
     };
