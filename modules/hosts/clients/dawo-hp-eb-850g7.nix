@@ -26,5 +26,7 @@
       ];
       networking.hostName = "dawo-hp-eb-850g7";
 
+      # Desktop choice (exactly one; see desktop-select).
+      dawo.desktop.plasma.enable = true;
     };
 }

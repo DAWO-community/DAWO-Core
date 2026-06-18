@@ -11,9 +11,13 @@
         # Hardening (mandatory-core tier; opt-in blocks enabled per workplace)
         profiles-dawo-core
 
-        # Desktop
+        # Desktop (DE-agnostic: blocks are gated, a host enables exactly one of
+        # dawo.desktop.plasma.enable / dawo.desktop.gnome.enable; desktop-select
+        # asserts the choice)
         desktop-plasma
+        desktop-gnome
         desktop-sddm-bzk
+        desktop-select
 
         # Environment
         environment-dawo-vars

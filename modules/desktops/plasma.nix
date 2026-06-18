@@ -1,4 +1,8 @@
 {
+  # KDE Plasma 6 desktop with SDDM. Alternative to desktop-gnome; a workplace picks
+  # one. Gated behind dawo.desktop.plasma.enable so importing the block does not
+  # force Plasma on every host. desktop-sddm-bzk pairs its display manager to this
+  # flag; desktop-select asserts exactly one desktop is enabled.
   flake.modules.nixos.desktop-plasma =
     {
       config,
@@ -6,12 +10,18 @@
       lib,
       ...
     }:
+    let
+      cfg = config.dawo.desktop.plasma;
+    in
     {
-      # Enable the KDE Plasma Desktop Environment.
-      services.desktopManager.plasma6.enable = true;
+      options.dawo.desktop.plasma.enable = lib.mkEnableOption "KDE Plasma 6 desktop with SDDM";
 
-      programs.kdeconnect.enable = true;
-      services.dbus.packages = lib.mkIf config.programs.kdeconnect.enable [
+      config = lib.mkIf cfg.enable {
+        # Enable the KDE Plasma Desktop Environment.
+        services.desktopManager.plasma6.enable = true;
+
+        programs.kdeconnect.enable = true;
+        services.dbus.packages = lib.mkIf config.programs.kdeconnect.enable [
         (pkgs.writeTextFile {
           name = "kdeconnect-bluetooth.conf";
           destination = "/share/dbus-1/system.d/kdeconnect-bluetooth.conf";
@@ -62,5 +72,6 @@
         klassy
         kid3-kde
       ];
+      };
     };
 }

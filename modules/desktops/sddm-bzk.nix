@@ -1,7 +1,11 @@
 { ... }:
 {
+  # SDDM display manager (BZK-themed) for the Plasma desktop. Gated on
+  # dawo.desktop.plasma.enable so the display manager is paired to its desktop:
+  # Plasma brings SDDM, GNOME brings GDM (see desktop-gnome). Importing this block
+  # alone does nothing until Plasma is enabled.
   flake.modules.nixos.desktop-sddm-bzk =
-    { lib, pkgs, ... }:
+    { config, lib, pkgs, ... }:
     let
       # Define the custom background package with the correct relative path
       background-package = pkgs.stdenvNoCC.mkDerivation {
@@ -14,44 +18,45 @@
       };
     in
     {
-
-      services.displayManager = {
-        autoLogin.enable = false;
-        defaultSession = lib.mkDefault "plasma";
-        sddm = {
-          enable = true;
-          theme = "breeze";
-          extraPackages = [ pkgs.kdePackages.plasma-keyboard ];
-          settings = {
-            General.InputMethod = "plasma-keyboard";
-            Wayland = {
-              CompositorCommand = "kwin_wayland --drm --no-lockscreen --no-global-shortcuts --locale1 --inputmethod plasma-keyboard";
-            };
-            Theme = {
-              # Enable avatars for the users displayed in SDDM.
-              EnableAvatars = true;
-              # set the threshold for the number of users.
-              # Avatars are not shown if this threshold is exceeded.
-              DisableAvatarsThreshold = 10;
-            };
-            Users = {
-              # See https://kanidm.github.io/kanidm/master/accounts/posix_accounts_and_groups.html#gid-number-generation
-              MinimumUid = 1000;
-              MaximumUid = 2147483647;
-              # SDDM won't display disabled users, nor ID's over 65000,
-              # but one can hope for future options.
-              RememberLastSession = true;
-              RememberLastUser = true;
+      config = lib.mkIf config.dawo.desktop.plasma.enable {
+        services.displayManager = {
+          autoLogin.enable = false;
+          defaultSession = lib.mkDefault "plasma";
+          sddm = {
+            enable = true;
+            theme = "breeze";
+            extraPackages = [ pkgs.kdePackages.plasma-keyboard ];
+            settings = {
+              General.InputMethod = "plasma-keyboard";
+              Wayland = {
+                CompositorCommand = "kwin_wayland --drm --no-lockscreen --no-global-shortcuts --locale1 --inputmethod plasma-keyboard";
+              };
+              Theme = {
+                # Enable avatars for the users displayed in SDDM.
+                EnableAvatars = true;
+                # set the threshold for the number of users.
+                # Avatars are not shown if this threshold is exceeded.
+                DisableAvatarsThreshold = 10;
+              };
+              Users = {
+                # See https://kanidm.github.io/kanidm/master/accounts/posix_accounts_and_groups.html#gid-number-generation
+                MinimumUid = 1000;
+                MaximumUid = 2147483647;
+                # SDDM won't display disabled users, nor ID's over 65000,
+                # but one can hope for future options.
+                RememberLastSession = true;
+                RememberLastUser = true;
+              };
             };
           };
         };
-      };
 
-      environment.systemPackages = [
-        (pkgs.writeTextDir "share/sddm/themes/breeze/theme.conf.user" ''
-          [General]
-          background = "${background-package}"
-        '')
-      ];
+        environment.systemPackages = [
+          (pkgs.writeTextDir "share/sddm/themes/breeze/theme.conf.user" ''
+            [General]
+            background = "${background-package}"
+          '')
+        ];
+      };
     };
 }

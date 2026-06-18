@@ -32,5 +32,9 @@
         #   dawo.apparmor.enable = true;
       ];
       networking.hostName = "dawo-t495s";
+
+      # Desktop choice (exactly one; see desktop-select). Flip to gnome.enable to
+      # test GNOME on the same host: rebuild swaps the desktop.
+      dawo.desktop.plasma.enable = true;
     };
 }
