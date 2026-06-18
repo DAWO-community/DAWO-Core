@@ -1,15 +1,15 @@
-# Uitrol & beheer
+# Deployment and management
 
-Twee fasen: **initiële install** (kaal toestel → DAWO) met nixos-anywhere, en
-**updates** van een draaiend toestel met deploy-rs (al gewired).
+Two phases: an initial install (bare device to DAWO) with nixos-anywhere, and
+updates of a running device with deploy-rs (already wired).
 
-## 1. Initiële install — nixos-anywhere
+## 1. Initial install - nixos-anywhere
 
-Gebruikt de `disko`-layout van de host (partitioneert + versleutelt + installeert
-op afstand). Geen extra flake-input nodig.
+Uses the host's disko layout (partitions, encrypts and installs remotely). No
+extra flake input needed.
 
-Voorwaarden: target boot in een Linux met SSH als root (installer-ISO of
-NixOS-live), netwerk, en de host bestaat in de flake (bv. `dawo-t495s`).
+Requirements: the target boots into a Linux with SSH as root (installer ISO or
+NixOS live), has network, and the host exists in the flake (e.g. dawo-t495s).
 
 ```bash
 nix run github:nix-community/nixos-anywhere -- \
@@ -17,35 +17,34 @@ nix run github:nix-community/nixos-anywhere -- \
   --target-host root@<target-ip>
 ```
 
-Hardware: de host heeft nu een handgeschreven hardware-module
-(`modules/hardware/<machine>.nix`). Voor een nieuw modeltype kun je het profiel
-op het toestel genereren:
+Hardware: the host has a hand-written hardware module
+(modules/hardware/<machine>.nix). For a new model type you can generate the
+profile on the device:
 
 ```bash
 nixos-anywhere --flake .#<host> --generate-hardware-config \
   nixos-facter ./modules/hardware/<machine>-facter.json root@<ip>
 ```
 
-en die in de hardware-module importeren (`nixos-facter-modules` is al als input
-aanwezig).
+and import it in the hardware module (nixos-facter-modules is already an input).
 
-> LUKS: `disko-single-nvme-luks` gebruikt een `passwordFile` voor de geautoma-
-> tiseerde install. Zet daarna een echte unlock (TPM2/FIDO2 via
-> `systemd-cryptenroll`) of een interactieve passphrase.
+> LUKS: disko-single-nvme-luks uses a passwordFile for the automated install.
+> Afterwards set a real unlock (TPM2/FIDO2 via systemd-cryptenroll) or an
+> interactive passphrase.
 
-## 2. Updates — deploy-rs
+## 2. Updates - deploy-rs
 
-Elke host in de flake is automatisch een deploy-node (zie
-`modules/flake-parts/deploy.nix`), via de `deploy`-user (SSH-key).
+Every host in the flake is automatically a deploy node (see
+modules/flake-parts/deploy.nix), via the deploy user (SSH key).
 
 ```bash
-nix develop          # levert deploy-rs in de shell
-deploy .#dawo-t495s  # bouwt en activeert op afstand
+nix develop          # provides deploy-rs in the shell
+deploy .#dawo-t495s  # builds and activates remotely
 ```
 
-## 3. Vloot
+## 3. Fleet
 
-Per toestel één host-bestand (`modules/hosts/clients/<naam>.nix`) dat een
-profiel + hardware + disko + de juiste users importeert (zie docs/users.md).
-Installeren = nixos-anywhere; daarna updaten = deploy-rs (of `comin` pull, al
-geconfigureerd voor git-gestuurde updates).
+One host file per device (modules/hosts/clients/<name>.nix) that imports a
+profile, hardware, disko and the right users (see docs/users.md). Installing is
+nixos-anywhere; updating afterwards is deploy-rs (or a comin pull, already
+configured for git-driven updates).

@@ -8,10 +8,9 @@
     }:
     {
       imports = [
-        inputs.nixos-hardware.nixosModules.common-pc-laptop
-        inputs.nixos-hardware.nixosModules.common-cpu-amd
-        inputs.nixos-hardware.nixosModules.common-gpu-amd
-        inputs.nixos-hardware.nixosModules.common-pc-ssd
+        # Upstream device profile (pulls in common-cpu-amd, common-gpu-amd,
+        # common-pc-laptop, common-pc-ssd, common-pc-laptop-acpi_call).
+        inputs.nixos-hardware.nixosModules.lenovo-thinkpad-t495
       ];
 
       hardware.enableAllFirmware = true;
@@ -20,8 +19,8 @@
         powerOnBoot = false;
       };
 
-      # AMD Ryzen Pro (T495s). initrd-modules afgeleid van een echte
-      # nixos-generate-config op het toestel; on-device met facter te vervangen.
+      # AMD Ryzen Pro (T495s). initrd modules taken from a real
+      # nixos-generate-config on the device; replace on-device with facter.
       boot.initrd.availableKernelModules = [
         "nvme"
         "xhci_pci"
