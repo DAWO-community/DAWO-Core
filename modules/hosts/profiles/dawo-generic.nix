@@ -8,6 +8,9 @@
     {
       imports = with config.flake.modules.nixos; [
 
+        # Hardening (mandatory-core tier; opt-in blocks enabled per workplace)
+        profiles-dawo-core
+
         # Desktop
         desktop-plasma
         desktop-sddm-bzk
