@@ -19,6 +19,43 @@ DAWO NixOS follows a modular, flake-based approach to infrastructure management.
 - **Flake Pinning**: Ensuring all dependencies are locked via flake pins for reproducible builds.
 - **Disko Integration**: Decoupling storage management from the NixOS system config to allow better lifecycle control of disks.
 
+## Modular design: blocks, tiers and consumers
+
+The core repo (this one) is a library of blocks, not a finished image. Each
+capability is a block exposed as `flake.modules.nixos.<name>`, with a uniform
+interface so a consumer can compose them without reading the implementation:
+
+- `dawo.<block>.enable` turns the block on (a `mkEnableOption`).
+- `dawo.<block>.options.<...>` holds the tunables; the body lives in
+  `mkIf cfg.enable`.
+
+Enforcement follows one rule (ADR-0002): mandatory security settings are forced
+with `lib.mkForce` so a consumer cannot silently weaken them, suggested defaults
+use `lib.mkDefault`, and an option that would break a device if left empty (an
+empty NTP list, a non-positive login-attempt limit) asserts at build time instead
+of failing quietly.
+
+Blocks are grouped into two tier-aggregates a consumer imports:
+
+- `profiles-dawo-core` -- the mandatory BIO/NCSC baseline (ssh, sysctl, usbguard,
+  chrony, audit). Forced on; a consumer configures it through the block options
+  but cannot drop a block. Wired into `profiles-dawo-generic`.
+- `profiles-dawo-hardened` -- opt-in, risky or specialist blocks (AppArmor, GNOME
+  hardening, and the next batch). Importing it only declares the options; each
+  stays default off until a workplace flips it.
+
+The consumer model has three layers (ADR-0001, ADR-0003):
+
+1. `DAWO-NixOS` (this repo) -- the upstream core: blocks plus the two tiers. No
+   branding, no user accounts, no app sets.
+2. Per-organisation repos (for example `DAWO-NixOS-BZK`, `DAWO-NixOS-VNG`) take
+   the core as a flake input and add their own shared blocks.
+3. A concrete device config (for example `DAWO-Gem-Zaanstad`) consumes the core
+   and the relevant organisation repo, and pins a host to its hardware and disko.
+
+This keeps the obligations in one place and lets organisations layer their own
+choices on top without forking the core.
+
 ## Architecture Decision Records (ADR)
 
 Short records of decisions that shape the image. Each one lists the context, the
