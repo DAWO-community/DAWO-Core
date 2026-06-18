@@ -7,9 +7,9 @@
     { ... }:
     {
       imports = with config.flake.modules.nixos; [
-        # Boot - lanzaboote (Secure Boot). pkiBundle /var/lib/sbctl matches the
-        # keys enrolled on the T495s.
-        boot-secureboot
+        # Boot - systemd-boot by default; Secure Boot (lanzaboote) is opt-in via
+        # dawo.secureboot.enable once sbctl keys are enrolled (see docs/deploy.md).
+        boot-loader
         boot-plymouth-bzk
 
         # Disko - BTRFS single-nvme-luks, the standard DAWO image layout. A fresh
@@ -36,5 +36,8 @@
       # Desktop choice (exactly one; see desktop-select). Flip to gnome.enable to
       # test GNOME on the same host: rebuild swaps the desktop.
       dawo.desktop.plasma.enable = true;
+
+      # Secure Boot off until sbctl keys are enrolled; flip to true then rebuild.
+      dawo.secureboot.enable = false;
     };
 }

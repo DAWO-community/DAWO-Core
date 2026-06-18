@@ -7,8 +7,8 @@
     { ... }:
     {
       imports = with config.flake.modules.nixos; [
-        # Boot
-        boot-systemd
+        # Boot - systemd-boot by default; Secure Boot opt-in via dawo.secureboot.
+        boot-loader
         boot-plymouth-bzk
 
         # Disko
