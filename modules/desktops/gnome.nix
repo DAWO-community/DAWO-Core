@@ -13,6 +13,27 @@
       config = lib.mkIf cfg.enable {
         services.displayManager.gdm.enable = true;
         services.desktopManager.gnome.enable = true;
+
+        # Sensible GNOME defaults (plain dconf/gsettings, not locked, so a user
+        # can still change them; no extensions, no gnome-tweaks needed). GNOME
+        # hides the minimize/maximize buttons by default; restore them, enable
+        # tap-to-click and natural scrolling for laptops, and show the date in
+        # the top bar. The hardened profile (hardening-gnome) adds its own locked
+        # keys; dconf merges both profiles.
+        programs.dconf.enable = true;
+        programs.dconf.profiles.user.databases = [
+          {
+            settings = {
+              "org/gnome/desktop/wm/preferences".button-layout =
+                "appmenu:minimize,maximize,close";
+              "org/gnome/desktop/peripherals/touchpad" = {
+                tap-to-click = true;
+                natural-scroll = true;
+              };
+              "org/gnome/desktop/interface".clock-show-date = true;
+            };
+          }
+        ];
       };
     };
 }
