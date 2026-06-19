@@ -49,6 +49,8 @@
                 disable-lock-screen = false;
                 disable-command-line = true;
               };
+              # Shell extensions are unvetted code running in the session; off.
+              "org/gnome/shell".disable-user-extensions = true;
             };
             locks = [
               "/org/gnome/desktop/screensaver/lock-enabled"
@@ -56,6 +58,7 @@
               "/org/gnome/desktop/privacy/remember-recent-files"
               "/org/gnome/desktop/lockdown/disable-user-switching"
               "/org/gnome/desktop/lockdown/disable-command-line"
+              "/org/gnome/shell/disable-user-extensions"
             ];
           }
         ];
