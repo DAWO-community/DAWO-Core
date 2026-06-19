@@ -1,1 +1,5 @@
 /.vscode/*
+
+# nix build out-links
+/result
+/result-*
