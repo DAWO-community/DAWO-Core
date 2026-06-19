@@ -1,12 +1,12 @@
 # Users: declarative management (gitops)
 
-Users are code. No manual `useradd`/`passwd` on the device — everything in
+Users are code. No manual `useradd`/`passwd` on the device - everything in
 git. This is the "2-layer inventory" in dendritic form:
 
 - **users/** (`modules/users/<name>.nix`) = the user inventory: one file per
   user, like the existing `users-dawo`.
 - **hosts/** (`modules/hosts/clients/<host>.nix`) = the machines: a host
-  imports the users that belong on it. The import list is the machine→user mapping.
+  imports the users that belong on it. The import list is the machine->user mapping.
 
 ## Adding a user
 
@@ -57,7 +57,7 @@ activation.
 
 ## Fully declarative (gov-proof)
 
-Enable `users-hardened` (opt-in) → `mutableUsers = false`: nothing outside git.
+Enable `users-hardened` (opt-in) -> `mutableUsers = false`: nothing outside git.
 **Requirement**: every login user then needs a `hashedPasswordFile`/`hashedPassword`
 (no `initialHashedPassword`). Migrate first, test on a canary, keep a
 recovery path. Lockout risk.
