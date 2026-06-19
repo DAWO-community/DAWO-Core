@@ -26,6 +26,7 @@
         environment-dawo-vars
         environment-dawo-pkgs
         environment-fonts
+        environment-dawo-version
 
         # Localization
         localization-nl_nl
