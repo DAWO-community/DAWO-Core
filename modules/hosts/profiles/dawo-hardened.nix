@@ -12,6 +12,7 @@
     { ... }:
     {
       imports = with config.flake.modules.nixos; [
+        hardening-usb-control
         hardening-apparmor
         hardening-gnome
         # next batch: hardening-pam-u2f, hardening-pam-oath, hardening-egress-deny

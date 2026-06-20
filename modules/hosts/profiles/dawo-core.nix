@@ -14,15 +14,16 @@
     { lib, ... }:
     {
       imports = with config.flake.modules.nixos; [
-        hardening-usb-control
         hardening-ssh
         hardening-sysctl-baseline
         hardening-timesync
         hardening-audit
       ];
 
-      # Forced on - mandatory on every device, not silently droppable.
-      dawo.usbControl.enable = lib.mkForce true;
+      # Forced on - mandatory on every device, not silently droppable. Only
+      # controls that are invisible and cannot lock a user out belong here.
+      # usbControl moved to the opt-in tier: blocking USB out of the box breaks
+      # the user experience (no stick/dongle), so it is a deliberate opt-in.
       dawo.ssh.enable = lib.mkForce true;
       dawo.sysctlBaseline.enable = lib.mkForce true;
       dawo.timesync.enable = lib.mkForce true;
