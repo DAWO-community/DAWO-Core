@@ -17,18 +17,16 @@
         hardening-ssh
         hardening-sysctl-baseline
         hardening-timesync
-        hardening-audit
       ];
 
       # Forced on - mandatory on every device, not silently droppable. Only
       # controls that are invisible and cannot lock a user out belong here.
       # usbControl moved to the opt-in tier: blocking USB out of the box breaks
       # the user experience (no stick/dongle), so it is a deliberate opt-in.
+      # audit moved to the opt-in tier too: it is a no-op on nixpkgs 26.05
+      # (auditctl module bug), so forcing it here only faked coverage.
       dawo.ssh.enable = lib.mkForce true;
       dawo.sysctlBaseline.enable = lib.mkForce true;
       dawo.timesync.enable = lib.mkForce true;
-      # audit is a no-op on 26.05 (see hardening/audit.nix); enabled so the
-      # contract is in place, the body fills once the module bug is fixed.
-      dawo.audit.enable = lib.mkForce true;
     };
 }
