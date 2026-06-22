@@ -40,6 +40,14 @@
       # Desktop choice (exactly one; see desktop-select).
       dawo.desktop.gnome.enable = true;
 
+      # Pilot app set (office workers; they reach a VDI over VPN/F5). LibreOffice
+      # by default (swap to collabora on-site if preferred); dev tools stay off.
+      dawo.apps = {
+        office.enable = true; # office.suite defaults to libreoffice
+        comms.enable = true;
+        creative.enable = true;
+      };
+
       # Secure Boot off until sbctl keys are enrolled; flip to true then rebuild.
       dawo.secureboot.enable = false;
     };

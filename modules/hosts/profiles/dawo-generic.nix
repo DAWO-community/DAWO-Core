@@ -28,6 +28,9 @@
         environment-fonts
         environment-dawo-version
 
+        # Apps - opt-in sets (off by default; a host/overlay enables what it wants)
+        apps-sets
+
         # Localization
         localization-nl_nl
 
