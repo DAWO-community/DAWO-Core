@@ -6,14 +6,19 @@ Thank you for your interest in contributing! To maintain a high standard of qual
 - **Primary Language**: English. All documentation, pull request descriptions, code comments, and technical discussions must be conducted in English. This is to facilitate easy collaboration across borders.
 - **Exception**: Dutch is permitted strictly within the **issue tracker** (for internal coordination or specific local context). Do not use Dutch in comments, pull requests or commit messages. Documentation can be translated to both languages when the need arises.
 
+## 🤖 AI Policy
+- **Disclosure**: When using AI, disclose this. Please refer to the relevant model(s) and agent(s) uses for creating code, issues and PRs.
+- **Responsible use**: Please only use AI when there is a specific need it addresses a specific need. Otherwise, plain human discussion and coding is preferred.
+- **Human compatibility**: when using AI for generating code, it is still the responsibility of the developer to provide high quality code. This code must be understandable on a human level so troubleshooting can be done by mere mortals.
+
 ## 🛠 Workflow
 To ensure every change is tracked and reviewed effectively, please follow this pipeline:
 
 1.  **Issue first**: Every new feature, bug fix, or enhancement must be logged as an **issue** before any code is written. High-level requirements should be discussed here to gain consensus.
-2.  **Pull requests (PRs)**: Once the issue is defined and discussed, create your pull request. 
+2.  **Pull requests (PRs)**: Once the issue is defined and discussed, create your pull request. Add the `WIP:` prefix when you're still working on the PR. Assign a reviewer as soon as your PR is ready.
 3.  **Linkage**: Every PR *must* reference its corresponding issue number in the title or description (e.g., `Ref: #123`). 
 4.  **Code-Only Discussions**: Please keep pull request discussions strictly focused on the code changes themselves. Structural debates, feature requests, or off-topic discussions should be moved back to the original issue or a new issue.
-5.  **Labelling**: Please attach all relevant labels to issues and pull request.
+5.  **Labelling**: Please attach all relevant labels to issues and pull requests.
 
 ## 📝 Commit Standards
 We follow the **Conventional Commits** specification. This allows us to automatically generate changelogs and keep our history clean.
