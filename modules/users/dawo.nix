@@ -8,6 +8,13 @@
   # so change it after first login (passwd). For real deployments give the host
   # its own gitops user (hashedPasswordFile via agenix) and drop this one; see
   # docs/users.md.
+  #
+  # wheel: this bootstrap user is the local break-glass admin. With root locked
+  # (users-basics sets hashedPassword "!"), if dawo were not in wheel a host with
+  # no other admin and no deploy key would be impossible to administer locally -
+  # exactly the lockout we hit. dawo in wheel means the documented dawo/dawo
+  # login can always sudo. A real deployment replaces this with named admins
+  # (wheel, agenix passwords) and can drop dawo.
   flake.modules.nixos.users-dawo =
     { ... }:
     {
@@ -18,6 +25,7 @@
             description = "DAWO";
             home = "/home/dawo";
             group = "users";
+            extraGroups = [ "wheel" ];
             createHome = true;
             homeMode = "700";
             # yescrypt hash of "dawo" (documented default; change on first login).
