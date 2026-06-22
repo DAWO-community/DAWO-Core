@@ -5,8 +5,12 @@
 # which is blocked on a hardened DAWO box (kernel.kexec_load_disabled=1).
 #
 # Org/person-neutral: wifi credentials AND the authorized key come from build-time
-# env (kept out of git), so the module stays generic. Build with --impure:
+# env (kept out of git), so the module stays generic. A second, optional network
+# (WIFI_SSID2/WIFI_PSK2) lets one stick provision from more than one location
+# (e.g. office + a phone hotspot); wpa_supplicant joins whichever is in range.
+# Build with --impure:
 #   WIFI_SSID="MyNet" WIFI_PSK="secret" \
+#   WIFI_SSID2="Hotspot" WIFI_PSK2="secret2" \
 #   INSTALLER_SSH_KEY="ssh-ed25519 AAAA... you@host" \
 #     nix build .#nixosConfigurations.dawo-installer.config.system.build.isoImage --impure
 #   # result: ./result/iso/*.iso  -> dd to a USB stick
@@ -14,6 +18,8 @@
 let
   ssid = builtins.getEnv "WIFI_SSID";
   psk = builtins.getEnv "WIFI_PSK";
+  ssid2 = builtins.getEnv "WIFI_SSID2";
+  psk2 = builtins.getEnv "WIFI_PSK2";
   sshKey = builtins.getEnv "INSTALLER_SSH_KEY";
 in
 {
@@ -41,9 +47,9 @@ in
       networking.networkmanager.enable = lib.mkForce false;
       networking.wireless = {
         enable = lib.mkForce true;
-        networks = lib.optionalAttrs (ssid != "" && psk != "") {
-          ${ssid}.psk = psk;
-        };
+        networks =
+          (lib.optionalAttrs (ssid != "" && psk != "") { ${ssid}.psk = psk; })
+          // (lib.optionalAttrs (ssid2 != "" && psk2 != "") { ${ssid2}.psk = psk2; });
       };
 
       # SSH open immediately with the provisioning key -> nixos-anywhere logs in
