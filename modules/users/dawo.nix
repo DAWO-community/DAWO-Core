@@ -9,7 +9,7 @@
   # its own gitops user (hashedPasswordFile via agenix) and drop this one; see
   # docs/users.md.
   flake.modules.nixos.users-dawo =
-    { pkgs, ... }:
+    { ... }:
     {
       users = {
         mutableUsers = true;
@@ -24,7 +24,7 @@
             initialHashedPassword = "$y$j9T$10bcN0cBIS0Tky6KQt/QF1$kEEq8BickyLduybuTVEZnxgt5yj1yZQph.HNuRQ2fs/";
             isSystemUser = false;
             isNormalUser = true;
-            shell = pkgs.zsh;
+            # shell: default (bash). zsh is opt-in via dawo.zsh.enable.
           };
         };
       };

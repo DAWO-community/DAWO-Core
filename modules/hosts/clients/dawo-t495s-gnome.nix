@@ -46,6 +46,7 @@
         office.enable = true; # office.suite defaults to libreoffice
         comms.enable = true;
         creative.enable = true;
+        media.enable = true;
       };
 
       # Secure Boot off until sbctl keys are enrolled; flip to true then rebuild.

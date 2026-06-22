@@ -31,6 +31,9 @@
         # Apps - opt-in sets (off by default; a host/overlay enables what it wants)
         apps-sets
 
+        # Tools - opt-in ops/support diagnostics (off by default)
+        tools-diagnostics
+
         # Localization
         localization-nl_nl
 

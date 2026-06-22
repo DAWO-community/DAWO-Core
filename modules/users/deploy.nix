@@ -1,6 +1,6 @@
 {
   flake.modules.nixos.users-deploy =
-    { pkgs, ... }:
+    { ... }:
     {
       users = {
         mutableUsers = true;
@@ -14,7 +14,7 @@
             initialHashedPassword = "$y$j9T$.KcXvkwksnJKfQDUhYlJ/.$XxtOo.bm7sPdTfWH615.lvjIAmv5yYQeyG3ZBxIBMX2";
             isSystemUser = true;
             isNormalUser = false;
-            shell = pkgs.zsh;
+            # shell: default (bash). zsh is opt-in via dawo.zsh.enable.
             extraGroups = [
               "wheel"
               "podman"

@@ -28,5 +28,14 @@
 
       # Desktop choice (exactly one; see desktop-select).
       dawo.desktop.plasma.enable = true;
+
+      # Pilot app set (office workers; they reach a VDI over VPN/F5). LibreOffice
+      # by default; dev tools stay off. This HP is a KDE pilot device.
+      dawo.apps = {
+        office.enable = true; # office.suite defaults to libreoffice
+        comms.enable = true;
+        creative.enable = true;
+        media.enable = true;
+      };
     };
 }

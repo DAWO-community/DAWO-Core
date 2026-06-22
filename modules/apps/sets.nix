@@ -35,6 +35,7 @@
         };
         comms.enable = lib.mkEnableOption "communication apps (Element)";
         creative.enable = lib.mkEnableOption "creative apps (GIMP, Inkscape, Krita, Penpot)";
+        media.enable = lib.mkEnableOption "media player (VLC)";
         dev.enable = lib.mkEnableOption "developer tools (VSCodium, Nix toolchain, gcc)";
       };
 
@@ -56,6 +57,9 @@
             penpot-desktop
           ];
         })
+        (lib.mkIf cfg.media.enable {
+          environment.systemPackages = [ pkgs.vlc ];
+        })
         (lib.mkIf cfg.dev.enable {
           environment.systemPackages = with pkgs; [
             ctags
@@ -64,6 +68,7 @@
             nil
             nixd
             nixfmt
+            nix-search-cli
             uv
             vscodium
           ];
