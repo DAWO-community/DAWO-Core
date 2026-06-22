@@ -11,6 +11,10 @@
 
       imports = with config.flake.modules.nixos; [
 
+        # Hardware baseline (firmware/fwupd/bluetooth/initrd-systemd/platform);
+        # a host adds its model module (nixos-hardware) or nixos-facter on top.
+        hardware-dawo-base
+
         # Hardening (mandatory-core tier; opt-in blocks enabled per workplace)
         profiles-dawo-core
 

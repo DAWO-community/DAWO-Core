@@ -1,26 +1,21 @@
 {
   flake.modules.nixos.hardware-lenovo-t495s =
+    { inputs, ... }:
     {
-      lib,
-      config,
-      inputs,
-      ...
-    }:
-    {
+      # Model-specific only. The generic bits (firmware, fwupd, bluetooth,
+      # initrd-systemd, platform) come from hardware-dawo-base via the profile.
       imports = [
         # Upstream device profile (pulls in common-cpu-amd, common-gpu-amd,
-        # common-pc-laptop, common-pc-ssd, common-pc-laptop-acpi_call).
+        # common-pc-laptop, common-pc-ssd, common-pc-laptop-acpi_call - incl. AMD
+        # microcode).
         inputs.nixos-hardware.nixosModules.lenovo-thinkpad-t495
       ];
 
+      # AMD T495s may need unfree firmware (wifi/gpu) beyond redistributable.
       hardware.enableAllFirmware = true;
-      hardware.bluetooth = {
-        enable = true;
-        powerOnBoot = false;
-      };
 
-      # AMD Ryzen Pro (T495s). initrd modules taken from a real
-      # nixos-generate-config on the device; replace on-device with facter.
+      # AMD Ryzen Pro (T495s). initrd modules from a real nixos-generate-config
+      # on the device; an unknown model uses nixos-facter instead.
       boot.initrd.availableKernelModules = [
         "nvme"
         "xhci_pci"
@@ -30,12 +25,6 @@
         "usbhid"
         "sd_mod"
       ];
-      boot.initrd.kernelModules = [ ];
-      boot.initrd.systemd.enable = true;
       boot.kernelModules = [ "kvm-amd" ];
-      boot.extraModulePackages = [ ];
-
-      hardware.cpu.amd.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
-      nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
     };
 }

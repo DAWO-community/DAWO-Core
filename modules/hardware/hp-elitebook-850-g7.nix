@@ -1,8 +1,7 @@
+{ ... }:
 {
-  config,
-  ...
-}:
-{
+  # Model-specific only. Generic bits (firmware, fwupd, bluetooth, initrd-systemd,
+  # platform) come from hardware-dawo-base via the profile.
   flake.modules.nixos.hardware-hp-elitebook-850-g7 =
     {
       pkgs,
@@ -17,24 +16,14 @@
         inputs.nixos-hardware.nixosModules.common-pc-ssd
       ];
 
-      environment.systemPackages = with pkgs; [
-        iio-sensor-proxy
-      ];
-
+      # Ambient-light sensor + Thunderbolt.
+      environment.systemPackages = [ pkgs.iio-sensor-proxy ];
       hardware.sensor.iio.enable = true;
-      hardware.enableAllFirmware = true;
-
-      hardware = {
-        bluetooth = {
-          enable = true;
-          powerOnBoot = true;
-        };
-      };
-
-      # Thunderbolt Service
       services.hardware.bolt.enable = true;
 
-      # Ensure boot works with all appropriate storage devices and protocols.
+      hardware.enableAllFirmware = true;
+
+      # Storage/boot devices for this model.
       boot.initrd.availableKernelModules = [
         "xhci_pci"
         "nvme"
@@ -48,14 +37,7 @@
         "kvm-intel"
         "hp-wmi"
       ];
-      boot.initrd.systemd.enable = true;
-      boot.initrd.supportedFilesystems = [ ];
-      boot.initrd.verbose = false;
-
       boot.kernelModules = [ "kvm-intel" ];
-      boot.extraModulePackages = [ ];
-
       boot.kernelPackages = pkgs.linuxPackages_latest;
-
     };
 }
