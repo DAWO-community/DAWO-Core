@@ -14,6 +14,10 @@
       ...
     }:
     let
+      # Human-readable release name, cut as a git tag on the release commit. The
+      # flake rev below is the exact provenance; this is the friendly version a
+      # user or support desk reads off the device.
+      releaseVersion = "0.1.0";
       flakeRev = inputs.self.rev or inputs.self.dirtyRev or "dirty";
       nixpkgsRev = inputs.nixpkgs.rev or inputs.nixpkgs.shortRev or "unknown";
       desktop =
@@ -34,6 +38,7 @@
           "uptime"
           { type = "de"; key = "Desktop"; }
           { type = "custom"; format = "------------ DAWO ------------"; }
+          { type = "custom"; key = "Release"; format = releaseVersion; }
           { type = "custom"; key = "Flake rev"; format = flakeRev; }
           { type = "custom"; key = "nixpkgs"; format = nixpkgsRev; }
           { type = "custom"; key = "Desktop block"; format = desktop; }
@@ -66,6 +71,7 @@
       system.configurationRevision = lib.mkDefault flakeRev;
 
       environment.etc."dawo/release".text = ''
+        release=${releaseVersion}
         flake-rev=${flakeRev}
         nixpkgs-rev=${nixpkgsRev}
         nixos=${config.system.nixos.version}
