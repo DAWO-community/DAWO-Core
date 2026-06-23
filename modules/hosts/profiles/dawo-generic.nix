@@ -15,6 +15,11 @@
         # a host adds its model module (nixos-hardware) or nixos-facter on top.
         hardware-dawo-base
 
+        # TPM2 LUKS auto-unlock (opt-in, off; enable per device after the
+        # on-device enroll - removes the boot passphrase prompt, see
+        # docs/secureboot-tpm.md). Secure Boot itself is the boot-loader block.
+        boot-tpm2-unlock
+
         # Hardening (mandatory-core tier; opt-in blocks enabled per workplace)
         profiles-dawo-core
 
