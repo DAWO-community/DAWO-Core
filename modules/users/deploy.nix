@@ -20,9 +20,9 @@
               "podman"
               "nixbld"
             ];
-            openssh.authorizedKeys.keys = [
-              "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPpNXWvAu+gS5DTurz9xl9RUr/5XDzfOZlFS0lLOm9IP deploy@bitwarden"
-            ];
+            # No keys in the generic core. SSH admin/deploy keys are added by the
+            # organisation overlay (e.g. Zaanstad), per ADR-0001/0003.
+            openssh.authorizedKeys.keys = [ ];
           };
         };
       };
