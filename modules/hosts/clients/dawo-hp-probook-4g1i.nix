@@ -22,7 +22,6 @@
 
         # Userland
         maid-dawo-generic
-
       ];
       networking.hostName = "dawo-hp-probook-4g1i";
 
