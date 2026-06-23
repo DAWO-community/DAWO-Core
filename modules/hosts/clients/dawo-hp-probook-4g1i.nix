@@ -3,7 +3,7 @@
   ...
 }:
 {
-  flake.modules.nixos."hosts/dawo-hp-eb-850g7" =
+  flake.modules.nixos."hosts/dawo-hp-probook-4g1i" =
     { ... }:
     {
       imports = with config.flake.modules.nixos; [
@@ -15,7 +15,7 @@
         disko-single-nvme-luks
 
         # Hardware
-        hardware-hp-elitebook-850-g7
+        hardware-hp-probook-4g1i
 
         # Profiles
         profiles-dawo-generic
@@ -24,7 +24,7 @@
         maid-dawo-generic
 
       ];
-      networking.hostName = "dawo-hp-eb-850g7";
+      networking.hostName = "dawo-hp-probook-4g1i";
 
       # Desktop choice (exactly one; see desktop-select).
       dawo.desktop.plasma.enable = true;

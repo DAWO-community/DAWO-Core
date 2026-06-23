@@ -5,7 +5,7 @@ Per-device hardware support for the DAWO fleet, layered:
 - `hardware-dawo-base` (dawo-base.nix) - the generic baseline every laptop gets
   (via profiles-dawo-generic): redistributable firmware, fwupd, bluetooth,
   initrd-systemd, platform. No model specifics.
-- A per-model module (e.g. lenovo-t495s.nix, hp-elitebook-850-g7.nix) adds only
+- A per-model module (e.g. lenovo-t495s.nix, hp-probook-4g1i.nix) adds only
   that model's quirks on top: a nixos-hardware profile, model initrd modules,
   CPU/GPU bits the profile does not cover.
 
@@ -18,7 +18,7 @@ Per-device hardware support for the DAWO fleet, layered:
    ```
    If there is no exact-model profile, compose the `common-*` profiles
    (common-cpu-intel/amd, common-gpu-*, common-pc-laptop, common-pc-ssd), as the
-   HP EliteBook module does.
+   HP ProBook module does.
 
 2. **Look up:** the nixos-hardware README/flake lists every supported device and
    its module name - search there: https://github.com/NixOS/nixos-hardware
