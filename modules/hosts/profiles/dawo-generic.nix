@@ -62,6 +62,7 @@
         # Services
         services-auto-update
         services-flatpak
+        services-printing
 
         # Users
         users-basics
