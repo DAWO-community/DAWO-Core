@@ -1,7 +1,8 @@
 {
   # SSH hardening (CIS/NCSC). MANDATORY-core tier.
-  # Does NOT touch PasswordAuthentication (per-host call). Norm: NCSC SSH/TLS
-  # crypto + CIS-DIL -> BIO. See architecture.md "Key Design Decisions".
+  # Key-only auth: PasswordAuthentication is forced off (remote SSH accepts keys
+  # only; local console login is unaffected). Norm: NCSC SSH/TLS crypto + CIS-DIL
+  # -> BIO. See architecture.md "Key Design Decisions".
   #
   # The crypto floor and login policy are forced (lib.mkForce) so a host cannot
   # silently weaken them; maxAuthTries is a suggested default a host may tune.
@@ -36,6 +37,9 @@
           settings = {
             # Forced: the mandatory crypto + login floor.
             PermitRootLogin = lib.mkForce "no";
+            # Key-only: no SSH password login (brute-force surface). Local console
+            # login is separate and still uses a password.
+            PasswordAuthentication = lib.mkForce false;
             KbdInteractiveAuthentication = lib.mkForce false;
             Banner = lib.mkForce "/etc/issue.net";
             Ciphers = lib.mkForce [
