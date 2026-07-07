@@ -1,22 +1,16 @@
 {
   inputs = {
+    # NOTE (sovereignty roadmap): all inputs below are FOSS but currently fetched
+    # from github.com. Goal = zero foreign-hosted deps (Dutch digital autonomy) by
+    # mirroring these to code.overheid.nl and repinning. 10 dead inputs were pruned
+    # (audit); these 15 are load-bearing and next up for the mirror pass.
     nixpkgs.url = "github:nixos/nixpkgs/nixos-26.05";
     nixpkgs-unstable.url = "github:nixos/nixpkgs/nixos-unstable";
     nix-flatpak.url = "github:gmodena/nix-flatpak/?ref=latest";
     nix-maid.url = "github:viperML/nix-maid";
-    nixos-blocks.url = "github:thecloudexplorers/nixos-blocks";
     nixos-hardware.url = "github:NixOS/nixos-hardware/master";
-    nix-vscode-extensions.url = "github:nix-community/nix-vscode-extensions/master";
-    systems.url = "github:nix-systems/default";
     import-tree.url = "github:vic/import-tree";
-    nixos-facter-modules.url = "github:nix-community/nixos-facter-modules";
-    treefmt-nix.url = "github:numtide/treefmt-nix";
     make-shell.url = "github:nicknovitski/make-shell";
-    headplane.url = "github:tale/headplane";
-    zen-browser = {
-      url = "github:youwen5/zen-browser-flake";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
     comin = {
       url = "github:nlewo/comin/main";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -37,11 +31,6 @@
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    plasma-manager = {
-      url = "github:nix-community/plasma-manager";
-      inputs.nixpkgs.follows = "nixpkgs";
-      inputs.home-manager.follows = "home-manager";
-    };
     lanzaboote = {
       # master: v1.0.0 still sets boot.bootspec.enable, removed in nixpkgs 26.05.
       url = "github:nix-community/lanzaboote";
@@ -51,14 +40,6 @@
     };
     rust-overlay = {
       url = "github:oxalica/rust-overlay";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-    lsfg-vk-flake = {
-      url = "github:pabloaul/lsfg-vk-flake/main";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-    nixos-generators = {
-      url = "github:nix-community/nixos-generators";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     agenix = {
