@@ -7,6 +7,7 @@
         corefonts
         inter
         noto-fonts
+        noto-fonts-color-emoji # color emoji (fontconfig emoji fallback) - else tofu in chat/web
         fira-code
         noto-fonts-cjk-sans
         font-awesome

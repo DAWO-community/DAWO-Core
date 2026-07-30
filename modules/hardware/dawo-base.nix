@@ -21,5 +21,12 @@
       # systemd in initrd (needed for TPM/FIDO2 LUKS unlock later, and the
       # general direction in 26.05).
       boot.initrd.systemd.enable = lib.mkDefault true;
+
+      # NTFS read/write for USB sticks/disks formatted on Windows.
+      boot.supportedFilesystems = [ "ntfs" ];
+
+      # zram: compressed RAM swap - better low-memory behaviour than leaning on
+      # the disk swapfile alone.
+      zramSwap.enable = lib.mkDefault true;
     };
 }

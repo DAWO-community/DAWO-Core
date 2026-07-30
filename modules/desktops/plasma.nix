@@ -15,6 +15,11 @@
     in
     {
       options.dawo.desktop.plasma.enable = lib.mkEnableOption "KDE Plasma 6 desktop with SDDM";
+      options.dawo.desktop.plasma.socialClient = lib.mkOption {
+        type = lib.types.bool;
+        default = true;
+        description = "Ship the Mastodon client (Tokodon). A deployment that does not want a social client sets this false.";
+      };
 
       config = lib.mkIf cfg.enable {
         # Enable the KDE Plasma Desktop Environment.
@@ -66,12 +71,12 @@
         kdePackages.qtmultimedia
         kdePackages.qtwebsockets
         kdePackages.skanpage
-        kdePackages.tokodon
         kdePackages.yakuake
         kdiskmark
         klassy
         kid3-kde
-      ];
+      ]
+      ++ lib.optional cfg.socialClient pkgs.kdePackages.tokodon;
       };
     };
 }

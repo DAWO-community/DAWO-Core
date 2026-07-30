@@ -60,8 +60,11 @@
         programs-firefox
 
         # Services
+        services-audio
         services-auto-update
         services-flatpak
+        services-printing
+        services-scanning
 
         # Users
         users-basics
