@@ -1,6 +1,37 @@
 {
   flake.modules.nixos.programs-firefox =
-    { pkgs, ... }:
+    { lib, pkgs, ... }:
+    let
+      # Spell checking for the ten most spoken languages in Europe (the list in
+      # #56). A language pack only translates the interface; the dictionary is a
+      # separate thing. Taking them from nixpkgs instead of addons.mozilla.org
+      # keeps spell checking working on a device that never reaches Mozilla, and
+      # keeps the closure reproducible.
+      dictionaryPkgs = with pkgs.hunspellDicts; [
+        ru_RU # Russian
+        de_DE # German
+        fr-any # French
+        en_US # English
+        en_GB-ise
+        it_IT # Italian
+        es_ES # Spanish
+        pl_PL # Polish
+        uk_UA # Ukrainian
+        ro_RO # Romanian
+        nl_NL # Dutch
+      ];
+
+      dictionaries = pkgs.runCommand "dawo-firefox-dictionaries" { } ''
+        mkdir -p $out
+        for dict in ${lib.concatStringsSep " " (map toString dictionaryPkgs)}; do
+          cp -t $out "$dict"/share/hunspell/*.aff "$dict"/share/hunspell/*.dic
+        done
+        # Firefox reads the file name as the locale code, and fr-any ships as
+        # fr-toutesvariantes, which is not one.
+        mv $out/fr-toutesvariantes.aff $out/fr_FR.aff
+        mv $out/fr-toutesvariantes.dic $out/fr_FR.dic
+      '';
+    in
     {
       programs = {
         firefox = {
@@ -12,6 +43,7 @@
             "en-GB"
           ];
           preferences = {
+            "spellchecker.dictionary_path" = "${dictionaries}";
             "widget.use-xdg-desktop-portal.file-picker" = 1;
             "browser.ml.enable" = 0;
             "browser.ml.chat.enabled" = 0;
