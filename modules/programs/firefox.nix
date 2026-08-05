@@ -53,7 +53,7 @@
             # Valid strings for installation_mode are "allowed", "blocked",
             # "force_installed" and "normal_installed".
             ExtensionSettings = {
-              "*".installation_mode = "allowed"; # blocks all addons except the ones specified below
+              "*".installation_mode = "allowed"; # users may install add-ons themselves; set to "blocked" to allow only the ones listed below
               # plasma Integration:
               "plasma-browser-integration@kde.org" = {
                 install_url = "https://addons.mozilla.org/firefox/downloads/latest/plasma-integration/latest.xpi";
