@@ -6,10 +6,22 @@
   # chrony itself is forced on; the server list is a suggested default a host
   # may swap for an internal NTP. An empty list is rejected at build time
   # (#8: no silently-undefined options - empty servers = no time = broken logs).
+  #
+  # Laptops suspend, and a suspended clock drifts. Two settings keep it honest
+  # (#49): the clock may be stepped at any moment instead of only during the
+  # first few updates after start, and chronyd is restarted on resume so it
+  # re-measures the offset right away instead of waiting for its poll interval.
   flake.modules.nixos.hardening-timesync =
     { config, lib, ... }:
     let
       cfg = config.dawo.timesync;
+
+      sleepTargets = [
+        "suspend.target"
+        "hibernate.target"
+        "hybrid-sleep.target"
+        "suspend-then-hibernate.target"
+      ];
     in
     {
       options.dawo.timesync = {
@@ -36,6 +48,33 @@
         services.chrony = {
           enable = lib.mkForce true;
           servers = cfg.options.servers;
+
+          # The NixOS default is `makestep 0.1 3`: after three steps chronyd only
+          # ever slews, which crawls back a post-resume offset of minutes or hours
+          # at ~1 part in 12. We want `makestep 1.0 -1` - step on any error above a
+          # second, without a limit on how often. The limit is typed as a positive
+          # integer upstream, so -1 cannot go through services.chrony.makestep and
+          # the directive is written out by hand instead.
+          makestep.enable = false;
+          extraConfig = ''
+            makestep 1.0 -1
+          '';
+        };
+
+        # A step needs a fresh measurement, and chronyd will not take one until
+        # its next poll - up to ~17 minutes on a settled client. Restarting it
+        # after a resume forces that measurement straight away. A unit that is
+        # `after` and `wantedBy` a sleep target runs on the way back up, which is
+        # the recipe from systemd.special(7). try-restart is a no-op if chronyd
+        # is not running.
+        systemd.services."chrony-resume" = {
+          description = "Re-sync the system clock after resume";
+          after = sleepTargets;
+          wantedBy = sleepTargets;
+          serviceConfig = {
+            Type = "oneshot";
+            ExecStart = "${config.systemd.package}/bin/systemctl try-restart chronyd.service";
+          };
         };
       };
     };
