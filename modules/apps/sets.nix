@@ -1,9 +1,11 @@
 {
-  # Application sets as opt-in blocks. The generic baseline ships only universal
+  # Application sets as blocks. The generic baseline ships only universal
   # tools (see environment-dawo-pkgs); app sets are off by default and a host or
-  # overlay enables what it needs. Vendor/org-specific apps (microsoft-edge,
-  # teams-for-linux) are NOT here - they live in the consuming organisation's
-  # overlay. The office suite is swappable (libreoffice | collabora) so a
+  # overlay enables what it needs. The exception is dawo.apps.security, which is
+  # opt-out: a password manager is a security control, not a taste.
+  # Vendor/org-specific apps (microsoft-edge, teams-for-linux) are NOT here -
+  # they live in the consuming organisation's overlay.
+  # The office suite is swappable (libreoffice | collabora) so a
   # deployment can switch with one line. (EuroOffice is a candidate to add once
   # it is solid; OnlyOffice is deliberately excluded - sovereignty concern.)
   flake.modules.nixos.apps-sets =
@@ -37,6 +39,11 @@
         creative.enable = lib.mkEnableOption "creative apps (GIMP, Inkscape, Krita, Penpot)";
         media.enable = lib.mkEnableOption "media player (VLC)";
         dev.enable = lib.mkEnableOption "developer tools (VSCodium, Nix toolchain, gcc)";
+        security.enable = lib.mkOption {
+          type = lib.types.bool;
+          default = true;
+          description = "Password manager (KeePassXC). The one set that is opt-out: without a password manager people reuse passwords or write them down, so a deployment has to say no on purpose (e.g. it ships an organisation-wide vault).";
+        };
       };
 
       config = lib.mkMerge [
@@ -59,6 +66,9 @@
         })
         (lib.mkIf cfg.media.enable {
           environment.systemPackages = [ pkgs.vlc ];
+        })
+        (lib.mkIf cfg.security.enable {
+          environment.systemPackages = [ pkgs.keepassxc ];
         })
         (lib.mkIf cfg.dev.enable {
           environment.systemPackages = with pkgs; [
