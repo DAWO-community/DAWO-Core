@@ -1,3 +1,12 @@
+# Reference layout for partitioning a disk by hand, without nixos-anywhere.
+# Run it from the installer, then continue with nixos-install:
+#
+#   nix run github:nix-community/disko -- --mode destroy,format,mount \
+#     ./assets/disko/single-nvme-luks-manual.nix
+#
+# This is not a NixOS module and it is deliberately outside modules/, which
+# import-tree reads as flake-parts modules. The layout matches
+# modules/hosts/profiles/disko/single-nvme-luks.nix; change both or neither.
 {
   disko.devices = {
     disk = {
