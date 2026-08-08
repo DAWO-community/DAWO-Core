@@ -1,7 +1,13 @@
-
-# DAWO NixOS Repository
+# DAWO Core Repository
 
 This repository contains the core NixOS configurations for the DAWO infrastructure. It utilizes a flake-based build system to provide reproducible and modular environment definitions across various hosts and services.
+
+## Notice
+DAWO Core has moved from https://code.overheid.nl to [Codeberg](https://codeberg.org/DAWO/DAWO-Core) to facilitate community collaboration.
+    
+Backup copies are available on:
+- https://code.overheid.nl/MinBZK/DAWO-NixOS
+- https://github.com/DAWO-community/DAWO-Core
 
 ## Contributing
 
