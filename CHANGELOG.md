@@ -1,5 +1,30 @@
 # Changelog
 
+## 0.1.2 - the move, and the vulnerability backlog
+
+First release from Codeberg. Issues #55 to #80.
+
+- chore(migration): the fleet and the docs point at Codeberg (#80). Devices
+  imaged before the move, with no explicit repoUrl, must be repointed by hand
+  once - the fix cannot reach them from the address it replaces.
+- feat(printing): `drivers` names a set (`open` / `broad`) instead of taking a
+  package list, discovery is separable, and the printer GUI is installed only
+  where the desktop lacks one (#76)
+- chore(deps): all fifteen flake inputs updated; openssl 3.6.3, expat 2.8.2,
+  python 3.13.14, and 7.1.7 on the hosts that follow the latest kernel
+  (#62, #71, #72, #74)
+- feat(firefox): hunspell spell check dictionaries, and `dawo.firefox.dictionaries`
+  to choose which of the eleven a device carries - 26 MB for all of them, 3.0 MB
+  for two (#55)
+
+Three vulnerability findings were closed as not applicable rather than fixed,
+each with the evidence on the issue: ejs (#67) and simple-git (#69) are not in
+the closure at all, and the ffmpeg finding (#73) matched an NVD range of the
+form *before 8.1* against `ffmpeg_7` 7.1.5, which already carries the fix
+backported to 7.1.4. That shape of finding over-reports against maintained
+stable branches and needs a check against the distribution trackers before it
+becomes an issue.
+
 ## 0.1.1 - audit fixes
 
 Fixes from the first real use of 0.1.0. Issues #35 to #44.

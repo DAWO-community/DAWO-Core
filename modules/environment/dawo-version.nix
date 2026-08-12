@@ -17,7 +17,7 @@
       # Human-readable release name, cut as a git tag on the release commit. The
       # flake rev below is the exact provenance; this is the friendly version a
       # user or support desk reads off the device.
-      releaseVersion = "0.1.1";
+      releaseVersion = "0.1.2";
       flakeRev = inputs.self.rev or inputs.self.dirtyRev or "dirty";
       nixpkgsRev = inputs.nixpkgs.rev or inputs.nixpkgs.shortRev or "unknown";
       desktop =
