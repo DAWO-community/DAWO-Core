@@ -19,8 +19,8 @@ See [CONTRIBUTING.md](CONTRIBUTING.md).
 - **Multi-Tenancy**: Specifically designed to handle diverse roles, from `desktops` to core `services`.
 
 ## Entry Points
-- [`flake.nix`](https://codeberg.org/DAWO/DAWO-Core/src/branch/main/flake.nix) - The primary build entry point and input definitions.
-- [`modules/`](https://codeberg.org/DAWO/DAWO-Core/src/branch/main/modules) - The directory containing all modular configurations.
+- [`flake.nix`](https://code.overheid.nl/MinBZK/DAWO-NixOS/blob/main/flake.nix) - The primary build entry point and input definitions.
+- [`modules/`](https://code.overheid.nl/MinBZK/DAWO-NixOS/tree/main/modules) - The directory containing all modular configurations.
 
 ## High-Level Architecture
 See [architecture.md](architecture.md).
