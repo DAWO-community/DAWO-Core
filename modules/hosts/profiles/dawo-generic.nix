@@ -15,6 +15,11 @@
         # a host adds its model module (nixos-hardware) or nixos-facter on top.
         hardware-dawo-base
 
+        # DisplayLink docks (opt-in, off). Imported so the option exists on
+        # every host; a device with such a dock sets dawo.displaylink.enable
+        # and must have the non-redistributable blob available to build.
+        hardware-displaylink
+
         # TPM2 LUKS auto-unlock (opt-in, off; enable per device after the
         # on-device enroll - removes the boot passphrase prompt, see
         # docs/secureboot-tpm.md). Secure Boot itself is the boot-loader block.

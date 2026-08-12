@@ -36,3 +36,46 @@ Per-device hardware support for the DAWO fleet, layered:
 Every path sits on top of `hardware-dawo-base`, so a new device needs little or
 no hand-written hardware code - which is what makes netboot/fleet imaging of
 arbitrary models practical.
+
+## Peripherals: DisplayLink docks
+
+`dawo.displaylink.enable` (off) adds evdi and the DisplayLink Manager service.
+Without it a DisplayLink dock drives exactly one external monitor: the further
+outputs are DisplayLink's own, and nothing in a stock kernel speaks to them, so
+the second screen stays dark rather than reporting a fault.
+
+The driver is **non-redistributable**, so it is not in this repository and not
+in cache.nixos.org. nixpkgs handles that with `requireFile`, which turns every
+device's store into a place somebody has to put a file by hand - workable for
+one laptop, not for a fleet.
+
+So the location is configuration instead:
+
+```nix
+dawo.displaylink = {
+  enable = true;
+  driverUrl = "https://mirror.example.org/displaylink-620.zip";
+};
+```
+
+An organisation's own mirror is the better answer for a fleet: one place to
+serve it from, no EULA click per device, and it keeps working when the vendor
+moves its download. The vendor's direct link works too, and a `file://` path
+serves a one-off machine.
+
+**The URL is not what is trusted - the hash is.** Whatever `driverUrl` points at
+is checked against the hash nixpkgs expects for the version it packages, so a
+mirror serving something else fails the build instead of shipping it to a fleet.
+`driverHash` overrides that expectation and is normally left alone: leaving it
+null means the pin moves with a nixpkgs bump rather than fixing this fleet to
+whichever release was current when someone wrote a hash down.
+
+Enabling the block without a `driverUrl` fails the evaluation with an assertion
+that says so, rather than at build time with a `requireFile` message about a
+file nobody was told to fetch.
+
+The block appends `displaylink` to `services.xserver.videoDrivers` rather than
+replacing it. That option carries a default (`modesetting`, `fbdev`) and a
+default is replaced by any definition rather than merged with it, so setting it
+to `[ "displaylink" ]` would take `modesetting` away from the internal panel and
+leave a laptop driving its dock and nothing else.
