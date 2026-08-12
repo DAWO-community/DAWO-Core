@@ -5,9 +5,33 @@ Per-device hardware support for the DAWO fleet, layered:
 - `hardware-dawo-base` (dawo-base.nix) - the generic baseline every laptop gets
   (via profiles-dawo-generic): redistributable firmware, fwupd, bluetooth,
   initrd-systemd, platform. No model specifics.
+- `hardware-generic-intel` / `hardware-generic-amd` - a starting point for a
+  machine whose exact model has no profile yet: the `common-*` CPU/GPU/laptop
+  profiles, all firmware, and the few initrd modules those profiles miss
+  (SD-card readers and USB mass storage).
 - A per-model module (e.g. lenovo-t495s.nix, hp-probook-4g1i.nix) adds only
   that model's quirks on top: a nixos-hardware profile, model initrd modules,
   CPU/GPU bits the profile does not cover.
+
+## Whose job is hardware?
+
+**Downstream's.** The organisation that buys the machines is the only party
+that knows which ones they are, so the core does not try to carry a module per
+model and will not grow into a hardware database. A deployment writes the
+modules for the hardware it actually runs, or leans on nixos-hardware, or lets
+nixos-facter detect it - the three paths below.
+
+The two model modules that do live here (`lenovo-t495s`, `hp-probook-4g1i`) are
+the pilot's own devices and double as worked examples of the "pick" and
+"compose" paths. They are not a statement that the core supports those models
+for anyone else.
+
+What the core does owe a downstream is a first boot. `hardware-generic-intel`
+and `hardware-generic-amd` exist so day one is a deployment rather than a
+hardware module to write before anything runs at all. They know nothing about
+any specific machine - no model firmware workarounds, no ambient-light sensor,
+no Thunderbolt daemon - so treat them as scaffolding and replace them with a
+real profile once the fleet's models are known.
 
 ## Adding a device (pick / look up / make)
 
