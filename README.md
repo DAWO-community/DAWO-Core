@@ -2,9 +2,7 @@
 
 This repository contains the core NixOS configurations for the DAWO infrastructure. It utilizes a flake-based build system to provide reproducible and modular environment definitions across various hosts and services.
 
-A [DAWO community](https://dawo.community) project, stewarded by BB Open. The
-licence is what makes this yours to run, fork and keep running: BB Open is the
-steward, not the owner.
+A [DAWO community](https://dawo.community) project.
 
 ## Notice
 DAWO Core has moved from https://code.overheid.nl to [Codeberg](https://codeberg.org/DAWO/DAWO-Core) to facilitate community collaboration.
