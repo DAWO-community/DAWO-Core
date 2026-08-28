@@ -300,6 +300,12 @@
           file.home.".face".source = ../../artwork/icons/logo-rijksoverheid-square.png;
           file.home.".face.icon".source = ../../artwork/icons/logo-rijksoverheid-square.png;
 
+          # Built from our own pinned input rather than nix-maid's default,
+          # which resolves through npins outside flake.lock and fetches from
+          # the live network at eval time. See the note on the input in
+          # flake.nix.
+          kconfig.package = pkgs.callPackage inputs.kconfig-declarative { };
+
           kconfig.settings = {
             kactivitymanagerdrc = {
               activities = {

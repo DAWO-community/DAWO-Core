@@ -244,6 +244,22 @@
         "type": "github"
       }
     },
+    "kconfig-declarative": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1767464959,
+        "narHash": "sha256-mLrvQ7oNcueBVmNcot+aKwOYLDhvQQt8idUvr1fZOP4=",
+        "ref": "refs/heads/main",
+        "rev": "d936b450b065cbc15c3db5efc37cec527bce655e",
+        "revCount": 3,
+        "type": "git",
+        "url": "https://codeberg.org/viperML/kconfig-declarative"
+      },
+      "original": {
+        "type": "git",
+        "url": "https://codeberg.org/viperML/kconfig-declarative"
+      }
+    },
     "lanzaboote": {
       "inputs": {
         "crane": "crane",
@@ -429,6 +445,7 @@
         "flake-parts": "flake-parts",
         "home-manager": "home-manager_2",
         "import-tree": "import-tree",
+        "kconfig-declarative": "kconfig-declarative",
         "lanzaboote": "lanzaboote",
         "make-shell": "make-shell",
         "nix-flatpak": "nix-flatpak",
