@@ -82,6 +82,26 @@
           }
         ];
 
+        # nixpkgs declares dlm.service with an EMPTY wantedBy: nothing starts
+        # it. It comes up only through the driver's udev rule, which matches
+        # the USB interface (17e9, class ff, protocol 03) on ACTION=="add".
+        # That is enough when a dock is hotplugged and usually enough at boot,
+        # since udev replays add events - but "usually" is what "one of my two
+        # screens" looks like from a user's chair. Wanting it from
+        # graphical.target makes it unconditional, and the daemon costs nothing
+        # on a device with no dock attached.
+        systemd.services.dlm.wantedBy = [ "graphical.target" ];
+
+        # Load evdi in the initrd rather than at boot, so the module is present
+        # before anything enumerates displays instead of arriving while the
+        # session is already deciding what outputs it has.
+        boot.initrd.kernelModules = [ "evdi" ];
+
+        # Everything below configures the X11 half. Both blocks are needed:
+        # under Wayland it is evdi and dlm that drive the dock, and under X11
+        # those are needed too - the driver and the provider hand-off sit on
+        # top of them.
+        #
         # Appended to the upstream default rather than replacing it.
         # videoDrivers carries a default (modesetting, fbdev) and a default is
         # replaced by any definition, not merged with it - so writing
