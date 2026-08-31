@@ -1,0 +1,21 @@
+# yamllint disable rule:line-length
+---
+name: Validate Nix Flake
+on: # yamllint disable-line rule:truthy
+  workflow_dispatch:
+  push:
+    paths:
+      - "**.nix"
+jobs:
+  validate-nix:
+    runs-on: native
+    steps:
+      - name: Checkout git repo
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+      - name: Validate Nix Flake
+        env:
+          PATH: /run/wrappers/bin:/home/gitea-runner/.nix-profile/bin:/nix/profile/bin:/home/gitea-runner/.local/state/nix/profile/bin:/etc/profiles/per-user/gitea-runner/bin:/nix/var/nix/profiles/default/bin:/run/current-system/sw/bin
+        run: |
+          /run/current-system/sw/bin/nix flake check
