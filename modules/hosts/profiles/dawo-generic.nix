@@ -67,6 +67,7 @@
         # Services
         services-audio
         services-auto-update
+        services-update-status
         services-flatpak
         services-printing
         services-scanning

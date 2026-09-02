@@ -49,7 +49,12 @@ profile, hardware, disko and the right users (see docs/users.md). Installing is
 nixos-anywhere; updating afterwards is deploy-rs (or a comin pull, already
 configured for git-driven updates).
 
-## 4. Secure Boot (opt-in, lanzaboote)
+## 4. Is a device still updating?
+
+`dawo-update-status` on the device: service state, last poll, last generation,
+reboot needed. See `docs/update-status.md`.
+
+## 5. Secure Boot (opt-in, lanzaboote)
 
 Devices boot with plain systemd-boot by default. Secure Boot is opt-in via
 `dawo.secureboot.enable` and needs a one-time key ceremony on the device BEFORE

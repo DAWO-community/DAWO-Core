@@ -1,5 +1,14 @@
 # Changelog
 
+## Unreleased
+
+- feat(update): `dawo-update-status` on every device - service state, last
+  poll, last generation and whether a reboot is pending, without sudo. Reads
+  comin's own socket where it answers and systemd plus the system profile
+  where it does not, so it still reports on a device whose update loop is
+  what broke. Desktop notifications are available opt-in through
+  `dawo.autoUpdate.desktopNotifications.enable`.
+
 ## 0.1.2 - the move, and the vulnerability backlog
 
 First release from Codeberg. Issues #55 to #80.
