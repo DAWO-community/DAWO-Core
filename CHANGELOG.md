@@ -14,6 +14,14 @@
   register also produces `dawo-verify`, which says on the device whether each
   enabled rule holds and why each disabled one is off (#110). The first seven
   rules carry checks only; configuration moves over one subject at a time.
+- feat(localization): `dawo.localization` replaces the two hard-wired locale
+  modules. The system language and the regional formats are now separate
+  options, the ten most spoken languages in Europe plus Dutch are generated on
+  the device so a user can switch the desktop language without a rebuild, and
+  each offered language gets its spell checker (#56). Consumers importing
+  `localization-nl_nl` or `localization-en_nl` switch to `localization-languages`;
+  the defaults reproduce the old Dutch behaviour. The legacy `nl_NL/ISO-8859-1`
+  locale is no longer generated.
 
 ## 0.1.2 - the move, and the vulnerability backlog
 
