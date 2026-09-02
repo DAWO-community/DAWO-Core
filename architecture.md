@@ -71,7 +71,8 @@ choices on top without forking the core.
 ## Architecture Decision Records (ADR)
 
 Short records of decisions that shape the image. Each one lists the context, the
-decision, and the main consequence. Newest on top.
+decision, and the main consequence, oldest first, so a reader can follow how the
+image got to where it is.
 
 ### ADR-0001: Blocks architecture, core flake + consumer inputs
 - Context (#6, #8): the image has obligations that must hold on every device and
@@ -122,3 +123,46 @@ decision, and the main consequence. Newest on top.
   removed, so the pinned tag fails to evaluate on the current nixpkgs.
 - Decision: track lanzaboote from master until a tagged release is compatible.
 - Consequence: Secure Boot hosts evaluate again; revisit when a new tag lands.
+
+### ADR-0007: Nothing evaluates over the network except through flake.lock
+- Context (#97): every device configuration stopped evaluating, with nothing in
+  this repository having changed. nix-maid resolves `maid.kconfig.package`
+  through npins rather than a flake input, so that fetch sat outside our lock and
+  reached the live network on every evaluation. When the upstream repository
+  moved from GitHub to Codeberg the old URL began to 404, and the core every
+  managed device is built from could not be evaluated at all.
+- Decision: a dependency an evaluation reaches for is a flake input, pinned in
+  `flake.lock`, or it does not exist. Where an upstream resolves something
+  through its own pinning mechanism, we take that dependency into our lock and
+  pass it in explicitly rather than letting the default reach out.
+- Consequence: an upstream moving house is a lock bump somebody reviews, not a
+  fleet that cannot build. The cost is that such an input has to be noticed and
+  adopted by hand; the check that notices it is CI evaluating every host
+  configuration rather than a subset (#88).
+
+### ADR-0008: The handbook is generated from the documentation in the repository
+- Context (#1): documentation was a flat set of files plus a page per module
+  directory, with no index and no order, so a reader could not tell where to
+  start or what existed. A separate documentation site would answer that, and
+  would immediately start drifting from the code it describes.
+- Decision: the handbook lives in `docs/handbook` as an mdBook whose pages
+  mostly `{{#include}}` the documentation already in the tree. New prose is
+  written only for questions no file answers. It builds with
+  `nix build .#handbook`, and mdBook bundles its own assets, so the rendered site
+  fetches nothing from anybody else's infrastructure.
+- Consequence: one source of truth per claim, and a page cannot silently
+  contradict the code. In exchange the book inherits its structure from the
+  repository layout, so a badly placed document is a badly placed chapter.
+
+### ADR-0009: Language and regional formats are two settings, not one
+- Context (#56): the image carried two localization modules that differed by a
+  single line, and the language a device was imaged with could not be changed
+  without an operator and a rebuild.
+- Decision: `dawo.localization` splits the language the desktop is written in
+  from the conventions used for dates, numbers, currency and paper, and generates
+  every offered locale on the device. Changing the desktop language is a user
+  action in Plasma or GNOME, not a rebuild.
+- Consequence: an English-language desktop in the Netherlands still writes
+  Dutch dates, and a device serves a user whose language is not the one the
+  deployment was built around. The price is disk: every offered locale is
+  generated whether or not anybody selects it.
