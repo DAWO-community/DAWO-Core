@@ -6,16 +6,57 @@ on: # yamllint disable-line rule:truthy
   push:
     paths:
       - "**.nix"
+      - "flake.lock"
+      - ".forgejo/workflows/validate-nix.yaml"
 jobs:
   validate-nix:
     runs-on: native
+    timeout-minutes: 30
     steps:
       - name: Checkout git repo
         uses: actions/checkout@v4
         with:
           submodules: true
+
       - name: Validate Nix Flake
+        # Several inputs still float on an upstream branch (nixpkgs-unstable,
+        # disko/latest, nixos-hardware/master, comin/main, nix-flatpak/latest),
+        # so a cached "still current" verdict can hide drift that has already
+        # landed. Refuse the caches and look again.
         env:
           PATH: /run/wrappers/bin:/home/gitea-runner/.nix-profile/bin:/nix/profile/bin:/home/gitea-runner/.local/state/nix/profile/bin:/etc/profiles/per-user/gitea-runner/bin:/nix/var/nix/profiles/default/bin:/run/current-system/sw/bin
         run: |
-          /run/current-system/sw/bin/nix flake check
+          /run/current-system/sw/bin/nix flake check \
+            --refresh \
+            --option tarball-ttl 0 \
+            --option eval-cache false
+
+      - name: Evaluate every host configuration
+        # `nix flake check` reports one verdict for the whole flake, and the
+        # baseline check in modules/flake-parts/checks.nix names two of the six
+        # hosts. Issue #97 is what that costs: four configurations stopped
+        # evaluating and nothing said so. Walk every host by name, keep going
+        # after a failure, and report each one, so a partial break is a red run
+        # naming the host rather than silence.
+        env:
+          PATH: /run/wrappers/bin:/home/gitea-runner/.nix-profile/bin:/nix/profile/bin:/home/gitea-runner/.local/state/nix/profile/bin:/etc/profiles/per-user/gitea-runner/bin:/nix/var/nix/profiles/default/bin:/run/current-system/sw/bin
+        run: |
+          nix=/run/current-system/sw/bin/nix
+          hosts=$("$nix" eval --raw .#nixosConfigurations \
+            --apply 'cs: builtins.concatStringsSep " " (builtins.attrNames cs)')
+          if [ -z "$hosts" ]; then
+            echo "no host configurations found; refusing to pass on nothing" >&2
+            exit 1
+          fi
+          echo "host configurations: $hosts"
+          rc=0
+          for h in $hosts; do
+            echo "== $h"
+            if ! "$nix" eval --raw \
+              ".#nixosConfigurations.$h.config.system.build.toplevel.drvPath"; then
+              echo "FAILED to evaluate $h" >&2
+              rc=1
+            fi
+            echo
+          done
+          exit $rc
