@@ -22,7 +22,7 @@ GNOME for comparison) by 1 July.
 
 Goal: a modular, hardened, identity-aware image; proposed to MinBZK.
 
-- dawo.<block> tiers; secure-by-default / opt-out except UX-breakers (Secure
+- `dawo.<block>` tiers; secure-by-default / opt-out except UX-breakers (Secure
   Boot, usbControl, apparmor, pam-2fa stay opt-in).
 - Compliance profiles (BIO-1/2, NCSC) as selectable tiers.
 - Observability seams: osquery (opt-in), journald log-export. The shipper/SIEM

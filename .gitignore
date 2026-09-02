@@ -3,3 +3,6 @@
 # nix build out-links
 /result
 /result-*
+
+# mdBook render output
+/docs/handbook/book

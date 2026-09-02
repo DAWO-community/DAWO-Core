@@ -1,0 +1,17 @@
+[book]
+title = "DAWO Core Handbook"
+description = "How the DAWO workplace image is built, installed, updated and extended."
+authors = ["DAWO community"]
+language = "en"
+src = "src"
+
+[output.html]
+default-theme = "light"
+preferred-dark-theme = "navy"
+git-repository-url = "https://codeberg.org/DAWO/DAWO-Core"
+edit-url-template = "https://codeberg.org/DAWO/DAWO-Core/_edit/main/docs/handbook/{path}"
+# Self-hosted, no external CDN: mdBook bundles its own assets. Keep it that way.
+no-section-label = false
+
+[output.html.search]
+enable = true

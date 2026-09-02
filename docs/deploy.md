@@ -18,7 +18,7 @@ nix run github:nix-community/nixos-anywhere -- \
 ```
 
 Hardware: the host has a hand-written hardware module
-(modules/hardware/<machine>.nix). For a new model type you can generate the
+(`modules/hardware/<machine>.nix`). For a new model type you can generate the
 profile on the device:
 
 ```bash
@@ -44,7 +44,7 @@ deploy .#dawo-t495s  # builds and activates remotely
 
 ## 3. Fleet
 
-One host file per device (modules/hosts/clients/<name>.nix) that imports a
+One host file per device (`modules/hosts/clients/<name>.nix`) that imports a
 profile, hardware, disko and the right users (see docs/users.md). Installing is
 nixos-anywhere; updating afterwards is deploy-rs (or a comin pull, already
 configured for git-driven updates).
