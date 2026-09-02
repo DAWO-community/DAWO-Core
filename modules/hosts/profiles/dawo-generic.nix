@@ -9,6 +9,11 @@
       # Auto-update on by default; a workplace overrides repoUrl to its overlay.
       dawo.autoUpdate.enable = lib.mkDefault true;
 
+      # Dutch desktop, Dutch conventions, every offered language generated so a
+      # user can switch without a rebuild. An overlay abroad changes the two
+      # options rather than the module.
+      dawo.localization.enable = lib.mkDefault true;
+
       imports = with config.flake.modules.nixos; [
 
         # Hardware baseline (firmware/fwupd/bluetooth/initrd-systemd/platform);
@@ -49,7 +54,7 @@
         tools-diagnostics
 
         # Localization
-        localization-nl_nl
+        localization-languages
 
         # Networking
         networking-client
