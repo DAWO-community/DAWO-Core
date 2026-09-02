@@ -7,7 +7,9 @@
     nixpkgs.url = "github:nixos/nixpkgs/nixos-26.05";
     nixpkgs-unstable.url = "github:nixos/nixpkgs/nixos-unstable";
     nix-flatpak.url = "github:gmodena/nix-flatpak/?ref=latest";
-    nix-maid.url = "github:viperML/nix-maid";
+    # nix-maid moved to Codeberg; the GitHub mirror stops working on
+    # 31 October 2026, and upstream warns about it on every evaluation.
+    nix-maid.url = "git+https://codeberg.org/viperML/nix-maid";
     # nix-maid resolves maid.kconfig.package through npins rather than a flake
     # input, so that fetch sits outside our lock and reaches the live network on
     # every eval. When viperML moved kconfig-declarative from GitHub to Codeberg
