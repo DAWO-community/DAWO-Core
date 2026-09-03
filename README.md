@@ -40,6 +40,7 @@ being wrong.
 | [`desktops`](modules/desktops/desktops.md)          | GUI environments and workspace setups.                       |
 | [`environment`](modules/environment/environment.md) | Global environment variables, apps and shell configurations. |
 | [`hardware`](modules/hardware/hardware.md)          | Platform-specific machine hardware definitions.              |
+| [`hardening`](modules/hardening/hardening.md)    | Security controls, and the rule register that selects them.  |
 | [`hosts`](modules/hosts/hosts.md)                   | The ultimate definition of specific server/client instances. |
 | [`networking`](modules/networking/networking.md)    | Network interfaces, WiFi, and VPN configurations.            |
 | [`nixos`](modules/nixos/nixos.md)                   | Core NixOS system-level overrides.                           |

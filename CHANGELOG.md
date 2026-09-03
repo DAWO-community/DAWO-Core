@@ -8,6 +8,12 @@
   where it does not, so it still reports on a device whose update loop is
   what broke. Desktop notifications are available opt-in through
   `dawo.autoUpdate.desktopNotifications.enable`.
+- feat(hardening): `dawo.hardening` selects security controls per rule instead
+  of per block: an ordered level (baseline, hardened, strict), a compliance
+  selection that cuts across it, and a switch per rule that wins over both. The
+  register also produces `dawo-verify`, which says on the device whether each
+  enabled rule holds and why each disabled one is off (#110). The first seven
+  rules carry checks only; configuration moves over one subject at a time.
 
 ## 0.1.2 - the move, and the vulnerability backlog
 
