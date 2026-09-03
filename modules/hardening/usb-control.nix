@@ -13,9 +13,17 @@
       cfg = config.dawo.usbControl;
     in
     {
+      # Renamed in 0.2: the `options` level went away. Kept for one release.
+      imports = [
+        (lib.mkRenamedOptionModule
+          [ "dawo" "usbControl" "options" "allowlist" ]
+          [ "dawo" "usbControl" "allowlist" ]
+        )
+      ];
+
       options.dawo.usbControl = {
         enable = lib.mkEnableOption "USBGuard device authorization (BIO/NCSC)";
-        options.allowlist = lib.mkOption {
+        allowlist = lib.mkOption {
           type = lib.types.listOf lib.types.str;
           default = [ ];
           example = [ ''allow id 18d1:4ee2 name "phone-tether"'' ];
@@ -40,7 +48,7 @@
             "dawo"
           ];
           # Tunable: extra allow rules merged into the forced policy.
-          rules = lib.concatStringsSep "\n" cfg.options.allowlist;
+          rules = lib.concatStringsSep "\n" cfg.allowlist;
         };
       };
     };

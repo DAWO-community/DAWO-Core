@@ -24,9 +24,17 @@
       ];
     in
     {
+      # Renamed in 0.2: the `options` level went away. Kept for one release.
+      imports = [
+        (lib.mkRenamedOptionModule
+          [ "dawo" "timesync" "options" "servers" ]
+          [ "dawo" "timesync" "servers" ]
+        )
+      ];
+
       options.dawo.timesync = {
         enable = lib.mkEnableOption "NTP time synchronization via chrony (BIO)";
-        options.servers = lib.mkOption {
+        servers = lib.mkOption {
           type = lib.types.listOf lib.types.str;
           default = [
             "ntp.time.nl"
@@ -40,14 +48,14 @@
       config = lib.mkIf cfg.enable {
         assertions = [
           {
-            assertion = cfg.options.servers != [ ];
-            message = "dawo.timesync.options.servers must list at least one NTP server (empty = no time sync = unusable log correlation).";
+            assertion = cfg.servers != [ ];
+            message = "dawo.timesync.servers must list at least one NTP server (empty = no time sync = unusable log correlation).";
           }
         ];
 
         services.chrony = {
           enable = lib.mkForce true;
-          servers = cfg.options.servers;
+          servers = cfg.servers;
 
           # The NixOS default is `makestep 0.1 3`: after three steps chronyd only
           # ever slews, which crawls back a post-resume offset of minutes or hours

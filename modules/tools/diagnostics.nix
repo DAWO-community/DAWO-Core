@@ -10,10 +10,18 @@
       ...
     }:
     let
-      cfg = config.dawo.tools.diagnostics;
+      cfg = config.dawo.diagnostics;
     in
     {
-      options.dawo.tools.diagnostics.enable =
+      # Renamed in 0.2: it carried a `tools` level no other block has.
+      imports = [
+        (lib.mkRenamedOptionModule
+          [ "dawo" "tools" "diagnostics" "enable" ]
+          [ "dawo" "diagnostics" "enable" ]
+        )
+      ];
+
+      options.dawo.diagnostics.enable =
         lib.mkEnableOption "hardware/CLI diagnostics for ops/support (htop, lshw, pciutils, dmidecode, ethtool, lm_sensors, usbutils)";
 
       config = lib.mkIf cfg.enable {

@@ -12,9 +12,17 @@
       cfg = config.dawo.ssh;
     in
     {
+      # Renamed in 0.2: the `options` level went away. Kept for one release.
+      imports = [
+        (lib.mkRenamedOptionModule
+          [ "dawo" "ssh" "options" "maxAuthTries" ]
+          [ "dawo" "ssh" "maxAuthTries" ]
+        )
+      ];
+
       options.dawo.ssh = {
         enable = lib.mkEnableOption "hardened OpenSSH crypto + login policy (NCSC/CIS)";
-        options.maxAuthTries = lib.mkOption {
+        maxAuthTries = lib.mkOption {
           type = lib.types.ints.positive;
           default = 4;
           description = "Max authentication attempts per connection (must be > 0).";
@@ -27,8 +35,8 @@
         # assertion documents the intent and gives a readable build-time error.
         assertions = [
           {
-            assertion = cfg.options.maxAuthTries > 0;
-            message = "dawo.ssh.options.maxAuthTries must be > 0 (0 disables the login-attempt limit).";
+            assertion = cfg.maxAuthTries > 0;
+            message = "dawo.ssh.maxAuthTries must be > 0 (0 disables the login-attempt limit).";
           }
         ];
 
@@ -57,7 +65,7 @@
               "hmac-sha2-256-etm@openssh.com"
             ];
             # Tunable: a suggested default a host may raise/lower.
-            MaxAuthTries = lib.mkDefault cfg.options.maxAuthTries;
+            MaxAuthTries = lib.mkDefault cfg.maxAuthTries;
           };
         };
       };

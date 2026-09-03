@@ -6,7 +6,7 @@
   # MANDATORY-core tier aggregate. A workplace imports this to inherit the
   # BIO/NCSC obligations that must hold on every device. The mandatory blocks
   # are forced on with `lib.mkForce`: a consumer can *configure* them through
-  # `dawo.<block>.options.*`, but cannot silently drop one. (Suggested defaults
+  # `dawo.<block>.<tunable>`, but cannot silently drop one. (Suggested defaults
   # inside the blocks use `lib.mkDefault`; only the security-critical enforcement
   # is forced.) Opt-in (hardened-tier) blocks stay default OFF; enable them per
   # workplace via profiles-dawo-hardened.
