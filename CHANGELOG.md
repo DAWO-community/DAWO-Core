@@ -14,6 +14,14 @@
   register also produces `dawo-verify`, which says on the device whether each
   enabled rule holds and why each disabled one is off (#110). The first seven
   rules carry checks only; configuration moves over one subject at a time.
+- refactor(options)!: the `options` level is gone from every block, so
+  `dawo.ssh.maxAuthTries` rather than `dawo.ssh.options.maxAuthTries`. Six of
+  the eight blocks with settings never used that level, so the documented
+  convention was the minority practice. Two blocks whose path did not match
+  their subject moved as well: `dawo.gnomeHardening` is now
+  `dawo.desktop.gnome.hardening`, and `dawo.tools.diagnostics` is now
+  `dawo.diagnostics`. Every old name keeps working for one release and warns
+  with the new path.
 
 ## 0.1.2 - the move, and the vulnerability backlog
 

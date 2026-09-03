@@ -26,7 +26,7 @@ capability is a block exposed as `flake.modules.nixos.<name>`, with a uniform
 interface so a consumer can compose them without reading the implementation:
 
 - `dawo.<block>.enable` turns the block on (a `mkEnableOption`).
-- `dawo.<block>.options.<...>` holds the tunables; the body lives in
+- `dawo.<block>.<tunable>` holds the settings; the body lives in
   `mkIf cfg.enable`.
 
 Enforcement follows one rule (ADR-0002): mandatory security settings are forced
@@ -81,7 +81,7 @@ image got to where it is.
 - Decision: this repo is the upstream core. Each capability is a block exposed as
   `flake.modules.nixos.<name>`. A consumer flake takes the core as an input and
   composes blocks. The interface is `dawo.<block>.enable` plus
-  `dawo.<block>.options.<...>` for tunables. Two tiers, expressed as aggregate
+  `dawo.<block>.<tunable>` for settings. Two tiers, expressed as aggregate
   profiles: `profiles-dawo-core` (mandatory) and `profiles-dawo-hardened` (opt-in).
 - Consequence: branding, user profiles and app sets live in the consumer, not here.
 
