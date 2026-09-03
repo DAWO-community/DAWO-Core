@@ -49,11 +49,13 @@ Reference it with `hashedPasswordFile = config.age.secrets."alice-password".path
 The host key (`age.identityPaths`, the SSH host key by default) decrypts it at
 activation.
 
-> The generic `users-dawo` is a demo/bootstrap account with a documented
-> default password (`dawo` / `dawo`) so a fresh image is loginable. It uses
-> `initialHashedPassword` and `mutableUsers = true`, so change it after first
-> login. For real deployments give the host its own gitops user
-> (`hashedPasswordFile` via agenix) and drop `users-dawo`.
+> The generic `users-dawo` is a bootstrap account so a fresh image is
+> loginable. Give it your own hash with
+> `dawo.bootstrapUser.initialHashedPassword`; without one it falls back to a
+> password written down in this repository and warns at every build. It uses
+> `initialHashedPassword` and `mutableUsers = true`, so the value applies at
+> account creation only. For real deployments give the host its own gitops user
+> (`hashedPasswordFile` via agenix) and set `dawo.bootstrapUser.enable = false`.
 
 ## Fully declarative (gov-proof)
 
