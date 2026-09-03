@@ -1,5 +1,15 @@
 # Changelog
 
+## Unreleased
+
+Breaking:
+
+- feat(flatpak): Flatpak no longer updates its applications by itself. A
+  deployment that declares Flatpak applications in `services.flatpak.packages`
+  sets `dawo.flatpak.autoUpdate`, or they stay at their installed version.
+  Flatpaks users install themselves were never updated by this and are not
+  affected. `dawo.flatpak.enable` turns the block off #116 #144
+
 ## 0.2.0
 
 Breaking:
