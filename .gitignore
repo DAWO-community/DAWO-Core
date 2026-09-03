@@ -6,3 +6,6 @@
 
 # mdBook render output
 /docs/handbook/book
+
+# sbomnix writes its metadata cache into the working directory
+/http_cache.sqlite

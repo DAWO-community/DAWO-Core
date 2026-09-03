@@ -1,0 +1,89 @@
+# yamllint disable rule:line-length
+---
+# What is in the image, and what is known to be wrong with it (#31, #54).
+#
+# On merge to main rather than on every pushed commit: "an SBOM after each PR"
+# is read as "after each PR lands". No pull_request trigger, for the reason
+# recorded in validate-nix.yaml: this runner is self-hosted and nothing has
+# decided what it may execute on behalf of an unknown contributor.
+#
+# Weekly as well, because the vulnerability databases move even when the code
+# does not.
+name: SBOM and vulnerabilities
+on: # yamllint disable-line rule:truthy
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "**.nix"
+      - "flake.lock"
+      - ".forgejo/workflows/sbom.yaml"
+  schedule:
+    - cron: "30 5 * * 1"
+jobs:
+  sbom:
+    runs-on: native
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        host:
+          - dawo-t495s
+          - dawo-t495s-gnome
+          - dawo-hp-probook-4g1i
+          - dawo-hp-probook-4g1i-gnome
+          - dawo-installer
+          - dawo-installer-netboot
+    steps:
+      - name: Checkout git repo
+        uses: actions/checkout@v4
+
+      - name: Generate the SBOM
+        # Buildtime mode: it walks the derivation graph and never realises the
+        # toplevel, so this costs minutes rather than a full closure build. A
+        # runtime SBOM, which is what actually ships, needs that build and
+        # belongs to a release rather than to every merge.
+        env:
+          PATH: /run/wrappers/bin:/home/gitea-runner/.nix-profile/bin:/nix/profile/bin:/home/gitea-runner/.local/state/nix/profile/bin:/etc/profiles/per-user/gitea-runner/bin:/nix/var/nix/profiles/default/bin:/run/current-system/sw/bin
+        run: |
+          /run/current-system/sw/bin/nix run .#sbom -- "${{ matrix.host }}" "out/${{ matrix.host }}"
+
+      - name: Upload the SBOM
+        uses: actions/upload-artifact@v4
+        with:
+          name: sbom-${{ matrix.host }}
+          path: out/${{ matrix.host }}
+          retention-days: 90
+
+  vulnscan:
+    needs: sbom
+    runs-on: native
+    timeout-minutes: 45
+    steps:
+      - name: Checkout git repo
+        uses: actions/checkout@v4
+
+      - name: Fetch the reference SBOM
+        uses: actions/download-artifact@v4
+        with:
+          name: sbom-dawo-t495s
+          path: sbom-in
+
+      - name: Scan it
+        # Reports, never gates. A desktop closure carries thousands of
+        # components, and glibc, openssl and perl always have an open CVE
+        # somewhere, so failing on any finding would leave this permanently red
+        # and a permanently red check is one nobody reads. The number moving is
+        # the signal; the number itself is not.
+        env:
+          PATH: /run/wrappers/bin:/home/gitea-runner/.nix-profile/bin:/nix/profile/bin:/home/gitea-runner/.local/state/nix/profile/bin:/etc/profiles/per-user/gitea-runner/bin:/nix/var/nix/profiles/default/bin:/run/current-system/sw/bin
+        run: |
+          /run/current-system/sw/bin/nix run .#vulnscan -- sbom-in/sbom.cdx.json vulns
+          cat vulns/vulns.csv || true
+
+      - name: Upload the report
+        uses: actions/upload-artifact@v4
+        with:
+          name: vulnscan-dawo-t495s
+          path: vulns
+          retention-days: 90
