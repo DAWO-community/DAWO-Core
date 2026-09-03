@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased
+
+Breaking:
+
+- fix(plasma): KDE Connect is off by default; set
+  `dawo.desktop.plasma.kdeconnect.enable` to get it back. Its BlueZ policy no
+  longer lets the users group own `org.bluez` #105 #127
+
 ## 0.2.0
 
 Breaking:

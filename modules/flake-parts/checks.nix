@@ -58,6 +58,19 @@
       # so that dropping the promise fails the build rather than the audit.
       refuses = name: cfg: [
         {
+          n = "${name}: KDE Connect ports closed unless a deployment opts in";
+          ok =
+            !lib.any (r: r.from <= 1716 && 1716 <= r.to) (
+              cfg.config.networking.firewall.allowedTCPPortRanges
+              ++ cfg.config.networking.firewall.allowedUDPPortRanges
+            );
+        }
+        {
+          n = "${name}: no D-Bus policy lets users own org.bluez";
+          ok =
+            !lib.any (p: lib.hasInfix ''own="org.bluez"'' (p.text or "")) cfg.config.services.dbus.packages;
+        }
+        {
           n = "${name}: no generic autoUpgrade (comin only)";
           ok = !cfg.config.system.autoUpgrade.enable;
         }
