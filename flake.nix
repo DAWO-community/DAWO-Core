@@ -21,12 +21,20 @@
       url = "git+https://codeberg.org/viperML/kconfig-declarative";
       flake = false;
     };
-    nixos-hardware.url = "github:NixOS/nixos-hardware/master";
+    nixos-hardware = {
+      url = "github:NixOS/nixos-hardware/master";
+      # Without this it locks its own nixpkgs, which is where the release
+      # tarball in our lock comes from: a second full nixpkgs nobody asked for.
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     import-tree.url = "github:vic/import-tree";
     make-shell.url = "github:nicknovitski/make-shell";
     comin = {
       url = "github:nlewo/comin/main";
       inputs.nixpkgs.follows = "nixpkgs";
+      # comin follows ours, but its own treefmt-nix does not, and that drags in
+      # a third nixpkgs behind it.
+      inputs.treefmt-nix.inputs.nixpkgs.follows = "nixpkgs";
     };
     flake-parts = {
       url = "github:hercules-ci/flake-parts";
