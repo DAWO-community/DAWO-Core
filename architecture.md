@@ -37,12 +37,24 @@ of failing quietly.
 
 Blocks are grouped into two tier-aggregates a consumer imports:
 
-- `profiles-dawo-core` -- the mandatory BIO/NCSC baseline (ssh, sysctl, usbguard,
-  chrony, audit). Forced on; a consumer configures it through the block options
-  but cannot drop a block. Wired into `profiles-dawo-generic`.
-- `profiles-dawo-hardened` -- opt-in, risky or specialist blocks (AppArmor, GNOME
-  hardening, and the next batch). Importing it only declares the options; each
-  stays default off until a workplace flips it.
+- `profiles-dawo-core` -- the mandatory baseline that is actually delivered:
+  ssh, sysctl and chrony, plus the login policy (PAM). Forced on; a consumer
+  configures those blocks through their options but cannot drop one. Wired into
+  `profiles-dawo-generic`.
+- `profiles-dawo-hardened` -- opt-in blocks that cost the user something or are
+  not ready: AppArmor, and the GNOME lockdown. Importing it only declares the
+  options.
+
+Two things this list used to claim and did not deliver, corrected here rather
+than left as a comment that reads better than the code. **usbguard** is opt-in,
+on purpose: a device that refuses a USB stick out of the box reads as broken to
+the person holding it, so it is selected at the hardened level or per rule, not
+forced. **auditd** is deferred: the module is a no-op on nixpkgs 26.05 because
+of an upstream auditctl bug, so claiming it here only faked coverage. journald
+is the log base until that is fixed.
+
+New controls arrive as rules in the register rather than as blocks; see
+ADR-0010.
 
 The consumer model has three layers (ADR-0001, ADR-0003):
 
