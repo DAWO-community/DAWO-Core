@@ -15,6 +15,23 @@
     in
     {
       options.dawo.desktop.plasma.enable = lib.mkEnableOption "KDE Plasma 6 desktop with SDDM";
+      options.dawo.desktop.plasma.unlockWalletAtLogin = lib.mkOption {
+        type = lib.types.bool;
+        default = true;
+        description = ''
+          Unlock the KDE wallet with the login password, at the display manager.
+
+          Without this the wallet asks for a password of its own the first time
+          something wants a stored credential, which is the prompt people report
+          as "why does it ask again". NixOS wires kwallet into the `login` stack
+          by itself, but `login` is the tty; SDDM is where anyone actually
+          arrives at a desktop.
+
+          It only works when the wallet is named kdewallet and its password
+          equals the login password. A device whose wallet was created with a
+          different one keeps asking until that wallet is reset.
+        '';
+      };
       options.dawo.desktop.plasma.socialClient = lib.mkOption {
         type = lib.types.bool;
         default = true;
@@ -24,6 +41,8 @@
       config = lib.mkIf cfg.enable {
         # Enable the KDE Plasma Desktop Environment.
         services.desktopManager.plasma6.enable = true;
+
+        security.pam.services.sddm.kwallet.enable = cfg.unlockWalletAtLogin;
 
         programs.kdeconnect.enable = true;
         services.dbus.packages = lib.mkIf config.programs.kdeconnect.enable [
