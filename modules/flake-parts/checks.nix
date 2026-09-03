@@ -114,7 +114,44 @@
         ok = (rule.verify or "") != "" && (rule.why or "") != "" && (rule.severity or "") != "";
       }) register;
 
-      claims = name: cfg: works name cfg ++ refuses name cfg;
+      # Combinations the build has to refuse. Each guard is an assertion, and
+      # an assertion that stops firing turns a refusal into a silent default,
+      # so each one is tried on each host: once where it must fire, and once
+      # for every way out it offers.
+      guards =
+        name: cfg:
+        let
+          refused =
+            needle: modules:
+            lib.any (a: !a.assertion && lib.hasInfix needle a.message)
+              (cfg.extendModules { inherit modules; }).config.assertions;
+          # Secure Boot is forced either way, since a host may set it itself.
+          tpm2Refused =
+            secureboot: extra:
+            refused "dawo.diskUnlock.tpm2.enable is on while" [
+              {
+                dawo.diskUnlock.tpm2.enable = true;
+                dawo.secureboot.enable = lib.mkForce secureboot;
+              }
+              extra
+            ];
+        in
+        [
+          {
+            n = "${name}: TPM2 unlock without Secure Boot is refused";
+            ok = tpm2Refused false { };
+          }
+          {
+            n = "${name}: TPM2 unlock with Secure Boot is allowed";
+            ok = !tpm2Refused true { };
+          }
+          {
+            n = "${name}: TPM2 unlock on a bench machine that says so is allowed";
+            ok = !tpm2Refused false { dawo.diskUnlock.tpm2.allowWithoutSecureBoot = true; };
+          }
+        ];
+
+      claims = name: cfg: works name cfg ++ refuses name cfg ++ guards name cfg;
       fails = lib.filter (c: !c.ok) (
         lib.concatLists (lib.mapAttrsToList claims hosts) ++ registerIsHonest
       );
