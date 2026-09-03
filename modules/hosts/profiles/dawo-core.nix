@@ -14,6 +14,7 @@
     { lib, ... }:
     {
       imports = with config.flake.modules.nixos; [
+        hardening-pam
         hardening-ssh
         hardening-sysctl-baseline
         hardening-timesync
@@ -25,6 +26,11 @@
       # the user experience (no stick/dongle), so it is a deliberate opt-in.
       # audit moved to the opt-in tier too: it is a no-op on nixpkgs 26.05
       # (auditctl module bug), so forcing it here only faked coverage.
+      # Login policy is mandatory: an image with no lockout lets somebody at the
+      # keyboard guess for as long as they like.
+      dawo.pam.lockout.enable = lib.mkForce true;
+      dawo.pam.quality.enable = lib.mkForce true;
+
       dawo.ssh.enable = lib.mkForce true;
       dawo.sysctlBaseline.enable = lib.mkForce true;
       dawo.timesync.enable = lib.mkForce true;

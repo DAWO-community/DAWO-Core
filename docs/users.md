@@ -62,6 +62,31 @@ Enable `users-hardened` (opt-in) -> `mutableUsers = false`: nothing outside git.
 (no `initialHashedPassword`). Migrate first, test on a canary, keep a
 recovery path. Lockout risk.
 
+## Login policy
+
+`dawo.pam` sets what happens when somebody guesses, and what a password has to
+look like. Both are on by default and forced on by the core profile.
+
+    dawo.pam.lockout.attempts = 5;        # failed tries before the account locks
+    dawo.pam.lockout.unlockSeconds = 600; # the lock expires on its own
+    dawo.pam.quality.minLength = 12;
+
+Two things are deliberate. root is never locked out, because the account that
+fixes a locked device should not be the one that is locked. And a lockout
+expires by itself, because a lock only an administrator can lift turns a typo on
+a train into a day without a laptop. To see or clear one by hand:
+
+    faillock --user <name>
+    sudo faillock --user <name> --reset
+
+The lockout applies to the console, `su`, `sudo` and whichever display manager
+is enabled. A place where a password can be typed and that is not in
+`dawo.pam.lockout.services` is a way around it.
+
+`dawo.pam.u2f.enable` puts a hardware key in front of login and sudo. It is off,
+and it should stay off until every user of that device has an enrolled key and a
+written recovery path, or it is a lockout with extra steps.
+
 ## Admins
 
 An admin = a user with `extraGroups = [ "wheel" ]`. Combine with
