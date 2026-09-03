@@ -1,5 +1,15 @@
 # Changelog
 
+## Unreleased
+
+Breaking:
+
+- fix(disko): the install-time LUKS passphrase moves from `/tmp/secret.key`
+  to `/run/dawo-luks.key` (option `dawo.disk.luks.passwordFile`). Imaging
+  scripts must write it there, for nixos-anywhere with
+  `--disk-encryption-keys /run/dawo-luks.key <file>`. The offline stick
+  follows the option by itself #112 #148
+
 ## 0.2.0
 
 Breaking:

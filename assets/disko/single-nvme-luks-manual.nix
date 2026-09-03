@@ -36,8 +36,11 @@
                 name = "crypted-main";
                 # if you want to use the key for interactive login be sure
                 # there is no trailing newline. For example use
-                # `echo -n "password" > /tmp/secret.key`
-                passwordFile = "/tmp/secret.key"; # Interactive
+                #   install -m 0600 /dev/null /run/dawo-luks.key
+                #   printf '%s' "$passphrase" > /run/dawo-luks.key
+                # /run is tmpfs and root-only; /tmp is readable by every user of
+                # the installer, and the passphrase is the disk.
+                passwordFile = "/run/dawo-luks.key";
                 settings = {
                   allowDiscards = true;
                 };

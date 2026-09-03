@@ -77,8 +77,8 @@ Bedenk per device een unieke sterke passphrase → noteer in Proton Pass (BB Ope
 
 Per laptop, vanaf het station (of Fedora-host op de prov-LAN):
 ```
-inspoelstraat/install-hp.sh <installer-ip> <host> <luks-passphrase>
-# bv: inspoelstraat/install-hp.sh 192.168.50.55 dawo-hp-probook-4g1i '<luks-uit-PP>'
+inspoelstraat/install-hp.sh <installer-ip> <host>   # vraagt de passphrase, leest hem van stdin
+# bv: inspoelstraat/install-hp.sh 192.168.50.55 dawo-hp-probook-4g1i
 ```
 Dit draait `nixos-anywhere --flake DAWO-NixOS#<host> --phases disko,install` (Secure Boot uit),
 zet de LUKS-passphrase, kopieert de closure van het station (harmonia-cache). Meerdere
@@ -86,6 +86,12 @@ terminals = parallel imagen.
 - Klaar = "done". Herhaal voor alle 15 (noteer host ↔ asset-tag ↔ LUKS in PP).
 
 ---
+
+> De passphrase hoort niet op de commandoregel: daar staat hij in `ps` en in de
+> shellgeschiedenis van de operator. Het installatiescript vraagt hem verborgen
+> en zet hem op de target in `/run/dawo-luks.key` (mode 0600, tmpfs) met
+> `nixos-anywhere --disk-encryption-keys /run/dawo-luks.key <lokaal-bestand>`.
+> Het doelpad moet gelijk zijn aan `dawo.disk.luks.passwordFile` van de host.
 
 ## 5. Per device: reboot → verify → Secure Boot + TPM2
 
