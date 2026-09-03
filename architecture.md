@@ -166,3 +166,24 @@ image got to where it is.
   Dutch dates, and a device serves a user whose language is not the one the
   deployment was built around. The price is disk: every offered locale is
   generated whether or not anybody selects it.
+
+### ADR-0010: hardening is a register of rules, not a set of blocks
+- Context (#110, and #106 and #114 as the evidence): controls were grouped into
+  two import lists. Whether a control applied could only be answered by reading
+  code, and that is how a whole tier came to be imported by nobody without
+  anything noticing, and how the on-device evidence script came to check for
+  controls no host runs. A deployment that wanted nineteen of twenty rules had
+  to take the block or rebuild it.
+- Decision: the unit is a rule. Each rule is data in `flake.dawo.rules` carrying
+  its own configuration, its own check, and its metadata: severity, tags, the
+  norms that ask for it, and why it exists. Selection has two axes.
+  `dawo.hardening.level` is ordered (baseline, hardened, strict) and a rule joins
+  when its severity fits inside the level; `dawo.hardening.compliance` cuts
+  across it, because a norm asks for a set of rules rather than a degree of
+  strictness. A per-rule switch overrides both, in either direction.
+- Consequence: the simple path stays one line, the fine grained path stops
+  needing a fork, and the coverage check and the device evidence can be
+  generated from the same source as the configuration rather than maintained
+  beside it. The cost is that every hardening change now arrives as a rule with
+  a check attached, which is more work per change and the reason the claim
+  becomes provable.
