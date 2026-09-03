@@ -33,6 +33,40 @@ Reboot, turn Secure Boot ON in firmware. Check it took:
 bootctl status | grep -i 'secure boot'       # -> enabled
 ```
 
+## What the default costs, so a deployment can weigh it
+
+Secure Boot is off unless a deployment turns it on. That is deliberate: enrolling
+keys is a ceremony with a lockout at the end of it when it goes wrong, and the
+core has to be installable by somebody who is not going to perform one.
+
+What it costs, said plainly: the ESP is a plain vfat partition outside the LUKS
+container, so on a device with Secure Boot off the kernel and initrd are not
+signed and not encrypted. Somebody with the machine in their hands for five
+minutes can replace the initrd and capture the passphrase on the next boot. Disk
+encryption protects a laptop that is stolen and never returned; it does not
+protect one that is borrowed.
+
+An organisation that cares about that turns Secure Boot on. One that does not
+should at least know which of the two it accepted.
+
+## Why PCR 7, and what it does not cover
+
+The enrolment below binds the TPM key to PCR 7, which measures the Secure Boot
+state and its key database. It does not measure the kernel or the initrd, which
+live in PCR 4, 9 and 11.
+
+The trade: binding to those as well would detect a swapped kernel, and it would
+also break the unlock on every kernel update, since the measurement changes with
+the closure. Every update would then need a re-enrolment on the device, which on
+a fleet means either an operator visit or an automation that holds the disk key,
+and the second one gives back what the binding was for.
+
+So PCR 7 with Secure Boot on: the signature chain protects what is booted, and
+the TPM checks that the chain itself was not turned off. Without Secure Boot,
+PCR 7 measures nothing worth measuring, which is why the build refuses that
+combination unless a deployment sets
+`dawo.diskUnlock.tpm2.allowWithoutSecureBoot`.
+
 ## 2. TPM2 auto-unlock (PCR 7 = Secure Boot state)
 
 ```bash
