@@ -5,11 +5,16 @@
   # admins (wheel, agenix passwords) sets it false, so only the named users
   # exist and no bootstrap login remains on the device.
   #
-  # The password is a deployment choice, not a constant. Without
-  # dawo.bootstrapUser.initialHashedPassword the account falls back to a
-  # password that is written down in this repository, which is fine on a bench
-  # and is not fine on a device that leaves it. That case warns at build time,
-  # loudly, every time.
+  # The account existing is the point: DAWO has to be installable by somebody
+  # with no technical knowledge, and an image nobody can log into fails that
+  # before it starts. So the default stays.
+  #
+  # What is a deployment choice is the password.
+  # dawo.bootstrapUser.initialHashedPassword takes one this deployment owns.
+  # Without it the account falls back to the password written down here, which
+  # is right for a first install and wrong for a device in use, so that case
+  # warns at build time until somebody either sets a hash, turns the account
+  # off, or acknowledges the default on purpose.
   #
   # wheel: with root locked (users-basics sets hashedPassword "!"), a host with
   # no admin and no deploy key cannot be administered locally - the lockout we
@@ -32,6 +37,20 @@
           description = "Create the dawo bootstrap/break-glass admin. Set false once named admins (agenix) are in place.";
         };
 
+        acknowledgeDefaultPassword = lib.mkOption {
+          type = lib.types.bool;
+          default = false;
+          description = ''
+            Say out loud that this deployment means to ship the password
+            documented in this module, and silence the warning about it.
+
+            The account exists so that somebody with no technical knowledge
+            ends up with a machine they can log into, which is worth keeping.
+            This option is how a deployment separates "we chose this" from
+            "nobody looked".
+          '';
+        };
+
         initialHashedPassword = lib.mkOption {
           type = lib.types.str;
           default = "";
@@ -48,12 +67,19 @@
       };
 
       config = lib.mkIf cfg.enable {
-        warnings = lib.optional (cfg.initialHashedPassword == "") ''
-          dawo.bootstrapUser is enabled with the password documented in this
-          repository. That is a local administrator anyone can log in as. Set
-          dawo.bootstrapUser.initialHashedPassword, or disable the account,
-          before this device leaves the bench.
-        '';
+        warnings =
+          lib.optional (cfg.initialHashedPassword == "" && !cfg.acknowledgeDefaultPassword)
+            ''
+              dawo.bootstrapUser is enabled with the password documented in this
+              module, so this device has a local administrator anyone can log in
+              as. That is the intended default for a first install and not for a
+              device in use.
+
+              Set dawo.bootstrapUser.initialHashedPassword, or disable the
+              account once a named admin works, or set
+              dawo.bootstrapUser.acknowledgeDefaultPassword to say this
+              deployment means it.
+            '';
 
         users = {
           mutableUsers = true;
