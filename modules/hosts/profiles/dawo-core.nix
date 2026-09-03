@@ -15,6 +15,7 @@
     {
       imports = with config.flake.modules.nixos; [
         hardening-pam
+        hardening-register
         hardening-ssh
         hardening-sysctl-baseline
         hardening-timesync
