@@ -1,12 +1,21 @@
 {
-  # USB device control (BIO/NCSC). MANDATORY-core tier.
-  # Block-default + allow for already-present devices (no lockout on
-  # keyboard/mouse). Norm: BIO USB device control / NCSC. Origin: DAWO-specific
-  # (not in securix). See architecture.md "Key Design Decisions".
+  # USB device control (BIO/NCSC). Opt-in, and that is a decision rather than an
+  # omission: blocking a stick or a dongle out of the box is the kind of default
+  # that makes a device feel broken to the person using it, and DAWO has to be
+  # installable by somebody who will not go looking for the reason. A deployment
+  # that wants it turns it on, per device or per fleet.
   #
-  # The USBGuard policy is forced (lib.mkForce) - mandatory, not weakenable.
-  # `allowlist` is the tunable; an empty list is a *defined, safe* default
-  # (block-new / allow-present), not an undefined option (#8), so no warning.
+  # The header used to say MANDATORY-core tier while no host imported the block
+  # at all, which is the worst of both: a claim in a comment and nothing on the
+  # device. It is selectable through the register now, at the hardened level.
+  #
+  # Block-default + allow for already-present devices (no lockout on
+  # keyboard/mouse). Norm: BIO USB device control / NCSC.
+  #
+  # Once on, the USBGuard policy itself is forced (lib.mkForce): a deployment
+  # chooses whether to run it, not how much of it to run. `allowlist` is the
+  # tunable; an empty list is a defined, safe default (block-new /
+  # allow-present).
   flake.modules.nixos.hardening-usb-control =
     { config, lib, ... }:
     let

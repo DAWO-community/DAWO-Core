@@ -16,6 +16,10 @@
       imports = with config.flake.modules.nixos; [
         hardening-pam
         hardening-register
+        # Importing declares the options; the register decides whether they are
+        # on. usb-control stays off in the baseline and is selected at the
+        # hardened level or per rule.
+        hardening-usb-control
         hardening-ssh
         hardening-sysctl-baseline
         hardening-timesync
