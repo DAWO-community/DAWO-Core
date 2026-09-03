@@ -290,6 +290,24 @@
         serviceConfig = {
           Type = "oneshot";
           User = "root";
+
+          # Root walking through directories users can write is the classic
+          # place to be handed a symlink, so give it the least that still lets
+          # it do the one job. It needs /home writable and the two capabilities
+          # that let root delete a file it does not own; everything else is off.
+          ProtectSystem = "strict";
+          ReadWritePaths = [ "/home" ];
+          PrivateTmp = true;
+          PrivateNetwork = true;
+          ProtectKernelTunables = true;
+          ProtectKernelModules = true;
+          ProtectControlGroups = true;
+          RestrictAddressFamilies = [ ];
+          NoNewPrivileges = true;
+          CapabilityBoundingSet = [
+            "CAP_DAC_OVERRIDE"
+            "CAP_FOWNER"
+          ];
         };
       };
       maid.sharedModulesForAllUsers = true;
