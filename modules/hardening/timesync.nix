@@ -74,6 +74,20 @@
           serviceConfig = {
             Type = "oneshot";
             ExecStart = "${config.systemd.package}/bin/systemctl try-restart chronyd.service";
+
+            # It asks systemd to restart one unit and does nothing else, so it
+            # gets nothing else: no write access, no home, no capabilities.
+            # Talking to systemd goes over /run/systemd/private, which a
+            # read-only filesystem does not block.
+            ProtectSystem = "strict";
+            ProtectHome = true;
+            PrivateTmp = true;
+            ProtectKernelTunables = true;
+            ProtectKernelModules = true;
+            ProtectControlGroups = true;
+            RestrictAddressFamilies = [ "AF_UNIX" ];
+            NoNewPrivileges = true;
+            CapabilityBoundingSet = "";
           };
         };
       };
