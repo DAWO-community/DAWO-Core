@@ -81,7 +81,6 @@ in
           };
 
       verdicts = lib.mapAttrs verdict register;
-      enabled = lib.filterAttrs (id: _: verdicts.${id}.on) register;
 
       checkLine =
         id: rule:
@@ -218,9 +217,12 @@ in
             };
           }
         ]
+        # Every rule is listed, and mkIf decides. Filtering the list on config
+        # instead would make the shape of config depend on config, which the
+        # module system answers with an infinite recursion.
         ++ lib.mapAttrsToList (
-          _id: rule: rule.config { inherit config lib pkgs; }
-        ) enabled
+          id: rule: lib.mkIf verdicts.${id}.on (rule.config { inherit lib pkgs; })
+        ) register
       );
     };
 }
