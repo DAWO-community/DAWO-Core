@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased
+
+Breaking:
+
+- feat(hardening): flashing firmware asks for an administrator (rule
+  `polkit-firmware-needs-admin`). Mounting removable media stays with the
+  active local user, as a recorded decision #115 #146
+
 ## 0.2.0
 
 Breaking:
