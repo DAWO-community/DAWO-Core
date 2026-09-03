@@ -54,14 +54,17 @@
           echo "------------ verification ------------"
           echo "build:     $(readlink -f /run/current-system)"
           echo "host:      $(hostname)"
-          echo "-- users (expect bram, no dawo) --"
-          getent passwd | grep -E '^(bram|dawo):' || echo "  (no bram/dawo)"
+          echo "-- local accounts in wheel --"
+          getent group wheel | cut -d: -f4 | tr ',' '\n' | sed 's/^/  /' || echo "  (none)"
           echo "-- agenix secrets decrypted --"
           find /run/agenix -mindepth 1 -maxdepth 1 -printf '  %f\n' 2>/dev/null || echo "  (none)"
-          echo "-- hardening services --"
-          for u in nftables usbguard auditd chronyd; do
-            printf '  %-10s %s\n' "$u" "$(systemctl is-active "$u" 2>/dev/null || true)"
-          done
+          echo "-- hardening rules --"
+          # The rules this device actually carries, from the register, rather
+          # than a hand-kept list of service names. The previous version looked
+          # for usbguard and auditd, which no host runs, and for a user that
+          # exists in no module: it proved a configuration this repository does
+          # not build.
+          dawo-verify || true
           echo "-- secure boot --"
           bootctl status 2>/dev/null | grep -i 'secure boot' | sed 's/^ */  /' || true
         '';
