@@ -32,6 +32,15 @@
           different one keeps asking until that wallet is reset.
         '';
       };
+      options.dawo.desktop.plasma.kdeconnect = {
+        enable = lib.mkEnableOption ''
+          KDE Connect. Off by default: it opens TCP and UDP 1714-1764 on every
+          interface, and once a phone is paired it carries clipboard contents,
+          files, notifications and remote input. That is a reasonable trade on
+          a home machine and a decision somebody has to make for a device that
+          roams onto networks we do not run
+        '';
+      };
       options.dawo.desktop.plasma.socialClient = lib.mkOption {
         type = lib.types.bool;
         default = true;
@@ -44,8 +53,13 @@
 
         security.pam.services.sddm.kwallet.enable = cfg.unlockWalletAtLogin;
 
-        programs.kdeconnect.enable = true;
-        services.dbus.packages = lib.mkIf config.programs.kdeconnect.enable [
+        programs.kdeconnect.enable = cfg.kdeconnect.enable;
+
+        # BlueZ access for KDE Connect over Bluetooth. `own` is deliberately
+        # absent: it would let any user in the group claim the org.bluez name
+        # on the system bus and answer as the Bluetooth daemon. Talking to
+        # BlueZ needs send_destination and the interfaces below, nothing more.
+        services.dbus.packages = lib.mkIf cfg.kdeconnect.enable [
         (pkgs.writeTextFile {
           name = "kdeconnect-bluetooth.conf";
           destination = "/share/dbus-1/system.d/kdeconnect-bluetooth.conf";
@@ -53,7 +67,6 @@
             <?xml version="1.0" encoding="UTF-8"?>
             <!DOCTYPE busconfig PUBLIC "-//freedesktop//DTD D-BUS Bus Configuration 1.0//EN" "http://www.freedesktop.org/standards/dbus/1.0/busconfig.dtd">
             <policy group="users">
-              <allow own="org.bluez"/>
               <allow send_destination="org.bluez"/>
               <allow send_interface="org.bluez.Agent1"/>
               <allow send_interface="org.bluez.MediaEndpoint1"/>
