@@ -93,6 +93,14 @@
           ok = cfg.config.security.sudo.execWheelOnly;
         }
         {
+          n = "${name}: the screen locks itself";
+          ok =
+            (cfg.config.environment.etc."xdg/kscreenlockerrc".text or "") != ""
+            && lib.any (
+              db: lib.elem "/org/gnome/desktop/screensaver/lock-enabled" (db.locks or [ ])
+            ) cfg.config.programs.dconf.profiles.user.databases;
+        }
+        {
           n = "${name}: the device can check itself";
           ok = hasPkg cfg "dawo-verify";
         }
