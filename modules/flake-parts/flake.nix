@@ -4,5 +4,8 @@
     type = with lib.types; lazyAttrsOf anything;
   };
 
-  config.flake.meta.uri = "https://codeberg.org/rutgerputter/nixos";
+  # Where this flake lives, for anything that reports provenance. It pointed at
+  # a personal fork, which is the wrong answer to "where did this device's
+  # configuration come from".
+  config.flake.meta.uri = "https://codeberg.org/DAWO/DAWO-Core";
 }
