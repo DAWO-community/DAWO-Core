@@ -141,3 +141,23 @@ Three of those are handled rather than endured:
 `flake.lock` is the one left. Union merge cannot help with JSON, so branches that
 move inputs are landed one at a time and the lock is regenerated rather than
 merged by hand.
+
+## GitHub's actions are not all portable to Forgejo
+
+`actions/upload-artifact@v4` and `download-artifact@v4` want the v4 artifact
+API. This forge does not advertise it, so the action stops with
+
+    @actions/artifact v2.0.0+, upload-artifact@v4+ and download-artifact@v4+
+    are not currently supported on GHES
+
+which reads like a server outage and is not one. The job runs, does its work,
+and throws it away at the last step.
+
+**What to do.** Use Forgejo's own forks, by full URL so nothing depends on how
+the runner resolves a bare name:
+
+    uses: https://code.forgejo.org/forgejo/upload-artifact@v4
+
+**How to recognise the general case.** A workflow step that fails only at the
+point where it talks to the forge, with an error naming GitHub Enterprise. The
+action assumed a server it is not running against.
