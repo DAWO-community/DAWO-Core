@@ -27,6 +27,12 @@ See [CONTRIBUTING.md](CONTRIBUTING.md).
 ## High-Level Architecture
 See [architecture.md](architecture.md).
 
+## Pitfalls
+
+Things that cost somebody hours: [docs/pitfalls.md](docs/pitfalls.md). Read it
+before debugging CI, a comin device, or anything that reports success while
+being wrong.
+
 ## Module Map
 | Module                                              | Purpose                                                      |
 | --------------------------------------------------- | ------------------------------------------------------------ |
