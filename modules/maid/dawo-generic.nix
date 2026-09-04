@@ -1,9 +1,21 @@
 { inputs, ... }:
 {
+  # The Plasma workspace as it is handed to a user: branding, the panel layout,
+  # and the settings a fresh account starts with.
+  #
+  # Named "generic" for historical reasons; it is Plasma-specific throughout,
+  # which is why the whole thing sits behind dawo.desktop.plasma.enable. It used
+  # to be imported unconditionally, so GNOME devices carried a KDE panel
+  # definition and a service that deleted KDE files out of their home
+  # directories.
   flake.modules.nixos.maid-dawo-generic =
-    { pkgs, ... }:
+    {
+      config,
+      lib,
+      pkgs,
+      ...
+    }:
     let
-      # Define the custom background package with the correct relative path
       wallpaper = pkgs.stdenvNoCC.mkDerivation {
         name = "wallpaper";
         src = ../../artwork/wallpapers/DAWO-achtergrond.png;
@@ -12,12 +24,256 @@
           cp $src $out
         '';
       };
+
+      # Plasma numbers containments per screen: the desktop is screen+1, the panel
+      # is (screen+1)*100, an applet is that panel number plus its position, and
+      # a nested applet is the applet id with two more digits. So everything
+      # below follows from the screen index, and the five hand-written copies
+      # this replaces were five chances to edit one and forget the other four.
+      #
+      # Checked rather than asserted: the rendered
+      # plasma-org.kde.plasma.desktop-appletsrc is identical to what those five
+      # produced.
+      screens = [
+        0
+        1
+        2
+        3
+        4
+      ];
+
+      mkDesktop = screen: {
+          Wallpaper = {
+            "org.kde.image" = {
+              General = {
+                Image = "/nix/store/vxchhzr0jkpz1gwcy7wm5kk4gvp6fhc9-wallpaper";
+              };
+            };
+          };
+          activityId = "c2b12168-8128-4075-8bce-38fb70b77c7a";
+          formfactor = 0;
+          immutability = 1;
+          location = 0;
+          plugin = "org.kde.plasma.folder";
+          wallpaperplugin = "org.kde.image";
+        } // { lastScreen = screen; };
+
+      mkPanel =
+        screen:
+        let
+          panel = (screen + 1) * 100;
+          a = n: toString (panel + n);
+        in
+        {
+          activityId = "";
+          formfactor = 2;
+          immutability = 1;
+          lastScreen = screen;
+          location = 4;
+          plugin = "org.kde.panel";
+          wallpaperplugin = "org.kde.image";
+          Applets = {
+            "${a 1}" = {
+              Configuration = {
+                Appearance = {
+                  chartFace = "org.kde.ksysguard.barchart";
+                  title = "Individual Core Usage";
+                };
+                CurrentPreset = "org.kde.plasma.systemmonitor";
+                Sensors = {
+                  highPrioritySensorIds = "[\"cpu/cpu.*/usage\"]";
+                  totalSensors = "[\"cpu/all/usage\"]";
+                };
+                popupHeight = 375;
+                popupWidth = 525;
+              };
+              immutability = 1;
+              plugin = "org.kde.plasma.systemmonitor.cpucore";
+            };
+            "${a 2}" = {
+              Configuration = {
+                Appearance = {
+                  chartFace = "org.kde.ksysguard.piechart";
+                  title = "Memory Usage";
+                };
+                CurrentPreset = "org.kde.plasma.systemmonitor";
+                Sensors = {
+                  highPrioritySensorIds = "[\"memory/physical/used\"]";
+                  lowPrioritySensorIds = "[\"memory/physical/total\"]";
+                  totalSensors = "[\"memory/physical/usedPercent\"]";
+                };
+                popupHeight = 375;
+                popupWidth = 525;
+              };
+              immutability = 1;
+              plugin = "org.kde.plasma.systemmonitor.memory";
+            };
+            "${a 3}" = {
+              immutability = 1;
+              plugin = "org.kde.plasma.panelspacer";
+            };
+            "${a 4}" = {
+              Configuration = {
+                General = {
+                  favoritesPortedToKAstats = true;
+                  icon = "app-launcher";
+                };
+                popupHeight = 493;
+                popupWidth = 633;
+              };
+              immutability = 1;
+              plugin = "org.kde.plasma.kickoff";
+            };
+            "${a 5}" = {
+              immutability = 1;
+              plugin = "org.kde.plasma.pager";
+            };
+            "${a 6}" = {
+              immutability = 1;
+              plugin = "org.kde.plasma.marginsseparator";
+            };
+            "${a 7}" = {
+              immutability = 1;
+              plugin = "org.kde.plasma.icontasks";
+            };
+            "${a 8}" = {
+              immutability = 1;
+              plugin = "org.kde.plasma.panelspacer";
+            };
+            "${a 9}" = {
+              Applets = {
+                "${a 9}01" = {
+                  immutability = 1;
+                  plugin = "org.kde.kdeconnect";
+                };
+                "${a 9}02" = {
+                  immutability = 1;
+                  plugin = "org.kde.plasma.cameraindicator";
+                };
+                "${a 9}03" = {
+                  immutability = 1;
+                  plugin = "org.kde.plasma.clipboard";
+                };
+                "${a 9}04" = {
+                  immutability = 1;
+                  plugin = "org.kde.plasma.devicenotifier";
+                };
+                "${a 9}05" = {
+                  immutability = 1;
+                  plugin = "org.kde.plasma.manage-inputmethod";
+                };
+                "${a 9}06" = {
+                  immutability = 1;
+                  plugin = "org.kde.plasma.notifications";
+                };
+                "${a 9}07" = {
+                  immutability = 1;
+                  plugin = "org.kde.kscreen";
+                };
+                "${a 9}08" = {
+                  immutability = 1;
+                  plugin = "org.kde.plasma.keyboardindicator";
+                };
+                "${a 9}09" = {
+                  immutability = 1;
+                  plugin = "org.kde.plasma.keyboardlayout";
+                };
+                "${a 9}10" = {
+                  immutability = 1;
+                  plugin = "org.kde.plasma.networkmanagement";
+                };
+                "${a 9}11" = {
+                  immutability = 1;
+                  plugin = "org.kde.plasma.printmanager";
+                };
+                "${a 9}12" = {
+                  Configuration = {
+                    General = {
+                      migrated = true;
+                    };
+                  };
+                  immutability = 1;
+                  plugin = "org.kde.plasma.volume";
+                };
+                "${a 9}13" = {
+                  immutability = 1;
+                  plugin = "org.kde.plasma.weather";
+                };
+                "${a 9}14" = {
+                  immutability = 1;
+                  plugin = "org.kde.plasma.brightness";
+                };
+                "${a 9}15" = {
+                  immutability = 1;
+                  plugin = "org.kde.plasma.battery";
+                };
+                "${a 9}16" = {
+                  immutability = 1;
+                  plugin = "org.kde.plasma.bluetooth";
+                };
+              };
+              General = {
+                extraItems = "org.kde.kdeconnect,org.kde.plasma.cameraindicator,org.kde.plasma.clipboard,org.kde.plasma.devicenotifier,org.kde.plasma.manage-inputmethod,org.kde.plasma.mediacontroller,org.kde.plasma.notifications,org.kde.kscreen,org.kde.plasma.bluetooth,org.kde.plasma.brightness,org.kde.plasma.keyboardindicator,org.kde.plasma.keyboardlayout,org.kde.plasma.networkmanagement,org.kde.plasma.printmanager,org.kde.plasma.volume,org.kde.plasma.weather,org.kde.plasma.battery";
+                knownItems = "org.kde.kdeconnect,org.kde.plasma.cameraindicator,org.kde.plasma.clipboard,org.kde.plasma.devicenotifier,org.kde.plasma.manage-inputmethod,org.kde.plasma.mediacontroller,org.kde.plasma.notifications,org.kde.kscreen,org.kde.plasma.battery,org.kde.plasma.bluetooth,org.kde.plasma.brightness,org.kde.plasma.keyboardindicator,org.kde.plasma.keyboardlayout,org.kde.plasma.networkmanagement,org.kde.plasma.printmanager,org.kde.plasma.volume,org.kde.plasma.weather";
+                shownItems = "org.kde.plasma.battery";
+              };
+              activityId = "";
+              formfactor = 0;
+              immutability = 1;
+              lastScreen = -1;
+              location = 0;
+              plugin = "org.kde.plasma.systemtray";
+              popupHeight = 432;
+              popupWidth = 432;
+              wallpaperplugin = "org.kde.image";
+            };
+            "${a 10}" = {
+              Configuration = {
+                popupHeight = 375;
+                popupWidth = 525;
+              };
+              immutability = 1;
+              plugin = "org.kde.plasma.digitalclock";
+            };
+            "${a 11}" = {
+              immutability = 1;
+              plugin = "org.kde.plasma.showdesktop";
+            };
+          };
+          General.AppletOrder = "${a 1};${a 2};${a 3};${a 4};${a 5};${a 6};${a 7};${a 8};${a 9};${a 10};${a 11}";
+        };
+
+      containments =
+        builtins.listToAttrs (
+          map (s: {
+            name = toString (s + 1);
+            value = mkDesktop s;
+          }) screens
+        )
+        // builtins.listToAttrs (
+          map (s: {
+            name = toString ((s + 1) * 100);
+            value = mkPanel s;
+          }) screens
+        );
+
+      panelViews = builtins.listToAttrs (
+        map (s: {
+          name = "Panel ${toString ((s + 1) * 100)}";
+          value = {
+            floating = 1;
+            Defaults.thickness = 44;
+          };
+        }) screens
+      );
+
     in
     {
       imports = [
         inputs.nix-maid.nixosModules.default
       ];
 
+      config = lib.mkIf config.dawo.desktop.plasma.enable {
       systemd.services."kdeconfig-cleanup" = {
         wantedBy = [ "maid-system-activation.service" ];
         script = ''
@@ -109,1004 +365,23 @@
               };
             };
             plasmashellrc = {
-              PlasmaViews."Panel 100" = {
-                floating = 1;
-                Defaults = {
-                  thickness = 44;
-                };
-              };
-              PlasmaViews."Panel 200" = {
-                floating = 1;
-                Defaults = {
-                  thickness = 44;
-                };
-              };
-              PlasmaViews."Panel 300" = {
-                floating = 1;
-                Defaults = {
-                  thickness = 44;
-                };
-              };
-              PlasmaViews."Panel 400" = {
-                floating = 1;
-                Defaults = {
-                  thickness = 44;
-                };
-              };
-              PlasmaViews."Panel 500" = {
-                floating = 1;
-                Defaults = {
-                  thickness = 44;
-                };
-              };
+              PlasmaViews = panelViews;
             };
             "plasma-org.kde.plasma.desktop-appletsrc" = {
               ActionPlugins = {
-                "0" = {
-                  "MiddleButton;NoModifier" = "org.kde.paste";
-                  "RightButton;NoModifier" = "org.kde.contextmenu";
-                };
-                "1" = {
-                  "RightButton;NoModifier" = "org.kde.contextmenu";
-                };
-              };
-              Containments = {
-                # Desktops
-                "1" = {
-                  activityId = "c2b12168-8128-4075-8bce-38fb70b77c7a";
-                  formfactor = 0;
-                  immutability = 1;
-                  lastScreen = 0;
-                  location = 0;
-                  plugin = "org.kde.plasma.folder";
-                  wallpaperplugin = "org.kde.image";
-                  Wallpaper."org.kde.image".General = {
-                    Image = wallpaper;
-                  };
-                };
-                "2" = {
-                  activityId = "c2b12168-8128-4075-8bce-38fb70b77c7a";
-                  formfactor = 0;
-                  immutability = 1;
-                  lastScreen = 1;
-                  location = 0;
-                  plugin = "org.kde.plasma.folder";
-                  wallpaperplugin = "org.kde.image";
-                  Wallpaper."org.kde.image".General = {
-                    Image = wallpaper;
-                  };
-                };
-                "3" = {
-                  activityId = "c2b12168-8128-4075-8bce-38fb70b77c7a";
-                  formfactor = 0;
-                  immutability = 1;
-                  lastScreen = 2;
-                  location = 0;
-                  plugin = "org.kde.plasma.folder";
-                  wallpaperplugin = "org.kde.image";
-                  Wallpaper."org.kde.image".General = {
-                    Image = wallpaper;
-                  };
-                };
-                "4" = {
-                  activityId = "c2b12168-8128-4075-8bce-38fb70b77c7a";
-                  formfactor = 0;
-                  immutability = 1;
-                  lastScreen = 3;
-                  location = 0;
-                  plugin = "org.kde.plasma.folder";
-                  wallpaperplugin = "org.kde.image";
-                  Wallpaper."org.kde.image".General = {
-                    Image = wallpaper;
-                  };
-                };
-                "5" = {
-                  activityId = "c2b12168-8128-4075-8bce-38fb70b77c7a";
-                  formfactor = 0;
-                  immutability = 1;
-                  lastScreen = 4;
-                  location = 0;
-                  plugin = "org.kde.plasma.folder";
-                  wallpaperplugin = "org.kde.image";
-                  Wallpaper."org.kde.image".General = {
-                    Image = wallpaper;
-                  };
-                };
-                # Panels and applets
-                "100" = {
-                  activityId = "";
-                  formfactor = 2;
-                  immutability = 1;
-                  lastScreen = 0;
-                  location = 4;
-                  plugin = "org.kde.panel";
-                  wallpaperplugin = "org.kde.image";
-                  Applets = {
-                    "101" = {
-                      immutability = 1;
-                      plugin = "org.kde.plasma.systemmonitor.cpucore";
-                      Configuration = {
-                        CurrentPreset = "org.kde.plasma.systemmonitor";
-                        popupHeight = 375;
-                        popupWidth = 525;
-                        Appearance = {
-                          chartFace = "org.kde.ksysguard.barchart";
-                          title = "Individual Core Usage";
-                        };
-                        Sensors = {
-                          highPrioritySensorIds = "[\"cpu/cpu.*/usage\"]";
-                          totalSensors = "[\"cpu/all/usage\"]";
-                        };
-                      };
-                    };
-                    "102" = {
-                      immutability = 1;
-                      plugin = "org.kde.plasma.systemmonitor.memory";
-                      Configuration = {
-                        CurrentPreset = "org.kde.plasma.systemmonitor";
-                        popupHeight = 375;
-                        popupWidth = 525;
-                        Appearance = {
-                          chartFace = "org.kde.ksysguard.piechart";
-                          title = "Memory Usage";
-                        };
-                        Sensors = {
-                          highPrioritySensorIds = "[\"memory/physical/used\"]";
-                          lowPrioritySensorIds = "[\"memory/physical/total\"]";
-                          totalSensors = "[\"memory/physical/usedPercent\"]";
-                        };
-                      };
-                    };
-                    "103" = {
-                      immutability = 1;
-                      plugin = "org.kde.plasma.panelspacer";
-                    };
-                    "104" = {
-                      immutability = 1;
-                      plugin = "org.kde.plasma.kickoff";
-                      Configuration = {
-                        popupHeight = 493;
-                        popupWidth = 633;
-                        General = {
-                          favoritesPortedToKAstats = true;
-                          icon = "app-launcher";
-                        };
-                      };
-                    };
-                    "105" = {
-                      immutability = 1;
-                      plugin = "org.kde.plasma.pager";
-                    };
-                    "106" = {
-                      immutability = 1;
-                      plugin = "org.kde.plasma.marginsseparator";
-                    };
-                    "107" = {
-                      immutability = 1;
-                      plugin = "org.kde.plasma.icontasks";
-                    };
-                    "108" = {
-                      immutability = 1;
-                      plugin = "org.kde.plasma.panelspacer";
-                    };
-                    "109" = {
-                      activityId = "";
-                      formfactor = 0;
-                      immutability = 1;
-                      lastScreen = -1;
-                      location = 0;
-                      plugin = "org.kde.plasma.systemtray";
-                      popupHeight = 432;
-                      popupWidth = 432;
-                      wallpaperplugin = "org.kde.image";
-                      General = {
-                        extraItems = "org.kde.kdeconnect,org.kde.plasma.cameraindicator,org.kde.plasma.clipboard,org.kde.plasma.devicenotifier,org.kde.plasma.manage-inputmethod,org.kde.plasma.mediacontroller,org.kde.plasma.notifications,org.kde.kscreen,org.kde.plasma.bluetooth,org.kde.plasma.brightness,org.kde.plasma.keyboardindicator,org.kde.plasma.keyboardlayout,org.kde.plasma.networkmanagement,org.kde.plasma.printmanager,org.kde.plasma.volume,org.kde.plasma.weather,org.kde.plasma.battery";
-                        knownItems = "org.kde.kdeconnect,org.kde.plasma.cameraindicator,org.kde.plasma.clipboard,org.kde.plasma.devicenotifier,org.kde.plasma.manage-inputmethod,org.kde.plasma.mediacontroller,org.kde.plasma.notifications,org.kde.kscreen,org.kde.plasma.battery,org.kde.plasma.bluetooth,org.kde.plasma.brightness,org.kde.plasma.keyboardindicator,org.kde.plasma.keyboardlayout,org.kde.plasma.networkmanagement,org.kde.plasma.printmanager,org.kde.plasma.volume,org.kde.plasma.weather";
-                        shownItems = "org.kde.plasma.battery";
-                      };
-                      Applets = {
-                        "10901" = {
-                          immutability = 1;
-                          plugin = "org.kde.kdeconnect";
-                        };
-                        "10902" = {
-                          immutability = 1;
-                          plugin = "org.kde.plasma.cameraindicator";
-                        };
-                        "10903" = {
-                          immutability = 1;
-                          plugin = "org.kde.plasma.clipboard";
-                        };
-                        "10904" = {
-                          immutability = 1;
-                          plugin = "org.kde.plasma.devicenotifier";
-                        };
-                        "10905" = {
-                          immutability = 1;
-                          plugin = "org.kde.plasma.manage-inputmethod";
-                        };
-                        "10906" = {
-                          immutability = 1;
-                          plugin = "org.kde.plasma.notifications";
-                        };
-                        "10907" = {
-                          immutability = 1;
-                          plugin = "org.kde.kscreen";
-                        };
-                        "10908" = {
-                          immutability = 1;
-                          plugin = "org.kde.plasma.keyboardindicator";
-                        };
-                        "10909" = {
-                          immutability = 1;
-                          plugin = "org.kde.plasma.keyboardlayout";
-                        };
-                        "10910" = {
-                          immutability = 1;
-                          plugin = "org.kde.plasma.networkmanagement";
-                        };
-                        "10911" = {
-                          immutability = 1;
-                          plugin = "org.kde.plasma.printmanager";
-                        };
-                        "10912" = {
-                          immutability = 1;
-                          plugin = "org.kde.plasma.volume";
-                          Configuration.General = {
-                            migrated = true;
-                          };
-                        };
-                        "10913" = {
-                          immutability = 1;
-                          plugin = "org.kde.plasma.weather";
-                        };
-                        "10914" = {
-                          immutability = 1;
-                          plugin = "org.kde.plasma.brightness";
-                        };
-                        "10915" = {
-                          immutability = 1;
-                          plugin = "org.kde.plasma.battery";
-                        };
-                        "10916" = {
-                          immutability = 1;
-                          plugin = "org.kde.plasma.bluetooth";
-                        };
-                      };
-                    };
-                    "110" = {
-                      immutability = 1;
-                      plugin = "org.kde.plasma.digitalclock";
-                      Configuration = {
-                        popupHeight = 375;
-                        popupWidth = 525;
-                      };
-                    };
-                    "111" = {
-                      immutability = 1;
-                      plugin = "org.kde.plasma.showdesktop";
-                    };
-                  };
-                  General = {
-                    AppletOrder = "101;102;103;104;105;106;107;108;109;110;111";
-                  };
-                };
-                "200" = {
-                  activityId = "";
-                  formfactor = 2;
-                  immutability = 1;
-                  lastScreen = 1;
-                  location = 4;
-                  plugin = "org.kde.panel";
-                  wallpaperplugin = "org.kde.image";
-                  Applets = {
-                    "201" = {
-                      immutability = 1;
-                      plugin = "org.kde.plasma.systemmonitor.cpucore";
-                      Configuration = {
-                        CurrentPreset = "org.kde.plasma.systemmonitor";
-                        popupHeight = 375;
-                        popupWidth = 525;
-                        Appearance = {
-                          chartFace = "org.kde.ksysguard.barchart";
-                          title = "Individual Core Usage";
-                        };
-                        Sensors = {
-                          highPrioritySensorIds = "[\"cpu/cpu.*/usage\"]";
-                          totalSensors = "[\"cpu/all/usage\"]";
-                        };
-                      };
-                    };
-                    "202" = {
-                      immutability = 1;
-                      plugin = "org.kde.plasma.systemmonitor.memory";
-                      Configuration = {
-                        CurrentPreset = "org.kde.plasma.systemmonitor";
-                        popupHeight = 375;
-                        popupWidth = 525;
-                        Appearance = {
-                          chartFace = "org.kde.ksysguard.piechart";
-                          title = "Memory Usage";
-                        };
-                        Sensors = {
-                          highPrioritySensorIds = "[\"memory/physical/used\"]";
-                          lowPrioritySensorIds = "[\"memory/physical/total\"]";
-                          totalSensors = "[\"memory/physical/usedPercent\"]";
-                        };
-                      };
-                    };
-                    "203" = {
-                      immutability = 1;
-                      plugin = "org.kde.plasma.panelspacer";
-                    };
-                    "204" = {
-                      immutability = 1;
-                      plugin = "org.kde.plasma.kickoff";
-                      Configuration = {
-                        popupHeight = 493;
-                        popupWidth = 633;
-                        General = {
-                          favoritesPortedToKAstats = true;
-                          icon = "app-launcher";
-                        };
-                      };
-                    };
-                    "205" = {
-                      immutability = 1;
-                      plugin = "org.kde.plasma.pager";
-                    };
-                    "206" = {
-                      immutability = 1;
-                      plugin = "org.kde.plasma.marginsseparator";
-                    };
-                    "207" = {
-                      immutability = 1;
-                      plugin = "org.kde.plasma.icontasks";
-                    };
-                    "208" = {
-                      immutability = 1;
-                      plugin = "org.kde.plasma.panelspacer";
-                    };
-                    "209" = {
-                      activityId = "";
-                      formfactor = 0;
-                      immutability = 1;
-                      lastScreen = -1;
-                      location = 0;
-                      plugin = "org.kde.plasma.systemtray";
-                      popupHeight = 432;
-                      popupWidth = 432;
-                      wallpaperplugin = "org.kde.image";
-                      General = {
-                        extraItems = "org.kde.kdeconnect,org.kde.plasma.cameraindicator,org.kde.plasma.clipboard,org.kde.plasma.devicenotifier,org.kde.plasma.manage-inputmethod,org.kde.plasma.mediacontroller,org.kde.plasma.notifications,org.kde.kscreen,org.kde.plasma.bluetooth,org.kde.plasma.brightness,org.kde.plasma.keyboardindicator,org.kde.plasma.keyboardlayout,org.kde.plasma.networkmanagement,org.kde.plasma.printmanager,org.kde.plasma.volume,org.kde.plasma.weather,org.kde.plasma.battery";
-                        knownItems = "org.kde.kdeconnect,org.kde.plasma.cameraindicator,org.kde.plasma.clipboard,org.kde.plasma.devicenotifier,org.kde.plasma.manage-inputmethod,org.kde.plasma.mediacontroller,org.kde.plasma.notifications,org.kde.kscreen,org.kde.plasma.battery,org.kde.plasma.bluetooth,org.kde.plasma.brightness,org.kde.plasma.keyboardindicator,org.kde.plasma.keyboardlayout,org.kde.plasma.networkmanagement,org.kde.plasma.printmanager,org.kde.plasma.volume,org.kde.plasma.weather";
-                        shownItems = "org.kde.plasma.battery";
-                      };
-                      Applets = {
-                        "20901" = {
-                          immutability = 1;
-                          plugin = "org.kde.kdeconnect";
-                        };
-                        "20902" = {
-                          immutability = 1;
-                          plugin = "org.kde.plasma.cameraindicator";
-                        };
-                        "20903" = {
-                          immutability = 1;
-                          plugin = "org.kde.plasma.clipboard";
-                        };
-                        "20904" = {
-                          immutability = 1;
-                          plugin = "org.kde.plasma.devicenotifier";
-                        };
-                        "20905" = {
-                          immutability = 1;
-                          plugin = "org.kde.plasma.manage-inputmethod";
-                        };
-                        "20906" = {
-                          immutability = 1;
-                          plugin = "org.kde.plasma.notifications";
-                        };
-                        "20907" = {
-                          immutability = 1;
-                          plugin = "org.kde.kscreen";
-                        };
-                        "20908" = {
-                          immutability = 1;
-                          plugin = "org.kde.plasma.keyboardindicator";
-                        };
-                        "20909" = {
-                          immutability = 1;
-                          plugin = "org.kde.plasma.keyboardlayout";
-                        };
-                        "20910" = {
-                          immutability = 1;
-                          plugin = "org.kde.plasma.networkmanagement";
-                        };
-                        "20911" = {
-                          immutability = 1;
-                          plugin = "org.kde.plasma.printmanager";
-                        };
-                        "20912" = {
-                          immutability = 1;
-                          plugin = "org.kde.plasma.volume";
-                          Configuration.General = {
-                            migrated = true;
-                          };
-                        };
-                        "20913" = {
-                          immutability = 1;
-                          plugin = "org.kde.plasma.weather";
-                        };
-                        "20914" = {
-                          immutability = 1;
-                          plugin = "org.kde.plasma.brightness";
-                        };
-                        "20915" = {
-                          immutability = 1;
-                          plugin = "org.kde.plasma.battery";
-                        };
-                        "20916" = {
-                          immutability = 1;
-                          plugin = "org.kde.plasma.bluetooth";
-                        };
-                      };
-                    };
-                    "210" = {
-                      immutability = 1;
-                      plugin = "org.kde.plasma.digitalclock";
-                      Configuration = {
-                        popupHeight = 375;
-                        popupWidth = 525;
-                      };
-                    };
-                    "211" = {
-                      immutability = 1;
-                      plugin = "org.kde.plasma.showdesktop";
-                    };
-                  };
-                  General = {
-                    AppletOrder = "201;202;203;204;205;206;207;208;209;210;211";
-                  };
-                };
-                "300" = {
-                  activityId = "";
-                  formfactor = 2;
-                  immutability = 1;
-                  lastScreen = 2;
-                  location = 4;
-                  plugin = "org.kde.panel";
-                  wallpaperplugin = "org.kde.image";
-                  Applets = {
-                    "301" = {
-                      immutability = 1;
-                      plugin = "org.kde.plasma.systemmonitor.cpucore";
-                      Configuration = {
-                        CurrentPreset = "org.kde.plasma.systemmonitor";
-                        popupHeight = 375;
-                        popupWidth = 525;
-                        Appearance = {
-                          chartFace = "org.kde.ksysguard.barchart";
-                          title = "Individual Core Usage";
-                        };
-                        Sensors = {
-                          highPrioritySensorIds = "[\"cpu/cpu.*/usage\"]";
-                          totalSensors = "[\"cpu/all/usage\"]";
-                        };
-                      };
-                    };
-                    "302" = {
-                      immutability = 1;
-                      plugin = "org.kde.plasma.systemmonitor.memory";
-                      Configuration = {
-                        CurrentPreset = "org.kde.plasma.systemmonitor";
-                        popupHeight = 375;
-                        popupWidth = 525;
-                        Appearance = {
-                          chartFace = "org.kde.ksysguard.piechart";
-                          title = "Memory Usage";
-                        };
-                        Sensors = {
-                          highPrioritySensorIds = "[\"memory/physical/used\"]";
-                          lowPrioritySensorIds = "[\"memory/physical/total\"]";
-                          totalSensors = "[\"memory/physical/usedPercent\"]";
-                        };
-                      };
-                    };
-                    "303" = {
-                      immutability = 1;
-                      plugin = "org.kde.plasma.panelspacer";
-                    };
-                    "304" = {
-                      immutability = 1;
-                      plugin = "org.kde.plasma.kickoff";
-                      Configuration = {
-                        popupHeight = 493;
-                        popupWidth = 633;
-                        General = {
-                          favoritesPortedToKAstats = true;
-                          icon = "app-launcher";
-                        };
-                      };
-                    };
-                    "305" = {
-                      immutability = 1;
-                      plugin = "org.kde.plasma.pager";
-                    };
-                    "306" = {
-                      immutability = 1;
-                      plugin = "org.kde.plasma.marginsseparator";
-                    };
-                    "307" = {
-                      immutability = 1;
-                      plugin = "org.kde.plasma.icontasks";
-                    };
-                    "308" = {
-                      immutability = 1;
-                      plugin = "org.kde.plasma.panelspacer";
-                    };
-                    "309" = {
-                      activityId = "";
-                      formfactor = 0;
-                      immutability = 1;
-                      lastScreen = -1;
-                      location = 0;
-                      plugin = "org.kde.plasma.systemtray";
-                      popupHeight = 432;
-                      popupWidth = 432;
-                      wallpaperplugin = "org.kde.image";
-                      General = {
-                        extraItems = "org.kde.kdeconnect,org.kde.plasma.cameraindicator,org.kde.plasma.clipboard,org.kde.plasma.devicenotifier,org.kde.plasma.manage-inputmethod,org.kde.plasma.mediacontroller,org.kde.plasma.notifications,org.kde.kscreen,org.kde.plasma.bluetooth,org.kde.plasma.brightness,org.kde.plasma.keyboardindicator,org.kde.plasma.keyboardlayout,org.kde.plasma.networkmanagement,org.kde.plasma.printmanager,org.kde.plasma.volume,org.kde.plasma.weather,org.kde.plasma.battery";
-                        knownItems = "org.kde.kdeconnect,org.kde.plasma.cameraindicator,org.kde.plasma.clipboard,org.kde.plasma.devicenotifier,org.kde.plasma.manage-inputmethod,org.kde.plasma.mediacontroller,org.kde.plasma.notifications,org.kde.kscreen,org.kde.plasma.battery,org.kde.plasma.bluetooth,org.kde.plasma.brightness,org.kde.plasma.keyboardindicator,org.kde.plasma.keyboardlayout,org.kde.plasma.networkmanagement,org.kde.plasma.printmanager,org.kde.plasma.volume,org.kde.plasma.weather";
-                        shownItems = "org.kde.plasma.battery";
-                      };
-                      Applets = {
-                        "30901" = {
-                          immutability = 1;
-                          plugin = "org.kde.kdeconnect";
-                        };
-                        "30902" = {
-                          immutability = 1;
-                          plugin = "org.kde.plasma.cameraindicator";
-                        };
-                        "30903" = {
-                          immutability = 1;
-                          plugin = "org.kde.plasma.clipboard";
-                        };
-                        "30904" = {
-                          immutability = 1;
-                          plugin = "org.kde.plasma.devicenotifier";
-                        };
-                        "30905" = {
-                          immutability = 1;
-                          plugin = "org.kde.plasma.manage-inputmethod";
-                        };
-                        "30906" = {
-                          immutability = 1;
-                          plugin = "org.kde.plasma.notifications";
-                        };
-                        "30907" = {
-                          immutability = 1;
-                          plugin = "org.kde.kscreen";
-                        };
-                        "30908" = {
-                          immutability = 1;
-                          plugin = "org.kde.plasma.keyboardindicator";
-                        };
-                        "30909" = {
-                          immutability = 1;
-                          plugin = "org.kde.plasma.keyboardlayout";
-                        };
-                        "30910" = {
-                          immutability = 1;
-                          plugin = "org.kde.plasma.networkmanagement";
-                        };
-                        "30911" = {
-                          immutability = 1;
-                          plugin = "org.kde.plasma.printmanager";
-                        };
-                        "30912" = {
-                          immutability = 1;
-                          plugin = "org.kde.plasma.volume";
-                          Configuration.General = {
-                            migrated = true;
-                          };
-                        };
-                        "30913" = {
-                          immutability = 1;
-                          plugin = "org.kde.plasma.weather";
-                        };
-                        "30914" = {
-                          immutability = 1;
-                          plugin = "org.kde.plasma.brightness";
-                        };
-                        "30915" = {
-                          immutability = 1;
-                          plugin = "org.kde.plasma.battery";
-                        };
-                        "30916" = {
-                          immutability = 1;
-                          plugin = "org.kde.plasma.bluetooth";
-                        };
-                      };
-                    };
-                    "310" = {
-                      immutability = 1;
-                      plugin = "org.kde.plasma.digitalclock";
-                      Configuration = {
-                        popupHeight = 375;
-                        popupWidth = 525;
-                      };
-                    };
-                    "311" = {
-                      immutability = 1;
-                      plugin = "org.kde.plasma.showdesktop";
-                    };
-                  };
-                  General = {
-                    AppletOrder = "301;302;303;304;305;306;307;308;309;310;311";
-                  };
-                };
-                "400" = {
-                  activityId = "";
-                  formfactor = 2;
-                  immutability = 1;
-                  lastScreen = 3;
-                  location = 4;
-                  plugin = "org.kde.panel";
-                  wallpaperplugin = "org.kde.image";
-                  Applets = {
-                    "401" = {
-                      immutability = 1;
-                      plugin = "org.kde.plasma.systemmonitor.cpucore";
-                      Configuration = {
-                        CurrentPreset = "org.kde.plasma.systemmonitor";
-                        popupHeight = 375;
-                        popupWidth = 525;
-                        Appearance = {
-                          chartFace = "org.kde.ksysguard.barchart";
-                          title = "Individual Core Usage";
-                        };
-                        Sensors = {
-                          highPrioritySensorIds = "[\"cpu/cpu.*/usage\"]";
-                          totalSensors = "[\"cpu/all/usage\"]";
-                        };
-                      };
-                    };
-                    "402" = {
-                      immutability = 1;
-                      plugin = "org.kde.plasma.systemmonitor.memory";
-                      Configuration = {
-                        CurrentPreset = "org.kde.plasma.systemmonitor";
-                        popupHeight = 375;
-                        popupWidth = 525;
-                        Appearance = {
-                          chartFace = "org.kde.ksysguard.piechart";
-                          title = "Memory Usage";
-                        };
-                        Sensors = {
-                          highPrioritySensorIds = "[\"memory/physical/used\"]";
-                          lowPrioritySensorIds = "[\"memory/physical/total\"]";
-                          totalSensors = "[\"memory/physical/usedPercent\"]";
-                        };
-                      };
-                    };
-                    "403" = {
-                      immutability = 1;
-                      plugin = "org.kde.plasma.panelspacer";
-                    };
-                    "404" = {
-                      immutability = 1;
-                      plugin = "org.kde.plasma.kickoff";
-                      Configuration = {
-                        popupHeight = 493;
-                        popupWidth = 633;
-                        General = {
-                          favoritesPortedToKAstats = true;
-                          icon = "app-launcher";
-                        };
-                      };
-                    };
-                    "405" = {
-                      immutability = 1;
-                      plugin = "org.kde.plasma.pager";
-                    };
-                    "406" = {
-                      immutability = 1;
-                      plugin = "org.kde.plasma.marginsseparator";
-                    };
-                    "407" = {
-                      immutability = 1;
-                      plugin = "org.kde.plasma.icontasks";
-                    };
-                    "408" = {
-                      immutability = 1;
-                      plugin = "org.kde.plasma.panelspacer";
-                    };
-                    "409" = {
-                      activityId = "";
-                      formfactor = 0;
-                      immutability = 1;
-                      lastScreen = -1;
-                      location = 0;
-                      plugin = "org.kde.plasma.systemtray";
-                      popupHeight = 432;
-                      popupWidth = 432;
-                      wallpaperplugin = "org.kde.image";
-                      General = {
-                        extraItems = "org.kde.kdeconnect,org.kde.plasma.cameraindicator,org.kde.plasma.clipboard,org.kde.plasma.devicenotifier,org.kde.plasma.manage-inputmethod,org.kde.plasma.mediacontroller,org.kde.plasma.notifications,org.kde.kscreen,org.kde.plasma.bluetooth,org.kde.plasma.brightness,org.kde.plasma.keyboardindicator,org.kde.plasma.keyboardlayout,org.kde.plasma.networkmanagement,org.kde.plasma.printmanager,org.kde.plasma.volume,org.kde.plasma.weather,org.kde.plasma.battery";
-                        knownItems = "org.kde.kdeconnect,org.kde.plasma.cameraindicator,org.kde.plasma.clipboard,org.kde.plasma.devicenotifier,org.kde.plasma.manage-inputmethod,org.kde.plasma.mediacontroller,org.kde.plasma.notifications,org.kde.kscreen,org.kde.plasma.battery,org.kde.plasma.bluetooth,org.kde.plasma.brightness,org.kde.plasma.keyboardindicator,org.kde.plasma.keyboardlayout,org.kde.plasma.networkmanagement,org.kde.plasma.printmanager,org.kde.plasma.volume,org.kde.plasma.weather";
-                        shownItems = "org.kde.plasma.battery";
-                      };
-                      Applets = {
-                        "40901" = {
-                          immutability = 1;
-                          plugin = "org.kde.kdeconnect";
-                        };
-                        "40902" = {
-                          immutability = 1;
-                          plugin = "org.kde.plasma.cameraindicator";
-                        };
-                        "40903" = {
-                          immutability = 1;
-                          plugin = "org.kde.plasma.clipboard";
-                        };
-                        "40904" = {
-                          immutability = 1;
-                          plugin = "org.kde.plasma.devicenotifier";
-                        };
-                        "40905" = {
-                          immutability = 1;
-                          plugin = "org.kde.plasma.manage-inputmethod";
-                        };
-                        "40906" = {
-                          immutability = 1;
-                          plugin = "org.kde.plasma.notifications";
-                        };
-                        "40907" = {
-                          immutability = 1;
-                          plugin = "org.kde.kscreen";
-                        };
-                        "40908" = {
-                          immutability = 1;
-                          plugin = "org.kde.plasma.keyboardindicator";
-                        };
-                        "40909" = {
-                          immutability = 1;
-                          plugin = "org.kde.plasma.keyboardlayout";
-                        };
-                        "40910" = {
-                          immutability = 1;
-                          plugin = "org.kde.plasma.networkmanagement";
-                        };
-                        "40911" = {
-                          immutability = 1;
-                          plugin = "org.kde.plasma.printmanager";
-                        };
-                        "40912" = {
-                          immutability = 1;
-                          plugin = "org.kde.plasma.volume";
-                          Configuration.General = {
-                            migrated = true;
-                          };
-                        };
-                        "40913" = {
-                          immutability = 1;
-                          plugin = "org.kde.plasma.weather";
-                        };
-                        "40914" = {
-                          immutability = 1;
-                          plugin = "org.kde.plasma.brightness";
-                        };
-                        "40915" = {
-                          immutability = 1;
-                          plugin = "org.kde.plasma.battery";
-                        };
-                        "40916" = {
-                          immutability = 1;
-                          plugin = "org.kde.plasma.bluetooth";
-                        };
-                      };
-                    };
-                    "410" = {
-                      immutability = 1;
-                      plugin = "org.kde.plasma.digitalclock";
-                      Configuration = {
-                        popupHeight = 375;
-                        popupWidth = 525;
-                      };
-                    };
-                    "411" = {
-                      immutability = 1;
-                      plugin = "org.kde.plasma.showdesktop";
-                    };
-                  };
-                  General = {
-                    AppletOrder = "401;402;403;404;405;406;407;408;409;410;411";
-                  };
-                };
-                "500" = {
-                  activityId = "";
-                  formfactor = 2;
-                  immutability = 1;
-                  lastScreen = 4;
-                  location = 4;
-                  plugin = "org.kde.panel";
-                  wallpaperplugin = "org.kde.image";
-                  Applets = {
-                    "501" = {
-                      immutability = 1;
-                      plugin = "org.kde.plasma.systemmonitor.cpucore";
-                      Configuration = {
-                        CurrentPreset = "org.kde.plasma.systemmonitor";
-                        popupHeight = 375;
-                        popupWidth = 525;
-                        Appearance = {
-                          chartFace = "org.kde.ksysguard.barchart";
-                          title = "Individual Core Usage";
-                        };
-                        Sensors = {
-                          highPrioritySensorIds = "[\"cpu/cpu.*/usage\"]";
-                          totalSensors = "[\"cpu/all/usage\"]";
-                        };
-                      };
-                    };
-                    "502" = {
-                      immutability = 1;
-                      plugin = "org.kde.plasma.systemmonitor.memory";
-                      Configuration = {
-                        CurrentPreset = "org.kde.plasma.systemmonitor";
-                        popupHeight = 375;
-                        popupWidth = 525;
-                        Appearance = {
-                          chartFace = "org.kde.ksysguard.piechart";
-                          title = "Memory Usage";
-                        };
-                        Sensors = {
-                          highPrioritySensorIds = "[\"memory/physical/used\"]";
-                          lowPrioritySensorIds = "[\"memory/physical/total\"]";
-                          totalSensors = "[\"memory/physical/usedPercent\"]";
-                        };
-                      };
-                    };
-                    "503" = {
-                      immutability = 1;
-                      plugin = "org.kde.plasma.panelspacer";
-                    };
-                    "504" = {
-                      immutability = 1;
-                      plugin = "org.kde.plasma.kickoff";
-                      Configuration = {
-                        popupHeight = 493;
-                        popupWidth = 633;
-                        General = {
-                          favoritesPortedToKAstats = true;
-                          icon = "app-launcher";
-                        };
-                      };
-                    };
-                    "505" = {
-                      immutability = 1;
-                      plugin = "org.kde.plasma.pager";
-                    };
-                    "506" = {
-                      immutability = 1;
-                      plugin = "org.kde.plasma.marginsseparator";
-                    };
-                    "507" = {
-                      immutability = 1;
-                      plugin = "org.kde.plasma.icontasks";
-                    };
-                    "508" = {
-                      immutability = 1;
-                      plugin = "org.kde.plasma.panelspacer";
-                    };
-                    "509" = {
-                      activityId = "";
-                      formfactor = 0;
-                      immutability = 1;
-                      lastScreen = -1;
-                      location = 0;
-                      plugin = "org.kde.plasma.systemtray";
-                      popupHeight = 432;
-                      popupWidth = 432;
-                      wallpaperplugin = "org.kde.image";
-                      General = {
-                        extraItems = "org.kde.kdeconnect,org.kde.plasma.cameraindicator,org.kde.plasma.clipboard,org.kde.plasma.devicenotifier,org.kde.plasma.manage-inputmethod,org.kde.plasma.mediacontroller,org.kde.plasma.notifications,org.kde.kscreen,org.kde.plasma.bluetooth,org.kde.plasma.brightness,org.kde.plasma.keyboardindicator,org.kde.plasma.keyboardlayout,org.kde.plasma.networkmanagement,org.kde.plasma.printmanager,org.kde.plasma.volume,org.kde.plasma.weather,org.kde.plasma.battery";
-                        knownItems = "org.kde.kdeconnect,org.kde.plasma.cameraindicator,org.kde.plasma.clipboard,org.kde.plasma.devicenotifier,org.kde.plasma.manage-inputmethod,org.kde.plasma.mediacontroller,org.kde.plasma.notifications,org.kde.kscreen,org.kde.plasma.battery,org.kde.plasma.bluetooth,org.kde.plasma.brightness,org.kde.plasma.keyboardindicator,org.kde.plasma.keyboardlayout,org.kde.plasma.networkmanagement,org.kde.plasma.printmanager,org.kde.plasma.volume,org.kde.plasma.weather";
-                        shownItems = "org.kde.plasma.battery";
-                      };
-                      Applets = {
-                        "50901" = {
-                          immutability = 1;
-                          plugin = "org.kde.kdeconnect";
-                        };
-                        "50902" = {
-                          immutability = 1;
-                          plugin = "org.kde.plasma.cameraindicator";
-                        };
-                        "50903" = {
-                          immutability = 1;
-                          plugin = "org.kde.plasma.clipboard";
-                        };
-                        "50904" = {
-                          immutability = 1;
-                          plugin = "org.kde.plasma.devicenotifier";
-                        };
-                        "50905" = {
-                          immutability = 1;
-                          plugin = "org.kde.plasma.manage-inputmethod";
-                        };
-                        "50906" = {
-                          immutability = 1;
-                          plugin = "org.kde.plasma.notifications";
-                        };
-                        "50907" = {
-                          immutability = 1;
-                          plugin = "org.kde.kscreen";
-                        };
-                        "50908" = {
-                          immutability = 1;
-                          plugin = "org.kde.plasma.keyboardindicator";
-                        };
-                        "50909" = {
-                          immutability = 1;
-                          plugin = "org.kde.plasma.keyboardlayout";
-                        };
-                        "50910" = {
-                          immutability = 1;
-                          plugin = "org.kde.plasma.networkmanagement";
-                        };
-                        "50911" = {
-                          immutability = 1;
-                          plugin = "org.kde.plasma.printmanager";
-                        };
-                        "50912" = {
-                          immutability = 1;
-                          plugin = "org.kde.plasma.volume";
-                          Configuration.General = {
-                            migrated = true;
-                          };
-                        };
-                        "50913" = {
-                          immutability = 1;
-                          plugin = "org.kde.plasma.weather";
-                        };
-                        "50914" = {
-                          immutability = 1;
-                          plugin = "org.kde.plasma.brightness";
-                        };
-                        "50915" = {
-                          immutability = 1;
-                          plugin = "org.kde.plasma.battery";
-                        };
-                        "50916" = {
-                          immutability = 1;
-                          plugin = "org.kde.plasma.bluetooth";
-                        };
-                      };
-                    };
-                    "510" = {
-                      immutability = 1;
-                      plugin = "org.kde.plasma.digitalclock";
-                      Configuration = {
-                        popupHeight = 375;
-                        popupWidth = 525;
-                      };
-                    };
-                    "511" = {
-                      immutability = 1;
-                      plugin = "org.kde.plasma.showdesktop";
-                    };
-                  };
-                  General = {
-                    AppletOrder = "501;502;503;504;505;506;507;508;509;510;511";
-                  };
-                };
-              };
+                              "0" = {
+                                "MiddleButton;NoModifier" = "org.kde.paste";
+                                "RightButton;NoModifier" = "org.kde.contextmenu";
+                              };
+                              "1" = {
+                                "RightButton;NoModifier" = "org.kde.contextmenu";
+                              };
+                            };
+              Containments = containments;
             };
           };
         }
       ];
+      };
     };
 }
