@@ -19,7 +19,7 @@
       cfg = config.dawo.apps;
       officePkg =
         {
-          libreoffice = pkgs.libreoffice;
+          inherit (pkgs) libreoffice;
           collabora = pkgs.collabora-desktop;
         }
         .${cfg.office.suite};

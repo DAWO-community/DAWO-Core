@@ -7,7 +7,7 @@
 # (no AP client-isolation, unlike a phone hotspot). Build with --impure:
 #   INSTALLER_SSH_KEY="ssh-ed25519 AAAA... you@host" \
 #     nix build .#nixosConfigurations.dawo-installer-netboot.config.system.build.netbootRamdisk --impure
-{ ... }:
+_:
 let
   sshKey = builtins.getEnv "INSTALLER_SSH_KEY";
 in

@@ -67,19 +67,17 @@
       };
 
       config = lib.mkIf cfg.enable {
-        warnings =
-          lib.optional (cfg.initialHashedPassword == "" && !cfg.acknowledgeDefaultPassword)
-            ''
-              dawo.bootstrapUser is enabled with the password documented in this
-              module, so this device has a local administrator anyone can log in
-              as. That is the intended default for a first install and not for a
-              device in use.
+        warnings = lib.optional (cfg.initialHashedPassword == "" && !cfg.acknowledgeDefaultPassword) ''
+          dawo.bootstrapUser is enabled with the password documented in this
+          module, so this device has a local administrator anyone can log in
+          as. That is the intended default for a first install and not for a
+          device in use.
 
-              Set dawo.bootstrapUser.initialHashedPassword, or disable the
-              account once a named admin works, or set
-              dawo.bootstrapUser.acknowledgeDefaultPassword to say this
-              deployment means it.
-            '';
+          Set dawo.bootstrapUser.initialHashedPassword, or disable the
+          account once a named admin works, or set
+          dawo.bootstrapUser.acknowledgeDefaultPassword to say this
+          deployment means it.
+        '';
 
         users = {
           mutableUsers = true;

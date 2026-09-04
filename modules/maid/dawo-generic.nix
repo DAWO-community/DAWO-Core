@@ -42,7 +42,9 @@
         4
       ];
 
-      mkDesktop = screen: {
+      mkDesktop =
+        screen:
+        {
           Wallpaper = {
             "org.kde.image" = {
               General = {
@@ -56,7 +58,10 @@
           location = 0;
           plugin = "org.kde.plasma.folder";
           wallpaperplugin = "org.kde.image";
-        } // { lastScreen = screen; };
+        }
+        // {
+          lastScreen = screen;
+        };
 
       mkPanel =
         screen:
@@ -274,138 +279,138 @@
       ];
 
       config = lib.mkIf config.dawo.desktop.plasma.enable {
-      systemd.services."kdeconfig-cleanup" = {
-        wantedBy = [ "maid-system-activation.service" ];
-        script = ''
-          set -eu
-          find /home/*/.config -maxdepth 1 -type f -name "kactivitymanagerdrc" -delete
-          find /home/*/.config -maxdepth 1 -type f -name "kcminputrc" -delete
-          find /home/*/.config -maxdepth 1 -type f -name "kdeglobals" -delete
-          find /home/*/.config -maxdepth 1 -type f -name "kscreenlockerrc" -delete
-          find /home/*/.config -maxdepth 1 -type f -name "kwinrc" -delete
-          find /home/*/.config -maxdepth 1 -type f -name "plasmarc" -delete
-          find /home/*/.config -maxdepth 1 -type f -name "plasmashellrc" -delete
-          find /home/*/.config -maxdepth 1 -type f -name "plasma-org.kde.plasma.desktop-appletsrc" -delete
-        '';
-        serviceConfig = {
-          Type = "oneshot";
-          User = "root";
+        systemd.services."kdeconfig-cleanup" = {
+          wantedBy = [ "maid-system-activation.service" ];
+          script = ''
+            set -eu
+            find /home/*/.config -maxdepth 1 -type f -name "kactivitymanagerdrc" -delete
+            find /home/*/.config -maxdepth 1 -type f -name "kcminputrc" -delete
+            find /home/*/.config -maxdepth 1 -type f -name "kdeglobals" -delete
+            find /home/*/.config -maxdepth 1 -type f -name "kscreenlockerrc" -delete
+            find /home/*/.config -maxdepth 1 -type f -name "kwinrc" -delete
+            find /home/*/.config -maxdepth 1 -type f -name "plasmarc" -delete
+            find /home/*/.config -maxdepth 1 -type f -name "plasmashellrc" -delete
+            find /home/*/.config -maxdepth 1 -type f -name "plasma-org.kde.plasma.desktop-appletsrc" -delete
+          '';
+          serviceConfig = {
+            Type = "oneshot";
+            User = "root";
 
-          # Root walking through directories users can write is the classic
-          # place to be handed a symlink, so give it the least that still lets
-          # it do the one job. It needs /home writable and the two capabilities
-          # that let root delete a file it does not own; everything else is off.
-          ProtectSystem = "strict";
-          ReadWritePaths = [ "/home" ];
-          PrivateTmp = true;
-          PrivateNetwork = true;
-          ProtectKernelTunables = true;
-          ProtectKernelModules = true;
-          ProtectControlGroups = true;
-          RestrictAddressFamilies = [ ];
-          NoNewPrivileges = true;
-          CapabilityBoundingSet = [
-            "CAP_DAC_OVERRIDE"
-            "CAP_FOWNER"
-          ];
+            # Root walking through directories users can write is the classic
+            # place to be handed a symlink, so give it the least that still lets
+            # it do the one job. It needs /home writable and the two capabilities
+            # that let root delete a file it does not own; everything else is off.
+            ProtectSystem = "strict";
+            ReadWritePaths = [ "/home" ];
+            PrivateTmp = true;
+            PrivateNetwork = true;
+            ProtectKernelTunables = true;
+            ProtectKernelModules = true;
+            ProtectControlGroups = true;
+            RestrictAddressFamilies = [ ];
+            NoNewPrivileges = true;
+            CapabilityBoundingSet = [
+              "CAP_DAC_OVERRIDE"
+              "CAP_FOWNER"
+            ];
+          };
         };
-      };
-      maid.sharedModulesForAllUsers = true;
-      maid.sharedModules = [
-        {
-          packages = [ pkgs.git ];
+        maid.sharedModulesForAllUsers = true;
+        maid.sharedModules = [
+          {
+            packages = [ pkgs.git ];
 
-          file.home.".face".source = ../../artwork/icons/logo-rijksoverheid-square.png;
-          file.home.".face.icon".source = ../../artwork/icons/logo-rijksoverheid-square.png;
+            file.home.".face".source = ../../artwork/icons/logo-rijksoverheid-square.png;
+            file.home.".face.icon".source = ../../artwork/icons/logo-rijksoverheid-square.png;
 
-          # Built from our own pinned input rather than nix-maid's default,
-          # which resolves through npins outside flake.lock and fetches from
-          # the live network at eval time. See the note on the input in
-          # flake.nix.
-          kconfig.package = pkgs.callPackage inputs.kconfig-declarative { };
+            # Built from our own pinned input rather than nix-maid's default,
+            # which resolves through npins outside flake.lock and fetches from
+            # the live network at eval time. See the note on the input in
+            # flake.nix.
+            kconfig.package = pkgs.callPackage inputs.kconfig-declarative { };
 
-          kconfig.settings = {
-            kactivitymanagerdrc = {
-              activities = {
-                c2b12168-8128-4075-8bce-38fb70b77c7a = "Default";
+            kconfig.settings = {
+              kactivitymanagerdrc = {
+                activities = {
+                  c2b12168-8128-4075-8bce-38fb70b77c7a = "Default";
+                };
               };
-            };
-            kcminputrc = {
-              Keyboard = {
-                NumLock = 0;
+              kcminputrc = {
+                Keyboard = {
+                  NumLock = 0;
+                };
+                Mouse = {
+                  cursorTheme = "breeze_cursors";
+                };
               };
-              Mouse = {
-                cursorTheme = "breeze_cursors";
+              kdeglobals = {
+                General = {
+                  XftAntialias = true;
+                  XftHintStyle = "hintslight";
+                  XftSubPixel = "rgb";
+                  fixed = "Fira Code,10,-1,5,400,0,0,0,0,0,0,0,0,0,0,1";
+                  font = "Inter,10,-1,5,400,0,0,0,0,0,0,0,0,0,0,1";
+                  menuFont = "Inter,10,-1,5,400,0,0,0,0,0,0,0,0,0,0,1";
+                  smallestReadableFont = "Inter,8,-1,5,400,0,0,0,0,0,0,0,0,0,0,1";
+                  toolBarFont = "Inter,10,-1,5,400,0,0,0,0,0,0,0,0,0,0,1";
+                };
+                Icons = {
+                  Theme = "Papirus";
+                };
+                KDE = {
+                  LookAndFeelPackage = "org.kde.breeze.desktop";
+                };
               };
-            };
-            kdeglobals = {
-              General = {
-                XftAntialias = true;
-                XftHintStyle = "hintslight";
-                XftSubPixel = "rgb";
-                fixed = "Fira Code,10,-1,5,400,0,0,0,0,0,0,0,0,0,0,1";
-                font = "Inter,10,-1,5,400,0,0,0,0,0,0,0,0,0,0,1";
-                menuFont = "Inter,10,-1,5,400,0,0,0,0,0,0,0,0,0,0,1";
-                smallestReadableFont = "Inter,8,-1,5,400,0,0,0,0,0,0,0,0,0,0,1";
-                toolBarFont = "Inter,10,-1,5,400,0,0,0,0,0,0,0,0,0,0,1";
-              };
-              Icons = {
-                Theme = "Papirus";
-              };
-              KDE = {
-                LookAndFeelPackage = "org.kde.breeze.desktop";
-              };
-            };
-            kscreenlockerrc = {
-              Daemon = {
-                LockOnResume = true;
-                LockGrace = 0;
-                Timeout = 5;
-              };
-              Greeter = {
-                WallpaperPlugin = "org.kde.image";
-                Wallpaper = {
-                  "org.kde.image" = {
-                    General = {
-                      Image = wallpaper;
+              kscreenlockerrc = {
+                Daemon = {
+                  LockOnResume = true;
+                  LockGrace = 0;
+                  Timeout = 5;
+                };
+                Greeter = {
+                  WallpaperPlugin = "org.kde.image";
+                  Wallpaper = {
+                    "org.kde.image" = {
+                      General = {
+                        Image = wallpaper;
+                      };
                     };
                   };
                 };
               };
-            };
-            kwinrc = {
-              Plugins = {
-                blurEnabled = true;
-                kwin4_effect_geometry_changeEnabled = true;
-                magiclampEnabled = true;
+              kwinrc = {
+                Plugins = {
+                  blurEnabled = true;
+                  kwin4_effect_geometry_changeEnabled = true;
+                  magiclampEnabled = true;
+                };
+              };
+              plasmarc = {
+                Theme = {
+                  name = "default";
+                };
+                Wallpapers = {
+                  usersWallpapers = wallpaper;
+                };
+              };
+              plasmashellrc = {
+                PlasmaViews = panelViews;
+              };
+              "plasma-org.kde.plasma.desktop-appletsrc" = {
+                ActionPlugins = {
+                  "0" = {
+                    "MiddleButton;NoModifier" = "org.kde.paste";
+                    "RightButton;NoModifier" = "org.kde.contextmenu";
+                  };
+                  "1" = {
+                    "RightButton;NoModifier" = "org.kde.contextmenu";
+                  };
+                };
+                Containments = containments;
               };
             };
-            plasmarc = {
-              Theme = {
-                name = "default";
-              };
-              Wallpapers = {
-                usersWallpapers = wallpaper;
-              };
-            };
-            plasmashellrc = {
-              PlasmaViews = panelViews;
-            };
-            "plasma-org.kde.plasma.desktop-appletsrc" = {
-              ActionPlugins = {
-                              "0" = {
-                                "MiddleButton;NoModifier" = "org.kde.paste";
-                                "RightButton;NoModifier" = "org.kde.contextmenu";
-                              };
-                              "1" = {
-                                "RightButton;NoModifier" = "org.kde.contextmenu";
-                              };
-                            };
-              Containments = containments;
-            };
-          };
-        }
-      ];
+          }
+        ];
       };
     };
 }

@@ -1,11 +1,15 @@
-{ ... }:
-{
+_: {
   # SDDM display manager (BZK-themed) for the Plasma desktop. Gated on
   # dawo.desktop.plasma.enable so the display manager is paired to its desktop:
   # Plasma brings SDDM, GNOME brings GDM (see desktop-gnome). Importing this block
   # alone does nothing until Plasma is enabled.
   flake.modules.nixos.desktop-sddm-bzk =
-    { config, lib, pkgs, ... }:
+    {
+      config,
+      lib,
+      pkgs,
+      ...
+    }:
     let
       # Define the custom background package with the correct relative path
       background-package = pkgs.stdenvNoCC.mkDerivation {
