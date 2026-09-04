@@ -120,3 +120,24 @@ five chances to change one and forget the rest.
 mistakes were caught that way in one afternoon: applet ids concatenated instead
 of added, and an `installPhase` mangled to `stallPhase`, which an evaluation
 accepts and a build does not.
+
+## Two branches in flight always collide in the same files
+
+Not a trap so much as arithmetic: a changelog entry, an ADR, a module import and
+a coverage claim are each added at one specific line, so any two branches that
+both have one will conflict there, every time.
+
+Three of those are handled rather than endured:
+
+- `CHANGELOG.md` and `architecture.md` are marked `merge=union` in
+  `.gitattributes`, so git keeps both sides. Safe because nothing in those files
+  depends on anything else in them, and deliberately not applied to `.nix`,
+  where union merge produces something that parses and means the wrong thing.
+- Hardening controls arrive as rules in the register rather than as imports in
+  `modules/hosts/profiles/dawo-core.nix`, so they land in a file of their own.
+  That is what ADR-0010 is for; the collisions in that import list are what it
+  reads like before it is finished.
+
+`flake.lock` is the one left. Union merge cannot help with JSON, so branches that
+move inputs are landed one at a time and the lock is regenerated rather than
+merged by hand.

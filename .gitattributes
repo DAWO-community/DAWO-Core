@@ -1,0 +1,12 @@
+# Append-only files: take both sides instead of asking a human.
+#
+# A changelog entry and an ADR are added at the same place by every branch that
+# has one, so two branches in flight always collide there, and the resolution is
+# always the same: keep both. `merge=union` does that, and it is safe here
+# precisely because nothing in these files depends on anything else in them.
+#
+# Deliberately not applied to any .nix file. Union merge on code produces
+# something that parses and means the wrong thing, which is worse than a
+# conflict.
+CHANGELOG.md    merge=union
+architecture.md merge=union
