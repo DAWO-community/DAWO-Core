@@ -24,7 +24,8 @@
       register = config.dawo.rules;
 
       hasFont = cfg: needle: lib.any (p: lib.hasInfix needle (p.name or "")) cfg.config.fonts.packages;
-      hasPkg = cfg: needle: lib.any (p: lib.hasInfix needle (p.name or "")) cfg.config.environment.systemPackages;
+      hasPkg =
+        cfg: needle: lib.any (p: lib.hasInfix needle (p.name or "")) cfg.config.environment.systemPackages;
       sshd = cfg: cfg.config.services.openssh.settings;
       sysctl = cfg: key: cfg.config.boot.kernel.sysctl.${key} or null;
 

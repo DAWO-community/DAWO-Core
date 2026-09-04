@@ -14,7 +14,7 @@
 #   INSTALLER_SSH_KEY="ssh-ed25519 AAAA... you@host" \
 #     nix build .#nixosConfigurations.dawo-installer.config.system.build.isoImage --impure
 #   # result: ./result/iso/*.iso  -> dd to a USB stick
-{ ... }:
+_:
 let
   ssid = builtins.getEnv "WIFI_SSID";
   psk = builtins.getEnv "WIFI_PSK";

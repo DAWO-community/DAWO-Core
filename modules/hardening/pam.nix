@@ -132,7 +132,9 @@
             silent
           '';
 
-          security.pam.services = lib.genAttrs cfg.lockout.services (_: { rules = lockoutRules; });
+          security.pam.services = lib.genAttrs cfg.lockout.services (_: {
+            rules = lockoutRules;
+          });
 
           environment.systemPackages = [ pkgs.linux-pam ]; # faillock(8), to see and clear a lock
         })
@@ -163,7 +165,9 @@
             enable = true;
             settings.cue = true; # say "touch your key" rather than appearing to hang
           };
-          security.pam.services = lib.genAttrs cfg.lockout.services (_: { u2fAuth = true; });
+          security.pam.services = lib.genAttrs cfg.lockout.services (_: {
+            u2fAuth = true;
+          });
         })
       ];
     };

@@ -55,7 +55,7 @@
           boot.loader.systemd-boot.configurationLimit = 5;
           boot.lanzaboote = {
             enable = true;
-            pkiBundle = cfg.pkiBundle;
+            inherit (cfg) pkiBundle;
           };
           environment.systemPackages = with pkgs; [
             sbctl

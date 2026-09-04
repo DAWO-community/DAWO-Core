@@ -53,7 +53,10 @@
       title = "Address space layout is fully randomised";
       severity = "baseline";
       tags = [ "kernel" ];
-      compliance = [ "bio" "ncsc" ];
+      compliance = [
+        "bio"
+        "ncsc"
+      ];
       why = ''
         The cheapest mitigation there is, and the one most exploit chains have
         to work around.

@@ -12,7 +12,10 @@
       title = "SSH refuses a root login";
       severity = "baseline";
       tags = [ "remote-access" ];
-      compliance = [ "bio" "ncsc" ];
+      compliance = [
+        "bio"
+        "ncsc"
+      ];
       why = ''
         A shared root account over the network leaves no trace of who was there,
         and it is the first thing an untargeted scan tries.
@@ -25,7 +28,10 @@
       title = "SSH accepts keys, not passwords";
       severity = "baseline";
       tags = [ "remote-access" ];
-      compliance = [ "bio" "ncsc" ];
+      compliance = [
+        "bio"
+        "ncsc"
+      ];
       why = ''
         Password login on a roaming laptop is a brute force surface that costs
         nothing to remove, because the fleet authenticates with keys anyway.
@@ -41,7 +47,10 @@
     "ssh-crypto-floor" = {
       title = "SSH negotiates only current ciphers, key exchange and MACs";
       severity = "baseline";
-      tags = [ "remote-access" "crypto" ];
+      tags = [
+        "remote-access"
+        "crypto"
+      ];
       compliance = [ "ncsc" ];
       why = ''
         The default set carries algorithms kept for compatibility with things

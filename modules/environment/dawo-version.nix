@@ -28,22 +28,46 @@
         else
           "none";
 
-      ffConfig = pkgs.writeText "dawo-fastfetch.jsonc" (builtins.toJSON {
-        logo.source = "nixos";
-        modules = [
-          "title"
-          "separator"
-          "os"
-          "kernel"
-          "uptime"
-          { type = "de"; key = "Desktop"; }
-          { type = "custom"; format = "------------ DAWO ------------"; }
-          { type = "custom"; key = "Release"; format = releaseVersion; }
-          { type = "custom"; key = "Flake rev"; format = flakeRev; }
-          { type = "custom"; key = "nixpkgs"; format = nixpkgsRev; }
-          { type = "custom"; key = "Desktop block"; format = desktop; }
-        ];
-      });
+      ffConfig = pkgs.writeText "dawo-fastfetch.jsonc" (
+        builtins.toJSON {
+          logo.source = "nixos";
+          modules = [
+            "title"
+            "separator"
+            "os"
+            "kernel"
+            "uptime"
+            {
+              type = "de";
+              key = "Desktop";
+            }
+            {
+              type = "custom";
+              format = "------------ DAWO ------------";
+            }
+            {
+              type = "custom";
+              key = "Release";
+              format = releaseVersion;
+            }
+            {
+              type = "custom";
+              key = "Flake rev";
+              format = flakeRev;
+            }
+            {
+              type = "custom";
+              key = "nixpkgs";
+              format = nixpkgsRev;
+            }
+            {
+              type = "custom";
+              key = "Desktop block";
+              format = desktop;
+            }
+          ];
+        }
+      );
 
       dawo-proof = pkgs.writeShellApplication {
         name = "dawo-proof";

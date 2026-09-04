@@ -14,7 +14,12 @@
   # vendor set for older hardware. A package list encodes the implementation
   # of that decision instead of the decision.
   flake.modules.nixos.services-printing =
-    { config, lib, pkgs, ... }:
+    {
+      config,
+      lib,
+      pkgs,
+      ...
+    }:
     let
       cfg = config.dawo.printing;
     in
@@ -35,7 +40,10 @@
         };
 
         drivers = lib.mkOption {
-          type = lib.types.enum [ "open" "broad" ];
+          type = lib.types.enum [
+            "open"
+            "broad"
+          ];
           default = "open";
           description = ''
             Driver set. `open` covers the standard IPP Everywhere / PostScript
@@ -53,7 +61,13 @@
           # pulls a large amount of vendor code onto every device in the fleet.
           drivers =
             if cfg.drivers == "broad" then
-              (with pkgs; [ gutenprint gutenprintBin hplip splix brlaser ])
+              (with pkgs; [
+                gutenprint
+                gutenprintBin
+                hplip
+                splix
+                brlaser
+              ])
             else
               (with pkgs; [ gutenprint ]);
         };
@@ -70,9 +84,9 @@
         # A DE-agnostic printer GUI, but only where the desktop lacks one.
         # GNOME ships its own printer panel, so installing this there gives a
         # user two different dialogues for the same job.
-        environment.systemPackages =
-          lib.mkIf (config.dawo.desktop.plasma.enable or false)
-            [ pkgs.system-config-printer ];
+        environment.systemPackages = lib.mkIf (config.dawo.desktop.plasma.enable or false) [
+          pkgs.system-config-printer
+        ];
       };
     };
 }

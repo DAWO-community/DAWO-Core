@@ -21,17 +21,17 @@
       # Naming the target here means the rename is part of the mapping rather
       # than a fixup afterwards that only covers the cases somebody hit.
       dictionarySources = with pkgs.hunspellDicts; {
-        de_DE = de_DE; # German
+        inherit de_DE; # German
         en_GB = en_GB-ise; # English (British)
-        en_US = en_US; # English (American)
-        es_ES = es_ES; # Spanish
+        inherit en_US; # English (American)
+        inherit es_ES; # Spanish
         fr_FR = fr-any; # French
-        it_IT = it_IT; # Italian
-        nl_NL = nl_NL; # Dutch
-        pl_PL = pl_PL; # Polish
-        ro_RO = ro_RO; # Romanian
-        ru_RU = ru_RU; # Russian
-        uk_UA = uk_UA; # Ukrainian
+        inherit it_IT; # Italian
+        inherit nl_NL; # Dutch
+        inherit pl_PL; # Polish
+        inherit ro_RO; # Romanian
+        inherit ru_RU; # Russian
+        inherit uk_UA; # Ukrainian
       };
 
       # A hunspell package holds exactly one pair. If one ever holds more, the

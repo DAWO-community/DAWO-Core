@@ -28,6 +28,12 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     import-tree.url = "github:vic/import-tree";
+    treefmt-nix = {
+      # Formatting and linting as a flake check, so style is settled by a tool
+      # rather than in review. Already in the lock as a dependency of comin.
+      url = "github:numtide/treefmt-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     make-shell.url = "github:nicknovitski/make-shell";
     comin = {
       url = "github:nlewo/comin/main";

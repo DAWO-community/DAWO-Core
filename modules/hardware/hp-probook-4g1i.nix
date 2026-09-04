@@ -1,5 +1,4 @@
-{ ... }:
-{
+_: {
   # HP ProBook 4 G1i (16 inch Notebook AI PC, Intel Core Ultra 5 225U). Model-
   # specific only; the generic bits (firmware, fwupd, bluetooth, initrd-systemd,
   # platform) come from hardware-dawo-base via the profile. The common-* Intel

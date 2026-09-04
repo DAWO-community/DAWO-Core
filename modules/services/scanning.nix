@@ -7,7 +7,12 @@
   # skanpage). FOSS all the way. Access is via logind uaccess on the local
   # session - no scanner group needed.
   flake.modules.nixos.services-scanning =
-    { config, lib, pkgs, ... }:
+    {
+      config,
+      lib,
+      pkgs,
+      ...
+    }:
     let
       cfg = config.dawo.scanning;
     in
