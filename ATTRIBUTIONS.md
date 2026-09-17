@@ -4,7 +4,7 @@ As per the GPLv3 license, we need to show where DAWO comes from and what code ha
 
 ## DAWO Inception
 
-DAWO has been started as a subset of code and modules, reused from:
+DAWO has been started as a subset of code and modules, re-used from:
 
 - https://codeberg.org/rutgerputter/nixos
 - https://codeberg.org/bearmannl/nixos
@@ -12,7 +12,7 @@ DAWO has been started as a subset of code and modules, reused from:
 
 With the relevant permissions.
 
-A special thanks for this "starter kit" goed out to:
+A special thanks for this "starter kit" goes out to:
 
 - https://codeberg.org/rutgerputter
 - https://codeberg.org/bearmannl
