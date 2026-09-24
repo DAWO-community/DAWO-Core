@@ -59,6 +59,11 @@ Fixes:
   setting away as well; before, the switch changed the report and the block
   kept forcing the value. The generated sshd_config is unchanged on every
   host (#110).
+- refactor(hardening): the kernel and network sysctls live in the register,
+  as eight rules grouped by purpose; four of them are new, for the sixteen
+  values that had no rule and could not be turned off by name. Each rule reads
+  its values back from the running kernel. The generated sysctl.d file is
+  unchanged on every host (#110).
 
 - feat(update): `dawo-update-status` on every device - service state, last
   poll, last generation and whether a reboot is pending, without sudo. Reads
