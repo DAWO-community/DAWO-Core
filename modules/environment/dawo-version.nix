@@ -17,7 +17,20 @@
       # Human-readable release name, cut as a git tag on the release commit. The
       # flake rev below is the exact provenance; this is the friendly version a
       # user or support desk reads off the device.
-      releaseVersion = "0.1.2";
+      #
+      # Read from the newest release heading in CHANGELOG.md rather than typed
+      # here. It used to be a literal, and 0.1.3 shipped saying 0.1.2: cutting
+      # the changelog section is the step nobody skips, this one was.
+      releaseVersion =
+        let
+          headings = lib.filter (l: builtins.match "## [0-9]+\\.[0-9]+\\.[0-9]+ .*" l != null) (
+            lib.splitString "\n" (builtins.readFile ../../CHANGELOG.md)
+          );
+        in
+        if headings == [ ] then
+          throw "CHANGELOG.md has no release heading (## X.Y.Z - title)"
+        else
+          builtins.head (builtins.match "## ([0-9]+\\.[0-9]+\\.[0-9]+) .*" (builtins.head headings));
       flakeRev = inputs.self.rev or inputs.self.dirtyRev or "dirty";
       nixpkgsRev = inputs.nixpkgs.rev or inputs.nixpkgs.shortRev or "unknown";
       desktop =
