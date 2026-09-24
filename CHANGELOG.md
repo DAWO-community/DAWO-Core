@@ -2,18 +2,74 @@
 
 ## Unreleased
 
+## 0.1.3 - security scan, first round
+
+The first half of the security scan of 3 September, plus what it took to make
+main evaluate again. Issues #95 to #158. Everything that changes what a
+consumer has to do waits for 0.2.0.
+
+Security:
+
+- fix(users): the deploy credential is out of the repository, sudo for the
+  deploy account is scoped to deploy-rs's activation command, and the reason
+  it stays a trusted user is written down (#102, #124)
+- fix(users): `dawo.bootstrapUser.initialHashedPassword` takes a hash the
+  deployment owns; the documented default still works and warns at every
+  build (#104, #126)
+- feat(hardening): account lockout (five attempts, ten minutes) and password
+  quality (twelve characters, two classes) on every host. FIDO2 is wired but
+  off (#108, #141)
+- feat(hardening): the screen locks after five minutes on both desktops (#106,
+  #145), and USB device control is opt-in at the hardened level rather than
+  claimed as mandatory (#149)
+- feat(hardening): `dawo.hardening` selects security controls per rule instead
+  of per block: an ordered level (baseline, hardened, strict), a compliance
+  selection that cuts across it, and a switch per rule that wins over both. The
+  register also produces `dawo-verify`, which says on the device whether each
+  enabled rule holds and why each disabled one is off (#110, #137). The first seven
+  rules carry checks only; configuration moves over one subject at a time.
+- fix(systemd): the two units this repository defines run with a read-only
+  system and only the capabilities they use (#113, #139)
+- docs: the mandatory tier lists the three blocks it delivers, not five (#109,
+  #150)
+
+Fixes:
+
+- fix(maid): kconfig-declarative is pinned in our own lock; main did not
+  evaluate while its upstream URL returned 404 (#97, #98)
+- fix(flake): the flake declares its systems, so `nix develop` works (#134,
+  #156)
+- feat(auto-update): comin takes a credential, so a private overlay updates
+  (#95, #99)
+- fix(hardware): DisplayLink starts its manager and loads evdi under Wayland,
+  not only under X11 (#96, #100)
 - feat(update): `dawo-update-status` on every device - service state, last
   poll, last generation and whether a reboot is pending, without sudo. Reads
   comin's own socket where it answers and systemd plus the system profile
   where it does not, so it still reports on a device whose update loop is
   what broke. Desktop notifications are available opt-in through
-  `dawo.autoUpdate.desktopNotifications.enable`.
-- feat(hardening): `dawo.hardening` selects security controls per rule instead
-  of per block: an ordered level (baseline, hardened, strict), a compliance
-  selection that cuts across it, and a switch per rule that wins over both. The
-  register also produces `dawo-verify`, which says on the device whether each
-  enabled rule holds and why each disabled one is off (#110). The first seven
-  rules carry checks only; configuration moves over one subject at a time.
+  `dawo.autoUpdate.desktopNotifications.enable` (#133, #135).
+- fix(plasma): the wallet unlocks at the graphical login (#107, #143)
+- refactor(maid): the Plasma panel is generated, and GNOME hosts no longer carry
+  it (#154)
+- fix(version): the release a device reports is read from the newest heading
+  in this file. It was a literal, and 0.1.3 shipped saying 0.1.2
+- fix(meta): `flake.meta.uri` points at this repository, not a personal fork
+  (#152)
+
+CI and upkeep:
+
+- feat(ci): `nix flake check` and an eval of every host on every push (#101,
+  #128), and an SBOM per host with a vulnerability report on main (#151, #158).
+  The report step itself ran with a flag vulnxscan does not have and failed on
+  every run until the fix in this release
+- chore(ci): the tree is formatted and linted with treefmt, statix and deadnix
+  (#140)
+- chore(deps): all inputs updated, nix-maid followed to Codeberg, and two more
+  inputs follow our nixpkgs (#63, #129, #138)
+- docs: a handbook (#130), three ADRs (#132), and the traps that cost hours
+  this round (#155)
+- chore(git): union merges for CHANGELOG.md and architecture.md (#157)
 
 ## 0.1.2 - the move, and the vulnerability backlog
 
