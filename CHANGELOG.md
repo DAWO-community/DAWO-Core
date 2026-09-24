@@ -48,6 +48,13 @@ Fixes:
   records account changes, commands run as root by a user, and kernel module
   loads, with retention set to five files of 8 MiB. Selected at the hardened
   level as `audit-privileged-actions`; forwarding is not decided yet (#109).
+- fix(hardening)!: `dawo.pam.u2f` asks for the key and the password. It used
+  the nixpkgs default, `sufficient`, so the key replaced the password instead
+  of adding to it. `dawo.pam.u2f.mode = "passwordless"` keeps the old
+  behaviour. The recovery path for a lost key is written down in
+  docs/users.md (#108). **Breaking** for a device that already has u2f on:
+  its users now need both.
+
 - feat(update): `dawo-update-status` on every device - service state, last
   poll, last generation and whether a reboot is pending, without sudo. Reads
   comin's own socket where it answers and systemd plus the system profile

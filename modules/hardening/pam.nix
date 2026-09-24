@@ -110,11 +110,27 @@
 
         u2f = {
           enable = lib.mkEnableOption ''
-            a hardware key (FIDO2) as a second factor for login and sudo. Off by
-            default and deliberately so: every user needs an enrolled key and a
-            recovery path before this is turned on, or it is a lockout with
-            extra steps. See docs/users.md
+            a hardware key (FIDO2) for login and sudo. Off by default and
+            deliberately so: every user needs an enrolled key and a recovery
+            path before this is turned on, or it is a lockout with extra steps.
+            See docs/users.md
           '';
+          mode = lib.mkOption {
+            type = lib.types.enum [
+              "second-factor"
+              "passwordless"
+            ];
+            default = "second-factor";
+            description = ''
+              What the key is for. `second-factor` asks for the key and the
+              password, so a stolen key alone opens nothing. `passwordless`
+              lets the key stand in for the password, which is convenience,
+              not extra security: whoever holds the key is in.
+
+              In both modes a user without an enrolled key cannot log in
+              through the services in `dawo.pam.lockout.services`.
+            '';
+          };
         };
       };
 
@@ -163,6 +179,11 @@
         (lib.mkIf cfg.u2f.enable {
           security.pam.u2f = {
             enable = true;
+            # nixpkgs defaults to sufficient, which makes the key an
+            # alternative to the password rather than a second factor. A
+            # required module that fails cannot be rescued by the sufficient
+            # pam_unix after it, so second-factor needs both.
+            control = if cfg.u2f.mode == "second-factor" then "required" else "sufficient";
             settings.cue = true; # say "touch your key" rather than appearing to hang
           };
           security.pam.services = lib.genAttrs cfg.lockout.services (_: {
