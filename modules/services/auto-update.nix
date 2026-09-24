@@ -46,11 +46,36 @@
         url: builtins.match "ssh://.*" url != null || builtins.match "[^@/:]+@[^@/:]+:.*" url != null;
     in
     {
-      imports = [ inputs.comin.nixosModules.comin ];
+      # Renamed in 0.2: the `options` level went away. Kept for one release.
+      imports = [
+        inputs.comin.nixosModules.comin
+
+        # Renamed in 0.2: the `options` level went away. Kept for one release.
+        (lib.mkRenamedOptionModule
+          [ "dawo" "autoUpdate" "options" "repoUrl" ]
+          [ "dawo" "autoUpdate" "repoUrl" ]
+        )
+        (lib.mkRenamedOptionModule
+          [ "dawo" "autoUpdate" "options" "branch" ]
+          [ "dawo" "autoUpdate" "branch" ]
+        )
+        (lib.mkRenamedOptionModule
+          [ "dawo" "autoUpdate" "options" "pollSeconds" ]
+          [ "dawo" "autoUpdate" "pollSeconds" ]
+        )
+        (lib.mkRenamedOptionModule
+          [ "dawo" "autoUpdate" "options" "sshDeployKeyPath" ]
+          [ "dawo" "autoUpdate" "sshDeployKeyPath" ]
+        )
+        (lib.mkRenamedOptionModule
+          [ "dawo" "autoUpdate" "options" "knownHostsPath" ]
+          [ "dawo" "autoUpdate" "knownHostsPath" ]
+        )
+      ];
 
       options.dawo.autoUpdate = {
         enable = lib.mkEnableOption "git-driven auto-update via comin";
-        options.repoUrl = lib.mkOption {
+        repoUrl = lib.mkOption {
           type = lib.types.str;
           default = "https://codeberg.org/DAWO/DAWO-Core.git";
           description = ''
@@ -65,17 +90,17 @@
             has to be pointed at the new URL by hand once.
           '';
         };
-        options.branch = lib.mkOption {
+        branch = lib.mkOption {
           type = lib.types.str;
           default = "main";
           description = "Branch to follow on repoUrl.";
         };
-        options.pollSeconds = lib.mkOption {
+        pollSeconds = lib.mkOption {
           type = lib.types.ints.positive;
           default = 1800;
           description = "Poll interval in seconds (must be > 0).";
         };
-        options.sshDeployKeyPath = lib.mkOption {
+        sshDeployKeyPath = lib.mkOption {
           type = lib.types.str;
           default = "";
           example = "/run/agenix/comin-deploy-key";
@@ -101,7 +126,7 @@
             it is world readable. There is an assertion for that.
           '';
         };
-        options.knownHostsPath = lib.mkOption {
+        knownHostsPath = lib.mkOption {
           type = lib.types.str;
           default = "";
           example = "/etc/ssh/ssh_known_hosts";
@@ -119,23 +144,23 @@
       config = lib.mkIf cfg.enable {
         assertions = [
           {
-            assertion = cfg.options.repoUrl != "";
-            message = "dawo.autoUpdate.options.repoUrl must be set (the image/overlay flake to track).";
+            assertion = cfg.repoUrl != "";
+            message = "dawo.autoUpdate.repoUrl must be set (the image/overlay flake to track).";
           }
           {
-            assertion = !(lib.hasPrefix builtins.storeDir cfg.options.sshDeployKeyPath);
+            assertion = !(lib.hasPrefix builtins.storeDir cfg.sshDeployKeyPath);
             message = ''
-              dawo.autoUpdate.options.sshDeployKeyPath points into the Nix store,
+              dawo.autoUpdate.sshDeployKeyPath points into the Nix store,
               which is world readable, so the private key would be published to
               every user of the device. Give it a runtime path instead - an
               agenix secret path, or a file placed by the imaging step.
             '';
           }
           {
-            assertion = cfg.options.sshDeployKeyPath == "" || isSshUrl cfg.options.repoUrl;
+            assertion = cfg.sshDeployKeyPath == "" || isSshUrl cfg.repoUrl;
             message = ''
-              dawo.autoUpdate.options.sshDeployKeyPath is set but repoUrl is not
-              an SSH remote (${cfg.options.repoUrl}), so the key would never be
+              dawo.autoUpdate.sshDeployKeyPath is set but repoUrl is not
+              an SSH remote (${cfg.repoUrl}), so the key would never be
               used and every poll would fail as unauthenticated. Point repoUrl at
               the ssh:// or git@host:path form of the same repository.
             '';
@@ -147,18 +172,18 @@
           remotes = [
             {
               name = "dawo-image";
-              url = cfg.options.repoUrl;
-              branches.main.name = cfg.options.branch;
-              poller.period = cfg.options.pollSeconds;
+              url = cfg.repoUrl;
+              branches.main.name = cfg.branch;
+              poller.period = cfg.pollSeconds;
               auth = {
-                ssh_deploy_key_path = cfg.options.sshDeployKeyPath;
-                ssh_known_hosts_path = cfg.options.knownHostsPath;
+                ssh_deploy_key_path = cfg.sshDeployKeyPath;
+                ssh_known_hosts_path = cfg.knownHostsPath;
               }
               # Only take the username over when there is a key to use it with.
               # comin also reads it for the HTTPS token helper, and a deployment
               # on that path should keep whatever it set.
-              // lib.optionalAttrs (cfg.options.sshDeployKeyPath != "") {
-                username = sshUserFromUrl cfg.options.repoUrl;
+              // lib.optionalAttrs (cfg.sshDeployKeyPath != "") {
+                username = sshUserFromUrl cfg.repoUrl;
               };
             }
           ];

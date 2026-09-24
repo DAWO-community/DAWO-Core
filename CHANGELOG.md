@@ -112,6 +112,14 @@ CI and upkeep:
   `localization-nl_nl` or `localization-en_nl` switch to `localization-languages`;
   the defaults reproduce the old Dutch behaviour. The legacy `nl_NL/ISO-8859-1`
   locale is no longer generated.
+- refactor(options)!: the `options` level is gone from every block, so
+  `dawo.ssh.maxAuthTries` rather than `dawo.ssh.options.maxAuthTries`. Six of
+  the eight blocks with settings never used that level, so the documented
+  convention was the minority practice. Two blocks whose path did not match
+  their subject moved as well: `dawo.gnomeHardening` is now
+  `dawo.desktop.gnome.hardening`, and `dawo.tools.diagnostics` is now
+  `dawo.diagnostics`. Every old name keeps working for one release and warns
+  with the new path.
 
 ## 0.1.2 - the move, and the vulnerability backlog
 

@@ -8,13 +8,26 @@
   flake.modules.nixos.hardening-gnome =
     { config, lib, ... }:
     let
-      cfg = config.dawo.gnomeHardening;
+      cfg = config.dawo.desktop.gnome.hardening;
       gv = lib.gvariant;
     in
     {
-      options.dawo.gnomeHardening = {
+      # Renamed in 0.2: the block sat at dawo.gnomeHardening, which matched
+      # neither its subject nor any other block's naming. Kept for one release.
+      imports = [
+        (lib.mkRenamedOptionModule
+          [ "dawo" "gnomeHardening" "enable" ]
+          [ "dawo" "desktop" "gnome" "hardening" "enable" ]
+        )
+        (lib.mkRenamedOptionModule
+          [ "dawo" "gnomeHardening" "options" "idleLockSeconds" ]
+          [ "dawo" "desktop" "gnome" "hardening" "idleLockSeconds" ]
+        )
+      ];
+
+      options.dawo.desktop.gnome.hardening = {
         enable = lib.mkEnableOption "locked GNOME hardening dconf profile (opt-in)";
-        options.idleLockSeconds = lib.mkOption {
+        idleLockSeconds = lib.mkOption {
           type = lib.types.ints.positive;
           default = 300;
           description = "Idle seconds before the screen locks (must be > 0).";
@@ -24,8 +37,8 @@
       config = lib.mkIf cfg.enable {
         assertions = [
           {
-            assertion = cfg.options.idleLockSeconds > 0;
-            message = "dawo.gnomeHardening.options.idleLockSeconds must be > 0.";
+            assertion = cfg.idleLockSeconds > 0;
+            message = "dawo.desktop.gnome.hardening.idleLockSeconds must be > 0.";
           }
         ];
 
@@ -33,7 +46,7 @@
         programs.dconf.profiles.user.databases = [
           {
             settings = {
-              "org/gnome/desktop/session".idle-delay = gv.mkUint32 cfg.options.idleLockSeconds;
+              "org/gnome/desktop/session".idle-delay = gv.mkUint32 cfg.idleLockSeconds;
               "org/gnome/desktop/screensaver" = {
                 lock-enabled = true;
                 lock-delay = gv.mkUint32 0;
