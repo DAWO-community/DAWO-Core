@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- refactor(hardening): the kernel and network sysctls live in the register,
+  as eight rules grouped by purpose; four of them are new, for the sixteen
+  values that had no rule and could not be turned off by name. Each rule reads
+  its values back from the running kernel. The generated sysctl.d file is
+  unchanged on every host (#110).
+
 - feat(update): `dawo-update-status` on every device - service state, last
   poll, last generation and whether a reboot is pending, without sudo. Reads
   comin's own socket where it answers and systemd plus the system profile
