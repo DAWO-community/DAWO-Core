@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased
+
+- fix(hardening): auditd runs with real rules. audit 4.2.1 loads what
+  4.1.2-unstable rejected, so `dawo.audit.enable` stops being a warning and
+  records account changes, commands run as root by a user, and kernel module
+  loads, with retention set to five files of 8 MiB. Selected at the hardened
+  level as `audit-privileged-actions`; forwarding is not decided yet #109 #165
+
 ## 0.2.0
 
 Breaking:
