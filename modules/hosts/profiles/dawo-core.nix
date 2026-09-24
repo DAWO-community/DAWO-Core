@@ -17,9 +17,10 @@
         hardening-pam
         hardening-register
         # Importing declares the options; the register decides whether they are
-        # on. usb-control stays off in the baseline and is selected at the
-        # hardened level or per rule.
+        # on. usb-control and audit stay off in the baseline and are selected
+        # at the hardened level or per rule.
         hardening-usb-control
+        hardening-audit
         hardening-ssh
         hardening-sysctl-baseline
         hardening-timesync
@@ -29,8 +30,7 @@
       # controls that are invisible and cannot lock a user out belong here.
       # usbControl moved to the opt-in tier: blocking USB out of the box breaks
       # the user experience (no stick/dongle), so it is a deliberate opt-in.
-      # audit moved to the opt-in tier too: it is a no-op on nixpkgs 26.05
-      # (auditctl module bug), so forcing it here only faked coverage.
+      # audit is selected through the register as well, at the hardened level.
       # Login policy is mandatory: an image with no lockout lets somebody at the
       # keyboard guess for as long as they like.
       dawo.pam.lockout.enable = lib.mkForce true;

@@ -49,9 +49,9 @@ Two things this list used to claim and did not deliver, corrected here rather
 than left as a comment that reads better than the code. **usbguard** is opt-in,
 on purpose: a device that refuses a USB stick out of the box reads as broken to
 the person holding it, so it is selected at the hardened level or per rule, not
-forced. **auditd** is deferred: the module is a no-op on nixpkgs 26.05 because
-of an upstream auditctl bug, so claiming it here only faked coverage. journald
-is the log base until that is fixed.
+forced. **auditd** is selected the same way, at the hardened level: the rules
+load since audit 4.2.1, but the log costs disk and is only evidence once
+somebody collects it. journald is the log base on a baseline device.
 
 New controls arrive as rules in the register rather than as blocks; see
 ADR-0010.
