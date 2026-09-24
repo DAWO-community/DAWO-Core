@@ -60,7 +60,7 @@
             # have an open CVE somewhere, so failing on any finding would leave
             # this permanently red, and a check that is always red is a check
             # nobody reads.
-            exec ${pkgs.sbomnix}/bin/vulnxscan "$sbom" --sbom -o "$outdir/vulns.csv"
+            exec ${pkgs.sbomnix}/bin/vulnxscan "$sbom" --sbom --out "$outdir/vulns.csv"
           ''
         );
       };
