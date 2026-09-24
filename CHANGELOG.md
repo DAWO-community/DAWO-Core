@@ -54,6 +54,11 @@ Fixes:
   behaviour. The recovery path for a lost key is written down in
   docs/users.md (#108). **Breaking** for a device that already has u2f on:
   its users now need both.
+- refactor(hardening): the SSH floor lives in the register. Turning off
+  `ssh-no-root-login`, `ssh-key-only-auth` or `ssh-crypto-floor` now takes the
+  setting away as well; before, the switch changed the report and the block
+  kept forcing the value. The generated sshd_config is unchanged on every
+  host (#110).
 
 - feat(update): `dawo-update-status` on every device - service state, last
   poll, last generation and whether a reboot is pending, without sudo. Reads
