@@ -1,11 +1,11 @@
 {
-  # SSH hardening (CIS/NCSC). MANDATORY-core tier.
-  # Key-only auth: PasswordAuthentication is forced off (remote SSH accepts keys
-  # only; local console login is unaffected). Norm: NCSC SSH/TLS crypto + CIS-DIL
-  # -> BIO. See architecture.md "Key Design Decisions".
+  # SSH (CIS/NCSC). MANDATORY-core tier: sshd runs on every device.
   #
-  # The crypto floor and login policy are forced (lib.mkForce) so a host cannot
-  # silently weaken them; maxAuthTries is a suggested default a host may tune.
+  # The floor itself - no root login, keys only, the crypto set - lives in the
+  # register (hardening/rules/baseline-ssh.nix), one rule each, so a deployment
+  # can turn one off by name instead of forking this block. What stays here is
+  # what is not a control: that sshd runs, the banner, and the attempt limit a
+  # host may tune.
   flake.modules.nixos.hardening-ssh =
     { config, lib, ... }:
     let
@@ -35,27 +35,7 @@
         services.openssh = {
           enable = lib.mkForce true;
           settings = {
-            # Forced: the mandatory crypto + login floor.
-            PermitRootLogin = lib.mkForce "no";
-            # Key-only: no SSH password login (brute-force surface). Local console
-            # login is separate and still uses a password.
-            PasswordAuthentication = lib.mkForce false;
-            KbdInteractiveAuthentication = lib.mkForce false;
             Banner = lib.mkForce "/etc/issue.net";
-            Ciphers = lib.mkForce [
-              "chacha20-poly1305@openssh.com"
-              "aes256-gcm@openssh.com"
-              "aes128-gcm@openssh.com"
-            ];
-            KexAlgorithms = lib.mkForce [
-              "curve25519-sha256"
-              "curve25519-sha256@libssh.org"
-              "diffie-hellman-group16-sha512"
-            ];
-            Macs = lib.mkForce [
-              "hmac-sha2-512-etm@openssh.com"
-              "hmac-sha2-256-etm@openssh.com"
-            ];
             # Tunable: a suggested default a host may raise/lower.
             MaxAuthTries = lib.mkDefault cfg.options.maxAuthTries;
           };

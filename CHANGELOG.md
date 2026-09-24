@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- refactor(hardening): the SSH floor lives in the register. Turning off
+  `ssh-no-root-login`, `ssh-key-only-auth` or `ssh-crypto-floor` now takes the
+  setting away as well; before, the switch changed the report and the block
+  kept forcing the value. The generated sshd_config is unchanged on every
+  host (#110).
+
 - feat(update): `dawo-update-status` on every device - service state, last
   poll, last generation and whether a reboot is pending, without sudo. Reads
   comin's own socket where it answers and systemd plus the system profile
