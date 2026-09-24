@@ -3,9 +3,8 @@
     # NOTE (sovereignty roadmap): all inputs below are FOSS but currently fetched
     # from github.com. Goal = zero foreign-hosted deps (Dutch digital autonomy) by
     # mirroring these to code.overheid.nl and repinning. 10 dead inputs were pruned
-    # (audit); these 15 are load-bearing and next up for the mirror pass.
+    # (audit); these 16 are load-bearing and next up for the mirror pass.
     nixpkgs.url = "github:nixos/nixpkgs/nixos-26.05";
-    nixpkgs-unstable.url = "github:nixos/nixpkgs/nixos-unstable";
     nix-flatpak.url = "github:gmodena/nix-flatpak/?ref=latest";
     # nix-maid moved to Codeberg; the GitHub mirror stops working on
     # 31 October 2026, and upstream warns about it on every evaluation.

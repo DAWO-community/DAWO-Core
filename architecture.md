@@ -110,6 +110,10 @@ image got to where it is.
   `nixpkgs-unstable` input exposed through an overlay (`pkgs.unstable.*`) so a
   single package can be pulled from unstable when a newer version is needed.
 - Consequence: reproducible base, with a controlled escape for individual packages.
+- Revised (#121): the unstable input is gone. No module used `pkgs.unstable`,
+  and it cost a second full nixpkgs in the lock plus a ref that moved on every
+  update. The stable pin stands. A package that needs a newer version gets its
+  own input, named after the package, when that need is real.
 
 ### ADR-0005: BTRFS as the standard disk layout
 - Context (#14): an earlier ext4 layout was only there to match an existing

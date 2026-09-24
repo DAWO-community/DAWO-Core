@@ -64,6 +64,11 @@ Fixes:
   values that had no rule and could not be turned off by name. Each rule reads
   its values back from the running kernel. The generated sysctl.d file is
   unchanged on every host (#110).
+- chore(flake)!: the `nixpkgs-unstable` input and the `pkgs.unstable` overlay
+  are gone; no module used them (#121). **Breaking for consumers** that
+  follow it. Their evaluation stops with `input 'nixpkgs-unstable' follows a
+  non-existent input 'dawo/nixpkgs-unstable'`; remove that follows line from
+  flake.nix, or declare your own input if you use `pkgs.unstable`.
 
 - feat(update): `dawo-update-status` on every device - service state, last
   poll, last generation and whether a reboot is pending, without sudo. Reads
