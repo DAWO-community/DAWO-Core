@@ -7,12 +7,12 @@ don't rewrite them. Repo *hosting* is already sovereign; the *supply chain* is t
 remaining exposure.
 
 ## Current exposure (audit)
-- **15 flake inputs**, all `github.com`-hosted (all FOSS). See flake.nix.
+- **16 flake inputs**, all `github.com`-hosted (all FOSS). See flake.nix.
 - **1 build-time fetch**: the `libfprint-CS9711` fork (`modules/flake-parts/nixpkgs.nix`).
 - **Binary caches**: `cache.nixos.org` + `nix-community.cachix.org` (US) trusted at
   build (`modules/nixos/nix-settings.nix`).
 - **Flathub** (if flatpak apps are added; list currently empty).
-- **Mutable refs**: nixpkgs-unstable, `disko/latest`, `nixos-hardware/master`,
+- **Mutable refs**: `disko/latest`, `nixos-hardware/master`,
   `comin/main`, `nix-flatpak?ref=latest` — float on upstream, pinned only by flake.lock.
 
 ## Target architecture

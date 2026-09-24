@@ -19,8 +19,8 @@ jobs:
           submodules: true
 
       - name: Validate Nix Flake
-        # Several inputs still float on an upstream branch (nixpkgs-unstable,
-        # disko/latest, nixos-hardware/master, comin/main, nix-flatpak/latest),
+        # Several inputs still float on an upstream branch (disko/latest,
+        # nixos-hardware/master, comin/main, nix-flatpak/latest),
         # so a cached "still current" verdict can hide drift that has already
         # landed. Refuse the caches and look again.
         env:
