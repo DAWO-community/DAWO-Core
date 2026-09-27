@@ -9,6 +9,15 @@
     let
       cfg = config.dawo.firefox;
 
+      # Pinned instead of fetching "latest" from AMO on every device (#166).
+      # To update: bump the file id and version, set hash = "", build, and
+      # copy the hash Nix reports.
+      plasmaIntegrationXpi = pkgs.fetchurl {
+        name = "plasma-integration-2.1.xpi";
+        url = "https://addons.mozilla.org/firefox/downloads/file/4614817/plasma_integration-2.1.xpi";
+        hash = "sha256-Nb+jdm4JcWDnT1Jb3lTZe7upDXJdqkJbneb+9uxenUQ=";
+      };
+
       # Spell checking for the ten most spoken languages in Europe (the list in
       # #56). A language pack only translates the interface; the dictionary is a
       # separate thing. Taking them from nixpkgs instead of addons.mozilla.org
@@ -127,9 +136,10 @@
               # "force_installed" and "normal_installed".
               ExtensionSettings = {
                 "*".installation_mode = "allowed"; # users may install add-ons themselves; set to "blocked" to allow only the ones listed below
-                # plasma Integration:
+                # Plasma Integration is installed from the pinned Nix store file.
+                # Firefox's own extension update checks are separate.
                 "plasma-browser-integration@kde.org" = {
-                  install_url = "https://addons.mozilla.org/firefox/downloads/latest/plasma-integration/latest.xpi";
+                  install_url = "file://${plasmaIntegrationXpi}";
                   installation_mode = "force_installed";
                 };
               };
