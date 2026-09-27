@@ -8,9 +8,14 @@ remaining exposure.
 
 ## Current exposure (audit)
 - **15 flake inputs**, all `github.com`-hosted (all FOSS). See flake.nix.
-- **1 build-time fetch**: the `libfprint-CS9711` fork (`modules/flake-parts/nixpkgs.nix`).
+- **Build-time source fetches**: the `libfprint-CS9711` fork
+  (`modules/flake-parts/nixpkgs.nix`) and a fixed-hash Plasma Integration XPI
+  from AMO (`modules/programs/firefox.nix`).
 - **Binary caches**: `cache.nixos.org` + `nix-community.cachix.org` (US) trusted at
   build (`modules/nixos/nix-settings.nix`).
+- **Firefox extension updates**: Plasma Integration now installs from the Nix
+  store, but Firefox may still check AMO for updates; a controlled HTTPS
+  `update_url` is not configured.
 - **Flathub** (if flatpak apps are added; list currently empty).
 - **Mutable refs**: nixpkgs-unstable, `disko/latest`, `nixos-hardware/master`,
   `comin/main`, `nix-flatpak?ref=latest` — float on upstream, pinned only by flake.lock.
@@ -36,6 +41,8 @@ Per input: a mirror repo `code.overheid.nl/<org>/mirror-<name>`, synced from
 upstream. Repoint flake.nix -> `git+https://code.overheid.nl/.../mirror-<name>?rev=<sha>`.
 - **nixpkgs** is the heavy one (multi-GB) — a full git mirror on code.overheid.
 - Include the `libfprint-CS9711` fork.
+- Mirror the pinned Plasma Integration XPI and repoint its `fetchurl` to the
+  controlled artifact source.
 - One-time: mirror + repin; verify each host drvPath is identical (as with the
   dead-input prune, nix-diff should show only the flake-rev string).
 
@@ -44,7 +51,7 @@ upstream. Repoint flake.nix -> `git+https://code.overheid.nl/.../mirror-<name>?r
   scale it or a dedicated NL server). Populate it by building from the mirrors.
 - `nix.settings.substituters` = the NL cache ONLY; drop `cache.nixos.org` +
   `cachix`. Fallback = build-from-(mirrored)-source.
-- Removes the last foreign build-time fetch.
+- Removes foreign binary-cache fetches; source fetches also need NL mirrors.
 
 ### Phase 4 — Sovereign update process (mirror-sync CI)
 A CI job on a NL runner (the inspoelstraat), weekly: pull upstream into the
