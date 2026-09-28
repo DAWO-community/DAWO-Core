@@ -13,11 +13,11 @@ Any matter that cannot be solved by means of meaningful dicussion will be decide
 
 This comittee always needs an odd number of people to make majority decisions.
 
-| Name               | Languages | Role                | Profile                                                    | Affiliation               |
+| Name               | Languages | Role within SC      | Profile                                                    | Affiliation               |
 | ------------------ | --------- | ------------------- | ---------------------------------------------------------- | ------------------------- |
 | Victor Gevers      | :nl: :en: | Project Lead MinBZK | [codeberg](https://codeberg.org/cookiemonster)             | MinBZK                    |
 | Rutger Putter      | :nl: :en: | Maintainer          | [codeberg](https://codeberg.org/rutgerputter)              | Citizen / Realiz-IT / TCS |
-| Bram Buijs         | :nl: :en: | Main Developer      | [codeberg](https://codeberg.org/brambuijs)                 | VNG / BB-Open             |
+| Bram Buijs         | :nl: :en: | Developer           | [codeberg](https://codeberg.org/brambuijs)                 | VNG / BB-Open             |
 
 ## Roles
 
