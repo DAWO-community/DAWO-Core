@@ -1,0 +1,20 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  extends: ["config:recommended"],
+  // The nix manager is beta upstream, so it must be opted into explicitly
+  // (docs.renovatebot.com/modules/manager/nix). It walks the flake inputs and
+  // opens one PR per input that moved, plus the lock file maintenance below.
+  nix: {
+    enabled: true,
+  },
+  // Weekly flake.lock maintenance: bump every input to what its pinned branch
+  // or tag points at now. Upstream movement becomes a PR that CI evaluates,
+  // instead of something discovered when a device fails to build (#170).
+  lockFileMaintenance: {
+    enabled: true,
+    extends: ["schedule:weekly"],
+  },
+  // Nothing automerges. Which upstream code a government device runs is a
+  // human decision (docs/sovereignty-zero-deps.md); renovate proposes, the
+  // dependency dashboard collects, a person decides.
+}
