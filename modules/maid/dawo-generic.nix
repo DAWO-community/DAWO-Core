@@ -278,7 +278,7 @@
         inputs.nix-maid.nixosModules.default
       ];
 
-      config = lib.mkIf config.dawo.desktop.plasma.enable {
+      config = lib.mkIf (lib.attrByPath [ "dawo" "desktop" "plasma" "enable" ] false config) {
         systemd.services."kdeconfig-cleanup" = {
           wantedBy = [ "maid-system-activation.service" ];
           script = ''

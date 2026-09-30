@@ -33,10 +33,12 @@
           builtins.head (builtins.match "## ([0-9]+\\.[0-9]+\\.[0-9]+) .*" (builtins.head headings));
       flakeRev = inputs.self.rev or inputs.self.dirtyRev or "dirty";
       nixpkgsRev = inputs.nixpkgs.rev or inputs.nixpkgs.shortRev or "unknown";
+      # A consumer may import this block without any desktop block, so the
+      # desktop options can be absent entirely; attrByPath defaults to false.
       desktop =
-        if config.dawo.desktop.plasma.enable or false then
+        if lib.attrByPath [ "dawo" "desktop" "plasma" "enable" ] false config then
           "KDE Plasma 6"
-        else if config.dawo.desktop.gnome.enable or false then
+        else if lib.attrByPath [ "dawo" "desktop" "gnome" "enable" ] false config then
           "GNOME"
         else
           "none";

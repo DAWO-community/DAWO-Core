@@ -84,9 +84,11 @@
         # A DE-agnostic printer GUI, but only where the desktop lacks one.
         # GNOME ships its own printer panel, so installing this there gives a
         # user two different dialogues for the same job.
-        environment.systemPackages = lib.mkIf (config.dawo.desktop.plasma.enable or false) [
-          pkgs.system-config-printer
-        ];
+        environment.systemPackages =
+          lib.mkIf (lib.attrByPath [ "dawo" "desktop" "plasma" "enable" ] false config)
+            [
+              pkgs.system-config-printer
+            ];
       };
     };
 }

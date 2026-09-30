@@ -54,7 +54,9 @@
         # instead of shipping a lock that opens for whoever holds the laptop.
         assertions = [
           {
-            assertion = config.dawo.secureboot.enable;
+            # A consumer without the secureboot block has no Secure Boot, so
+            # attrByPath defaulting to false makes the assertion refuse.
+            assertion = lib.attrByPath [ "dawo" "secureboot" "enable" ] false config;
             message = ''
               dawo.diskUnlock.tpm2.enable requires dawo.secureboot.enable:
               TPM2 unlock is bound to PCR 7, which only measures the boot

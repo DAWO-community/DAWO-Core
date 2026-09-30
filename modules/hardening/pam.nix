@@ -82,8 +82,12 @@
               "su"
               "sudo"
             ]
-            ++ lib.optional config.dawo.desktop.plasma.enable "sddm"
-            ++ lib.optional config.dawo.desktop.gnome.enable "gdm-password";
+            # A display manager belongs in the lockout list, but only a
+            # consumer that imports the desktop blocks has the options to ask.
+            # attrByPath defaults to false when a block is absent, so this
+            # module evaluates on a host with no desktop at all.
+            ++ lib.optional (lib.attrByPath [ "dawo" "desktop" "plasma" "enable" ] false config) "sddm"
+            ++ lib.optional (lib.attrByPath [ "dawo" "desktop" "gnome" "enable" ] false config) "gdm-password";
             defaultText = lib.literalMD "the console, su, sudo, and whichever display manager is enabled";
             description = ''
               PAM services the lockout applies to. Every place a password can be
