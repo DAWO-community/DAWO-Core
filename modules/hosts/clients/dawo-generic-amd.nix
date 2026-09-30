@@ -3,7 +3,10 @@
   ...
 }:
 {
-  flake.modules.nixos."hosts/dawo-t495s" =
+  # Starter host: a common AMD laptop whose exact model has no profile yet
+  # (hardware-generic-amd). The Intel counterpart carries the reasoning; see
+  # dawo-generic-intel.nix and modules/hardware/hardware.md (#171).
+  flake.modules.nixos."hosts/dawo-generic-amd" =
     { ... }:
     {
       imports = with config.flake.modules.nixos; [
@@ -17,26 +20,18 @@
         disko-single-nvme-luks
 
         # Hardware
-        hardware-lenovo-t495s
+        hardware-generic-amd
 
-        # Profiles
+        # Profiles (mandatory hardening included; see profiles.md)
         profiles-dawo-generic
 
         # Userland
         maid-dawo-generic
-
-        # Mandatory hardening (ssh, sysctl, chrony, and the login policy) is
-        # pulled in automatically by profiles-dawo-generic, which imports
-        # profiles-dawo-core and forces those blocks on. usbguard and auditd are
-        # deliberately not in that list: the first is opt-in, the second is a
-        # no-op on nixpkgs 26.05. To turn on an opt-in block, import
-        # profiles-dawo-hardened and flip the one you want, e.g.:
-        #   dawo.apparmor.enable = true;
       ];
-      networking.hostName = "dawo-t495s";
+      networking.hostName = "dawo-generic-amd";
 
-      # Desktop choice (exactly one; see desktop-select). Flip to gnome.enable to
-      # test GNOME on the same host: rebuild swaps the desktop.
+      # Desktop choice (exactly one; see desktop-select). The -gnome variant
+      # pairs GNOME with the same hardware block.
       dawo.desktop.plasma.enable = true;
 
       # Pilot app set (office workers; they reach a VDI over VPN/F5). LibreOffice

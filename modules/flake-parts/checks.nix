@@ -15,8 +15,8 @@
     { lib, config, ... }:
     let
       hosts = {
-        plasma = config.nixosConfigurations.dawo-hp-probook-4g1i;
-        gnome = config.nixosConfigurations.dawo-t495s-gnome;
+        plasma = config.nixosConfigurations.dawo-generic-intel;
+        gnome = config.nixosConfigurations.dawo-generic-amd-gnome;
       };
       pkgs = hosts.plasma.pkgs;
       # Inside `flake = { config, ... }` this config is the flake submodule, so

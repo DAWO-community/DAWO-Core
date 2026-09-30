@@ -3,11 +3,11 @@
   ...
 }:
 {
-  # Lenovo T495s, GNOME. A standalone target alongside hosts/dawo-t495s (Plasma)
-  # so the two desktops can be deployed and tested separately on the same machine:
-  #   nixos-rebuild switch --flake .#dawo-t495s         # KDE Plasma
-  #   nixos-rebuild switch --flake .#dawo-t495s-gnome   # GNOME
-  flake.modules.nixos."hosts/dawo-t495s-gnome" =
+  # Starter host, GNOME variant: dawo-generic-intel with the other desktop, so
+  # the two can be deployed and tested separately on the same machine:
+  #   nixos-rebuild switch --flake .#dawo-generic-intel        # KDE Plasma
+  #   nixos-rebuild switch --flake .#dawo-generic-intel-gnome # GNOME
+  flake.modules.nixos."hosts/dawo-generic-intel-gnome" =
     { ... }:
     {
       imports = with config.flake.modules.nixos; [
@@ -21,23 +21,15 @@
         disko-single-nvme-luks
 
         # Hardware
-        hardware-lenovo-t495s
+        hardware-generic-intel
 
-        # Profiles
+        # Profiles (mandatory hardening included; see profiles.md)
         profiles-dawo-generic
 
         # Userland
         maid-dawo-generic
-
-        # Mandatory hardening (ssh, sysctl, chrony, and the login policy) is
-        # pulled in automatically by profiles-dawo-generic, which imports
-        # profiles-dawo-core and forces those blocks on. usbguard and auditd are
-        # deliberately not in that list: the first is opt-in, the second is a
-        # no-op on nixpkgs 26.05. To turn on an opt-in block, import
-        # profiles-dawo-hardened and flip the one you want, e.g.:
-        #   dawo.apparmor.enable = true;
       ];
-      networking.hostName = "dawo-t495s-gnome";
+      networking.hostName = "dawo-generic-intel-gnome";
 
       # Desktop choice (exactly one; see desktop-select).
       dawo.desktop.gnome.enable = true;

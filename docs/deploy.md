@@ -9,11 +9,11 @@ Uses the host's disko layout (partitions, encrypts and installs remotely). No
 extra flake input needed.
 
 Requirements: the target boots into a Linux with SSH as root (installer ISO or
-NixOS live), has network, and the host exists in the flake (e.g. dawo-t495s).
+NixOS live), has network, and the host exists in the flake (e.g. dawo-generic-intel).
 
 ```bash
 nix run github:nix-community/nixos-anywhere -- \
-  --flake .#dawo-t495s \
+  --flake .#dawo-generic-intel \
   --target-host root@<target-ip>
 ```
 
@@ -43,7 +43,7 @@ modules/flake-parts/deploy.nix), via the deploy user (SSH key).
 
 ```bash
 nix develop          # provides deploy-rs in the shell
-deploy .#dawo-t495s  # builds and activates remotely
+deploy .#dawo-generic-intel  # builds and activates remotely
 ```
 
 A deploy activates a root closure, so the connection is verified: deploy-rs

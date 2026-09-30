@@ -31,9 +31,13 @@ De image = `nixosConfigurations.<host>` uit **DAWO-NixOS**. Bestaande hosts:
 ```
 nix flake show /home/brambuijs/Cloud/Operations/dawo/DAWO-NixOS | grep -A20 nixosConfigurations
 ```
-Typisch: `dawo-hp-probook-4g1i` (KDE) / `dawo-hp-probook-4g1i-gnome` (GNOME),
-`dawo-hp-eb-850g7`, `dawo-t495s`. **Onbekend model** → eerst een hardware-block +
-host in de core toevoegen en committen (zie `modules/hardware/` + `modules/hosts/clients/`).
+De core heeft sinds #171 alleen nog **generieke starter-hosts**:
+`dawo-generic-intel` / `dawo-generic-intel-gnome` en
+`dawo-generic-amd` / `dawo-generic-amd-gnome`. Vendor-modellen (HP ProBook,
+Lenovo T495s) zijn downstream verhuisd (breaking change in 0.2.0). **Bekend model** → hardware-block +
+host in de eigen overlay (de drie paden staan in `modules/hardware/hardware.md`);
+**onbekend model** → de generieke host van het juiste CPU-type, en na de pilot
+vervangen door een echt profiel.
 
 ### 1b. Versie / branch
 Deploy de stabiele release-branch met de audit-fixes (printen/geluid/scannen/emoji,
@@ -78,7 +82,7 @@ Bedenk per device een unieke sterke passphrase → noteer in Proton Pass (BB Ope
 Per laptop, vanaf het station (of Fedora-host op de prov-LAN):
 ```
 inspoelstraat/install-hp.sh <installer-ip> <host>
-# bv: inspoelstraat/install-hp.sh 192.168.50.55 dawo-hp-probook-4g1i
+# bv: inspoelstraat/install-hp.sh 192.168.50.55 dawo-generic-intel
 ```
 De LUKS-passphrase vraagt het script via een verborgen prompt (`read -rs`) —
 nooit als shell-argument: dat landt in `ps` en de shell-history van het station
