@@ -2,6 +2,17 @@
 
 ## Unreleased
 
+Breaking in 0.2.0:
+
+- refactor(hardware): the vendor hardware modules and their hosts
+  (dawo-t495s, dawo-t495s-gnome, dawo-hp-probook-4g1i,
+  dawo-hp-probook-4g1i-gnome) are removed. The core ships generic starter
+  hosts instead (dawo-generic-intel, dawo-generic-amd, and their -gnome
+  variants), because hardware choices happen downstream. A fleet that ran a
+  vendor host moves the hardware module into its own overlay, or points the
+  device at the generic host of the right CPU type. CI builds SBOMs for the
+  generic hosts only (#171)
+
 ## 0.1.3 - security scan, first round
 
 The first half of the security scan of 3 September, plus what it took to make

@@ -2,6 +2,11 @@
 ---
 # What is in the image, and what is known to be wrong with it (#31, #54).
 #
+# SBOMs for the generic starter profiles only (#171): hardware choices happen
+# downstream, so a vendor model here would say what one pilot fleet runs, not
+# what the core ships. A downstream that wants SBOMs for its own hosts runs
+# the same `nix run .#sbom` against its overlay.
+#
 # On merge to main rather than on every pushed commit: "an SBOM after each PR"
 # is read as "after each PR lands". No pull_request trigger, for the reason
 # recorded in validate-nix.yaml: this runner is self-hosted and nothing has
@@ -28,10 +33,10 @@ jobs:
       fail-fast: false
       matrix:
         host:
-          - dawo-t495s
-          - dawo-t495s-gnome
-          - dawo-hp-probook-4g1i
-          - dawo-hp-probook-4g1i-gnome
+          - dawo-generic-intel
+          - dawo-generic-intel-gnome
+          - dawo-generic-amd
+          - dawo-generic-amd-gnome
           - dawo-installer
           - dawo-installer-netboot
     steps:
@@ -71,7 +76,7 @@ jobs:
       - name: Fetch the reference SBOM
         uses: https://code.forgejo.org/forgejo/download-artifact@v4
         with:
-          name: sbom-dawo-t495s
+          name: sbom-dawo-generic-intel
           path: sbom-in
 
       - name: Scan it
@@ -89,6 +94,6 @@ jobs:
       - name: Upload the report
         uses: https://code.forgejo.org/forgejo/upload-artifact@v4
         with:
-          name: vulnscan-dawo-t495s
+          name: vulnscan-dawo-generic-intel
           path: vulns
           retention-days: 90

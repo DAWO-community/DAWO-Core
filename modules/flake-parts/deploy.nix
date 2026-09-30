@@ -19,6 +19,13 @@
 
   flake =
     { lib, config, ... }:
+    let
+      # The only source of host keys a deploy trusts (#103). Everything else
+      # is turned off: accepting whatever answers first is how a deploy that
+      # activates a root closure becomes remote code execution by any device
+      # on the path. Host keys are public, so a store path is fine here.
+      knownHosts = builtins.toString ./../hosts/known_hosts;
+    in
     {
       deploy.nodes = lib.mapAttrs' (
         hostname: nixosConfiguration:
@@ -30,30 +37,27 @@
           value = {
             inherit hostname;
             fastConnection = true;
-            # BatchMode only: never prompt, and fail rather than ask. The two
-            # options that used to sit here, StrictHostKeyChecking=no and
-            # UserKnownHostsFile=/dev/null, accepted whatever host key answered
-            # while pushing a closure that is then activated as root. That is
-            # the same trust-on-first-use the auto-update block refuses for
-            # comin, on a path with more privilege.
-            #
-            # A host key that is not yet known now stops the deploy. Add it
-            # deliberately, checking the fingerprint against the device rather
-            # than against the network:
-            #
-            #   ssh-keyscan <host> >> ~/.ssh/known_hosts
-            #
-            # and compare with `ssh-keygen -lf /etc/ssh/ssh_host_ed25519_key.pub`
-            # read off the machine itself.
-            sshOpts = [ "-o BatchMode=yes" ];
+            sshOpts = [
+              "-o BatchMode=yes"
+              # Verify against the fleet's known_hosts and nothing else. The
+              # system-wide /etc file is excluded on purpose: a deploy should
+              # fail on a key this repository does not vouch for, and a host
+              # that is not recorded yet is a host that cannot be deployed to
+              # until it is (see docs/deploy.md).
+              "-o GlobalKnownHostsFile=/dev/null"
+              "-o UserKnownHostsFile=${knownHosts}"
+              "-o StrictHostKeyChecking=yes"
+            ];
             profiles.system = {
               sshUser = "deploy";
               user = "root";
               interactiveSudo = false;
-              # Roll back when the new generation cannot be reached after
-              # activation. A laptop that loses its network on switch is the
-              # normal case this exists for, and the alternative is a device
-              # that has to be visited.
+              # Rollback verification back on (#103): the new generation must
+              # report in over SSH before the old one is dropped, so a config
+              # that breaks boot rolls the device back instead of leaving it
+              # dead. The device must be able to reach the operator back for
+              # this - on the provisioning LAN it always can; on a one-way NAT
+              # a deploy fails safe rather than skipping verification.
               magicRollback = true;
               remoteBuild = false;
               confirmTimeout = 30;

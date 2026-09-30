@@ -1,0 +1,39 @@
+# yamllint disable rule:line-length
+---
+# Upstream movement made visible (#170). Renovate walks the flake inputs and
+# opens one PR per input that moved, plus weekly flake.lock maintenance
+# (renovate.json5). It never merges: validate-nix runs on the PR, and which
+# upstream code a government device runs is a human decision.
+#
+# Self-hosted on purpose: no hosted bot and no third-party token. Renovate
+# runs from the nixpkgs pin in this flake's own lock, on our runner, against
+# our forge.
+#
+# One-time setup (repository admin): create a Codeberg token with repository
+# scope for the bot account and add it as the RENOVATE_TOKEN secret. Without
+# the secret this workflow fails - loud beats silently doing nothing.
+name: Renovate
+on: # yamllint disable-line rule:truthy
+  workflow_dispatch:
+  schedule:
+    - cron: "45 6 * * 1"
+jobs:
+  renovate:
+    runs-on: native
+    timeout-minutes: 30
+    steps:
+      - name: Checkout git repo
+        uses: actions/checkout@v4
+
+      - name: Run renovate against this repository
+        # renovate clones and writes through the API with RENOVATE_TOKEN; the
+        # checkout is here because --inputs-from . pins renovate itself to
+        # this flake's nixpkgs, and that needs the local flake.
+        env:
+          RENOVATE_TOKEN: ${{ secrets.RENOVATE_TOKEN }}
+          PATH: /run/wrappers/bin:/home/gitea-runner/.nix-profile/bin:/nix/profile/bin:/home/gitea-runner/.local/state/nix/profile/bin:/etc/profiles/per-user/gitea-runner/bin:/nix/var/nix/profiles/default/bin:/run/current-system/sw/bin
+        run: |
+          nix shell --inputs-from . nixpkgs#renovate nixpkgs#git -c renovate \
+            --platform gitea \
+            --endpoint https://codeberg.org/api/v1 \
+            DAWO/DAWO-Core

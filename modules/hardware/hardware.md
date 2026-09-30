@@ -9,22 +9,21 @@ Per-device hardware support for the DAWO fleet, layered:
   machine whose exact model has no profile yet: the `common-*` CPU/GPU/laptop
   profiles, all firmware, and the few initrd modules those profiles miss
   (SD-card readers and USB mass storage).
-- A per-model module (e.g. lenovo-t495s.nix, hp-probook-4g1i.nix) adds only
-  that model's quirks on top: a nixos-hardware profile, model initrd modules,
-  CPU/GPU bits the profile does not cover.
+- A per-model module (a nixos-hardware profile, a `common-*` composition, or a
+  nixos-facter dump) adds only that model's quirks on top. Those live
+  downstream (#171): the organisation that buys the machines is the only
+  party that knows which ones they are, and a vendor model in the core says
+  what one pilot fleet runs, not what the core ships.
 
 ## Whose job is hardware?
 
 **Downstream's.** The organisation that buys the machines is the only party
-that knows which ones they are, so the core does not try to carry a module per
-model and will not grow into a hardware database. A deployment writes the
-modules for the hardware it actually runs, or leans on nixos-hardware, or lets
+that knows which ones they are, so the core does not carry a module per model
+and will not grow into a hardware database. The pilot's own vendor modules
+(lenovo-t495s, hp-probook-4g1i) lived here as worked examples and were removed
+in 0.2.0, a breaking change: a deployment writes the modules for the hardware
+it actually runs in its own overlay, or leans on nixos-hardware, or lets
 nixos-facter detect it - the three paths below.
-
-The two model modules that do live here (`lenovo-t495s`, `hp-probook-4g1i`) are
-the pilot's own devices and double as worked examples of the "pick" and
-"compose" paths. They are not a statement that the core supports those models
-for anyone else.
 
 What the core does owe a downstream is a first boot. `hardware-generic-intel`
 and `hardware-generic-amd` exist so day one is a deployment rather than a
@@ -41,8 +40,8 @@ real profile once the fleet's models are known.
    # e.g. lenovo-thinkpad-t495, dell-latitude-..., framework-13-...
    ```
    If there is no exact-model profile, compose the `common-*` profiles
-   (common-cpu-intel/amd, common-gpu-*, common-pc-laptop, common-pc-ssd), as the
-   HP ProBook module does.
+   (common-cpu-intel/amd, common-gpu-*, common-pc-laptop, common-pc-ssd), as
+   `hardware-generic-intel` / `hardware-generic-amd` do.
 
 2. **Look up:** the nixos-hardware README/flake lists every supported device and
    its module name - search there: https://github.com/NixOS/nixos-hardware

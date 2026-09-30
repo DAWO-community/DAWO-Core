@@ -9,11 +9,11 @@ Uses the host's disko layout (partitions, encrypts and installs remotely). No
 extra flake input needed.
 
 Requirements: the target boots into a Linux with SSH as root (installer ISO or
-NixOS live), has network, and the host exists in the flake (e.g. dawo-t495s).
+NixOS live), has network, and the host exists in the flake (e.g. dawo-generic-intel).
 
 ```bash
 nix run github:nix-community/nixos-anywhere -- \
-  --flake .#dawo-t495s \
+  --flake .#dawo-generic-intel \
   --target-host root@<target-ip>
 ```
 
@@ -28,9 +28,13 @@ nixos-anywhere --flake .#<host> --generate-hardware-config \
 
 and import it in the hardware module (nixos-facter-modules is already an input).
 
-> LUKS: disko-single-nvme-luks uses a passwordFile for the automated install.
-> Afterwards set a real unlock (TPM2/FIDO2 via systemd-cryptenroll) or an
-> interactive passphrase.
+> LUKS: disko-single-nvme-luks reads its passphrase from
+> `dawo.diskEncryption.passwordFile` on the target (default /tmp/secret.key,
+> placed there by nixos-anywhere --disk-encryption-keys from a 0600 local
+> tmpfile; never a shell argument, never a store path - there is an assertion).
+> The install passphrase is slot 0. Afterwards set a real unlock (TPM2/FIDO2
+> via systemd-cryptenroll, see docs/secureboot-tpm.md); `dawo-proof` reports
+> per device whether that rotation has happened.
 
 ## 2. Updates - deploy-rs
 
@@ -39,8 +43,25 @@ modules/flake-parts/deploy.nix), via the deploy user (SSH key).
 
 ```bash
 nix develop          # provides deploy-rs in the shell
-deploy .#dawo-t495s  # builds and activates remotely
+deploy .#dawo-generic-intel  # builds and activates remotely
 ```
+
+A deploy activates a root closure, so the connection is verified: deploy-rs
+checks the device's SSH host key against `modules/hosts/known_hosts` and
+nothing else, and a device that is not recorded there refuses to deploy.
+Record a device once, at first boot or imaging, for every name or address a
+deployment will connect to it by:
+
+```bash
+ssh-keyscan -t ed25519,ecdsa,rsa <device> >> modules/hosts/known_hosts
+```
+
+Magic rollback is on: the new generation has to report in over SSH before the
+old one is dropped, so a configuration that breaks boot rolls the device back
+instead of leaving it dead. That needs the device to reach the operator back -
+true on the provisioning LAN; behind a one-way NAT a deploy fails safe rather
+than skipping verification. Never record the installer ISO's host key: the
+installer lives in RAM and its key changes on every boot.
 
 ## 3. Fleet
 

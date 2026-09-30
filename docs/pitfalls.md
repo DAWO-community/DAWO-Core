@@ -75,7 +75,7 @@ and the error points at the key.
 
 ## Never deploy the core's own host configuration onto an overlay device
 
-`deploy .#dawo-t495s` works, and on a device that belongs to an organisation
+`deploy .#dawo-generic-intel` works, and on a device that belongs to an organisation
 overlay it takes away everything the overlay added: the mesh network, the
 operator's SSH keys, the open port 22, the users, the agenix secrets, comin
 itself and the printers. The device is then reachable only from its own keyboard.

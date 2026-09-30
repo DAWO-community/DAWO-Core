@@ -31,9 +31,13 @@ De image = `nixosConfigurations.<host>` uit **DAWO-NixOS**. Bestaande hosts:
 ```
 nix flake show /home/brambuijs/Cloud/Operations/dawo/DAWO-NixOS | grep -A20 nixosConfigurations
 ```
-Typisch: `dawo-hp-probook-4g1i` (KDE) / `dawo-hp-probook-4g1i-gnome` (GNOME),
-`dawo-hp-eb-850g7`, `dawo-t495s`. **Onbekend model** → eerst een hardware-block +
-host in de core toevoegen en committen (zie `modules/hardware/` + `modules/hosts/clients/`).
+De core heeft sinds #171 alleen nog **generieke starter-hosts**:
+`dawo-generic-intel` / `dawo-generic-intel-gnome` en
+`dawo-generic-amd` / `dawo-generic-amd-gnome`. Vendor-modellen (HP ProBook,
+Lenovo T495s) zijn downstream verhuisd (breaking change in 0.2.0). **Bekend model** → hardware-block +
+host in de eigen overlay (de drie paden staan in `modules/hardware/hardware.md`);
+**onbekend model** → de generieke host van het juiste CPU-type, en na de pilot
+vervangen door een echt profiel.
 
 ### 1b. Versie / branch
 Deploy de stabiele release-branch met de audit-fixes (printen/geluid/scannen/emoji,
@@ -77,20 +81,20 @@ Bedenk per device een unieke sterke passphrase → noteer in Proton Pass (BB Ope
 
 Per laptop, vanaf het station (of Fedora-host op de prov-LAN):
 ```
-inspoelstraat/install-hp.sh <installer-ip> <host>   # vraagt de passphrase, leest hem van stdin
-# bv: inspoelstraat/install-hp.sh 192.168.50.55 dawo-hp-probook-4g1i '<luks-uit-PP>'
+inspoelstraat/install-hp.sh <installer-ip> <host>
+# bv: inspoelstraat/install-hp.sh 192.168.50.55 dawo-generic-intel
 ```
-Dit draait `nixos-anywhere --flake DAWO-NixOS#<host> --phases disko,install` (Secure Boot uit),
+De LUKS-passphrase vraagt het script via een verborgen prompt (`read -rs`) —
+nooit als shell-argument: dat landt in `ps` en de shell-history van het station
+(#112). Het script houdt hem bij de uitvoering in een 0600-tmpfile die bij exit
+verwijderd wordt, en kopieert die met `nixos-anywhere --disk-encryption-keys`
+naar `/tmp/secret.key` op de installer. Dit draait
+`nixos-anywhere --flake DAWO-NixOS#<host> --phases disko,install` (Secure Boot uit),
 zet de LUKS-passphrase, kopieert de closure van het station (harmonia-cache). Meerdere
 terminals = parallel imagen.
 - Klaar = "done". Herhaal voor alle 15 (noteer host ↔ asset-tag ↔ LUKS in PP).
 
 ---
-
-> De passphrase hoort niet op de commandoregel: daar staat hij in `ps` en in de
-> shellgeschiedenis van de operator. Het installatiescript zet hem op de target
-> in `/run/dawo-luks.key`, mode 0600, op tmpfs. Zie
-> `dawo.disk.luks.passwordFile` als een uitrol een ander pad wil.
 
 ## 5. Per device: reboot → verify → Secure Boot + TPM2
 
@@ -146,7 +150,7 @@ Per device: LUKS-passphrase (+ evt. host-key bij agenix-varianten). Nooit in dez
 ```
 # op de prov-switch:
 inspoelstraat/find-hps.sh                                       # installer-IPs
-inspoelstraat/install-hp.sh <ip> <host> <luks>                 # per device (parallel)
+inspoelstraat/install-hp.sh <ip> <host>                          # per device (parallel); vraagt LUKS via prompt
 # per device na reboot: sbctl create-keys -> SB-variant switch -> enroll-keys -> BIOS SB on
 #                        -> systemd-cryptenroll tpm2 pcrs=7 -> reboot (auto-unlock)
 # checklist §6 -> uitleveren

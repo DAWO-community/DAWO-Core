@@ -1,11 +1,4 @@
 {
-  # Single NVMe, LUKS, btrfs subvolumes. The layout the pilot devices use.
-  #
-  # The install-time passphrase is a runtime path, never a Nix path literal: a
-  # path literal is copied into /nix/store, which is world readable, so the disk
-  # key would ship to every user of the device. There is an assertion for that,
-  # the same one the comin deploy key has, because the mistake is the same
-  # mistake and it is silent both times.
   flake.modules.nixos.disko-single-nvme-luks =
     {
       config,
@@ -14,38 +7,48 @@
       ...
     }:
     let
-      cfg = config.dawo.disk;
+      cfg = config.dawo.diskEncryption;
     in
     {
       imports = [
         inputs.disko.nixosModules.disko
       ];
 
-      options.dawo.disk.luks.passwordFile = lib.mkOption {
+      options.dawo.diskEncryption.passwordFile = lib.mkOption {
         type = lib.types.str;
-        default = "/run/dawo-luks.key";
+        default = "/tmp/secret.key";
         description = ''
-          Where disko reads the LUKS passphrase during installation. A runtime
-          path on the installer, not a file in this repository and not a Nix
-          path literal.
+          Path, ON THE TARGET, of the file disko reads the LUKS passphrase
+          from during the install. The imaging step puts it there with
+          nixos-anywhere --disk-encryption-keys <this path> <local file>;
+          the local file is a 0600 tmpfile the operator pastes or pipes the
+          passphrase into, never a shell argument (#112).
 
-          The default is on tmpfs and readable by root only. The previous value
-          was /tmp/secret.key, which every user of the installer could read.
+          Deliberately a string, not a path literal: a Nix path would copy the
+          passphrase into /nix/store, where it is world readable. There is an
+          assertion for that. No trailing newline in the file
+          (`printf %s`, not echo) or the passphrase carries one.
         '';
       };
 
       config = {
         assertions = [
           {
-            assertion = !(lib.hasPrefix builtins.storeDir cfg.luks.passwordFile);
+            assertion = cfg.passwordFile != "";
+            message = "dawo.diskEncryption.passwordFile must be set; disko needs a source for the LUKS passphrase.";
+          }
+          {
+            assertion = !(lib.hasPrefix builtins.storeDir cfg.passwordFile);
             message = ''
-              dawo.disk.luks.passwordFile points into the Nix store, which is
-              world readable, so the disk passphrase would be published to every
-              user of the device. Give it a runtime path on the installer
-              instead.
+              dawo.diskEncryption.passwordFile points into the Nix store,
+              which is world readable, so the LUKS passphrase would be
+              published to every user of the device and to every build. Give
+              it a runtime path on the target instead - nixos-anywhere's
+              --disk-encryption-keys copies a local 0600 file there.
             '';
           }
         ];
+
         disko.devices = {
           disk = {
             main = {
@@ -72,16 +75,9 @@
                     content = {
                       type = "luks";
                       name = "crypted-main";
-                      # Read once, at install time, by disko. It has to be a
-                      # string rather than a path literal, and it has to be
-                      # somewhere the whole machine cannot read: /run is tmpfs and
-                      # root-only, /tmp is not.
-                      #
-                      # Write it without a trailing newline, or the passphrase
-                      # will not match what a person types at the prompt:
-                      #   install -m 0600 /dev/null /run/dawo-luks.key
-                      #   printf '%s' "$passphrase" > /run/dawo-luks.key
-                      passwordFile = cfg.luks.passwordFile;
+                      # Read on the target during the disko phase; see the
+                      # dawo.diskEncryption.passwordFile option above.
+                      inherit (cfg) passwordFile;
                       settings = {
                         allowDiscards = true;
                       };

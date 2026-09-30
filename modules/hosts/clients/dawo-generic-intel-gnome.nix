@@ -3,7 +3,11 @@
   ...
 }:
 {
-  flake.modules.nixos."hosts/dawo-t495s" =
+  # Starter host, GNOME variant: dawo-generic-intel with the other desktop, so
+  # the two can be deployed and tested separately on the same machine:
+  #   nixos-rebuild switch --flake .#dawo-generic-intel        # KDE Plasma
+  #   nixos-rebuild switch --flake .#dawo-generic-intel-gnome # GNOME
+  flake.modules.nixos."hosts/dawo-generic-intel-gnome" =
     { ... }:
     {
       imports = with config.flake.modules.nixos; [
@@ -17,27 +21,18 @@
         disko-single-nvme-luks
 
         # Hardware
-        hardware-lenovo-t495s
+        hardware-generic-intel
 
-        # Profiles
+        # Profiles (mandatory hardening included; see profiles.md)
         profiles-dawo-generic
 
         # Userland
         maid-dawo-generic
-
-        # Mandatory hardening (ssh, sysctl, chrony, and the login policy) is
-        # pulled in automatically by profiles-dawo-generic, which imports
-        # profiles-dawo-core and forces those blocks on. usbguard and auditd are
-        # deliberately not in that list: both are selected at the hardened
-        # level of the register. To turn on an opt-in block, import
-        # profiles-dawo-hardened and flip the one you want, e.g.:
-        #   dawo.apparmor.enable = true;
       ];
-      networking.hostName = "dawo-t495s";
+      networking.hostName = "dawo-generic-intel-gnome";
 
-      # Desktop choice (exactly one; see desktop-select). Flip to gnome.enable to
-      # test GNOME on the same host: rebuild swaps the desktop.
-      dawo.desktop.plasma.enable = true;
+      # Desktop choice (exactly one; see desktop-select).
+      dawo.desktop.gnome.enable = true;
 
       # Pilot app set (office workers; they reach a VDI over VPN/F5). LibreOffice
       # by default (swap to collabora on-site if preferred); dev tools stay off.

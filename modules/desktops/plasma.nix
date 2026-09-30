@@ -32,20 +32,18 @@
           different one keeps asking until that wallet is reset.
         '';
       };
-      options.dawo.desktop.plasma.kdeconnect = {
-        enable = lib.mkEnableOption ''
-          KDE Connect. Off by default: it opens TCP and UDP 1714-1764 on every
-          interface, and once a phone is paired it carries clipboard contents,
-          files, notifications and remote input. That is a reasonable trade on
-          a home machine and a decision somebody has to make for a device that
-          roams onto networks we do not run
-        '';
-      };
       options.dawo.desktop.plasma.socialClient = lib.mkOption {
         type = lib.types.bool;
         default = true;
         description = "Ship the Mastodon client (Tokodon). A deployment that does not want a social client sets this false.";
       };
+      # Off by default (#105): KDE Connect listens on TCP and UDP 1714-1764
+      # on every interface, which is clipboard sync, file transfer and remote
+      # input on a roaming laptop. A workplace that wants phone integration
+      # opts in per host (or in its overlay) rather than every device shipping
+      # an open listener no document asked for.
+      options.dawo.desktop.plasma.kdeconnect.enable =
+        lib.mkEnableOption "KDE Connect (opens TCP/UDP 1714-1764 on all interfaces)";
 
       config = lib.mkIf cfg.enable {
         # Enable the KDE Plasma Desktop Environment.
@@ -55,10 +53,10 @@
 
         programs.kdeconnect.enable = cfg.kdeconnect.enable;
 
-        # BlueZ access for KDE Connect over Bluetooth. `own` is deliberately
-        # absent: it would let any user in the group claim the org.bluez name
-        # on the system bus and answer as the Bluetooth daemon. Talking to
-        # BlueZ needs send_destination and the interfaces below, nothing more.
+        # Bluetooth pairing from KDE Connect talks to BlueZ over the system
+        # bus. `own` would let any local user impersonate the Bluetooth
+        # daemon, which is more than the client needs (#105): sending to it
+        # is what it does, so that is all the policy grants.
         services.dbus.packages = lib.mkIf cfg.kdeconnect.enable [
           (pkgs.writeTextFile {
             name = "kdeconnect-bluetooth.conf";
