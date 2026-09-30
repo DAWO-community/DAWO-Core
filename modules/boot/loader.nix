@@ -26,7 +26,18 @@
       ];
 
       options.dawo.secureboot = {
-        enable = lib.mkEnableOption "lanzaboote Secure Boot (requires sbctl keys enrolled at pkiBundle)";
+        enable = lib.mkEnableOption ''
+          lanzaboote Secure Boot (requires sbctl keys enrolled at pkiBundle)
+
+          Off (the default) is a choice with a residual risk, stated here
+          because a deployment reads it here (#111): with Secure Boot off the
+          ESP (/boot) is a plain vfat partition outside the LUKS container, so
+          anyone with physical access can replace the kernel and initrd and
+          capture the LUKS passphrase on the next boot. A device that accepts
+          that (stored in a drawer, no adversary holds it) stays on the
+          default; a device that does not runs the key ceremony first
+          (docs/secureboot-tpm.md) and flips this flag.
+        '';
         pkiBundle = lib.mkOption {
           type = lib.types.str;
           default = "/var/lib/sbctl";

@@ -8,6 +8,28 @@ Both ship in the image as opt-in blocks, OFF by default:
 - `dawo.secureboot.enable` (boot-loader block)
 - `dawo.diskUnlock.tpm2.enable` (boot-tpm2-unlock block)
 
+The build refuses the second without the first: TPM2 unlock asserts
+`dawo.secureboot.enable`, because PCR 7 only measures anything when Secure
+Boot is on and either half alone is not a guarantee.
+
+## Why PCR 7 alone (decision, #111)
+
+The enrolment binds the TPM key to PCR 7 - the firmware's Secure Boot policy,
+which keys and binaries firmware accepts - and to nothing else. That is a
+decision, not an oversight:
+
+- It covers the attack this is for: with Secure Boot enforced, firmware
+  refuses to boot an initrd the keys did not sign, so a swapped-in initrd
+  cannot run and cannot capture the passphrase. What firmware refuses to
+  run, never asks the TPM for the key.
+- PCRs 4 and 11 (bootloader and UKI measurements) would bind tighter, but they
+  change on every kernel generation, which would re-lock the disk on every
+  update and make the typed passphrase the daily unlock again - the opposite
+  of the UX this block exists for.
+- The residual gap is a hypothetical signed-boot bypass (a firmware or shim
+  flaw that runs attacker code despite PCR 7). Revisit this decision if one
+  becomes real; until then, PCR 7 + Secure Boot is the accepted pair.
+
 This is a deliberate second step because a wrong enrolment can leave a machine
 unbootable. Do it ON the device, with recovery ready. Order matters: Secure Boot
 first (it defines PCR 7), then TPM2 enrol against PCR 7.
