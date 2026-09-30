@@ -37,6 +37,13 @@
         default = true;
         description = "Ship the Mastodon client (Tokodon). A deployment that does not want a social client sets this false.";
       };
+      # Off by default (#105): KDE Connect listens on TCP and UDP 1714-1764
+      # on every interface, which is clipboard sync, file transfer and remote
+      # input on a roaming laptop. A workplace that wants phone integration
+      # opts in per host (or in its overlay) rather than every device shipping
+      # an open listener no document asked for.
+      options.dawo.desktop.plasma.kdeconnect.enable =
+        lib.mkEnableOption "KDE Connect (opens TCP/UDP 1714-1764 on all interfaces)";
 
       config = lib.mkIf cfg.enable {
         # Enable the KDE Plasma Desktop Environment.
@@ -44,8 +51,13 @@
 
         security.pam.services.sddm.kwallet.enable = cfg.unlockWalletAtLogin;
 
-        programs.kdeconnect.enable = true;
-        services.dbus.packages = lib.mkIf config.programs.kdeconnect.enable [
+        programs.kdeconnect.enable = cfg.kdeconnect.enable;
+
+        # Bluetooth pairing from KDE Connect talks to BlueZ over the system
+        # bus. `own` would let any local user impersonate the Bluetooth
+        # daemon, which is more than the client needs (#105): sending to it
+        # is what it does, so that is all the policy grants.
+        services.dbus.packages = lib.mkIf cfg.kdeconnect.enable [
           (pkgs.writeTextFile {
             name = "kdeconnect-bluetooth.conf";
             destination = "/share/dbus-1/system.d/kdeconnect-bluetooth.conf";
@@ -53,7 +65,6 @@
               <?xml version="1.0" encoding="UTF-8"?>
               <!DOCTYPE busconfig PUBLIC "-//freedesktop//DTD D-BUS Bus Configuration 1.0//EN" "http://www.freedesktop.org/standards/dbus/1.0/busconfig.dtd">
               <policy group="users">
-                <allow own="org.bluez"/>
                 <allow send_destination="org.bluez"/>
                 <allow send_interface="org.bluez.Agent1"/>
                 <allow send_interface="org.bluez.MediaEndpoint1"/>
