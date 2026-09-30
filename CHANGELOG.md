@@ -2,6 +2,19 @@
 
 ## Unreleased
 
+## 0.2.0 - the consumer round
+
+The half the 0.1.3 notes deferred: everything that changes what a consumer
+has to do. The security scan's second half (auditd with rules, the last
+unguarded dbus own, Secure Boot and TPM2 held together, the disk passphrase
+off the command line, deploy host keys verified), the hardening register
+finished for SSH and the kernel, and the break a fleet sees when it moves:
+vendor hosts gone in favour of generic starter hosts, flat option paths,
+the hardware key as a second factor, and the unstable input dropped.
+
+Shipped first as v0.2.0-rc.1 for the hardware test; the tag moves to the
+final commit when the test passes. Issues #56 to #171.
+
 Breaking in 0.2.0:
 
 - refactor(hardware): the vendor hardware modules and their hosts
@@ -65,6 +78,13 @@ Security:
   `modules/hosts/known_hosts` before activating a root closure, and magic
   rollback is back on: the new generation must report in over SSH before the
   old one is dropped (#103).
+- feat(hardening): two polkit cases are decided instead of inherited from
+  whatever the desktop ships: firmware updates ask for an administrator, and
+  removable media stays with the person at the keyboard (#115).
+- feat(flatpak): `dawo.flatpak.enable` keeps the block on, and
+  `dawo.flatpak.autoUpdate` defaults to off (#116) - a second, unpinned
+  software supply chain that updated itself weekly and on every activation
+  is now a decision rather than a default.
 
 Hardening register:
 
