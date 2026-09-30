@@ -8,7 +8,7 @@ Thank you for your interest in contributing! To maintain a high standard of qual
 
 ## 🤖 AI Policy
 - **Disclosure**: When using AI, disclose this. Please refer to the relevant model(s) and agent(s) uses for creating code, issues and PRs.
-- **Responsible use**: Please only use AI when there is a specific need it addresses a specific need. Otherwise, plain human discussion and coding is preferred.
+- **Responsible use**: Please only use AI when it addresses a specific need. Otherwise, plain human discussion and coding is preferred.
 - **Human compatibility**: when using AI for generating code, it is still the responsibility of the developer to provide high quality code. This code must be understandable on a human level so troubleshooting can be done by mere mortals.
 
 ## 🛠 Workflow
