@@ -42,6 +42,23 @@ nix develop          # provides deploy-rs in the shell
 deploy .#dawo-t495s  # builds and activates remotely
 ```
 
+A deploy activates a root closure, so the connection is verified: deploy-rs
+checks the device's SSH host key against `modules/hosts/known_hosts` and
+nothing else, and a device that is not recorded there refuses to deploy.
+Record a device once, at first boot or imaging, for every name or address a
+deployment will connect to it by:
+
+```bash
+ssh-keyscan -t ed25519,ecdsa,rsa <device> >> modules/hosts/known_hosts
+```
+
+Magic rollback is on: the new generation has to report in over SSH before the
+old one is dropped, so a configuration that breaks boot rolls the device back
+instead of leaving it dead. That needs the device to reach the operator back -
+true on the provisioning LAN; behind a one-way NAT a deploy fails safe rather
+than skipping verification. Never record the installer ISO's host key: the
+installer lives in RAM and its key changes on every boot.
+
 ## 3. Fleet
 
 One host file per device (`modules/hosts/clients/<name>.nix`) that imports a

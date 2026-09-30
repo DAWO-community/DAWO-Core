@@ -1,0 +1,14 @@
+# SSH host keys of the fleet, one line per device, in the standard
+# known_hosts format. deploy-rs verifies every connection against this file
+# and nothing else (modules/flake-parts/deploy.nix, #103).
+#
+# Record a device at first boot or imaging, for every name or address a
+# deployment will connect to it by:
+#
+#   ssh-keyscan -t ed25519,ecdsa,rsa <device> | sed 's/^/  /' >> this file
+#
+# Host keys are public material, so a store path is fine; a device that is
+# not in this file is a device that cannot be deployed to, which is the
+# intended failure mode. Never record the installer ISO's ephemeral key: the
+# installer is reinstalled into RAM on every boot, so its key changes and a
+# recorded entry would only create the impression of a pinned device.
