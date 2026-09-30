@@ -28,9 +28,13 @@ nixos-anywhere --flake .#<host> --generate-hardware-config \
 
 and import it in the hardware module (nixos-facter-modules is already an input).
 
-> LUKS: disko-single-nvme-luks uses a passwordFile for the automated install.
-> Afterwards set a real unlock (TPM2/FIDO2 via systemd-cryptenroll) or an
-> interactive passphrase.
+> LUKS: disko-single-nvme-luks reads its passphrase from
+> `dawo.diskEncryption.passwordFile` on the target (default /tmp/secret.key,
+> placed there by nixos-anywhere --disk-encryption-keys from a 0600 local
+> tmpfile; never a shell argument, never a store path - there is an assertion).
+> The install passphrase is slot 0. Afterwards set a real unlock (TPM2/FIDO2
+> via systemd-cryptenroll, see docs/secureboot-tpm.md); `dawo-proof` reports
+> per device whether that rotation has happened.
 
 ## 2. Updates - deploy-rs
 

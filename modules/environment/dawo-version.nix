@@ -84,7 +84,10 @@
 
       dawo-proof = pkgs.writeShellApplication {
         name = "dawo-proof";
-        runtimeInputs = [ pkgs.fastfetch ];
+        runtimeInputs = [
+          pkgs.fastfetch
+          pkgs.cryptsetup
+        ];
         text = ''
           fastfetch -c ${ffConfig}
           echo
@@ -104,6 +107,26 @@
           dawo-verify || true
           echo "-- secure boot --"
           bootctl status 2>/dev/null | grep -i 'secure boot' | sed 's/^ */  /' || true
+          echo "-- disk unlock --"
+          # The install put the LUKS passphrase in slot 0; rotating it away
+          # means a TPM2 (or FIDO2) token enrolled with systemd-cryptenroll
+          # (docs/secureboot-tpm.md). Reported rather than enforced, because
+          # only the device knows what is enrolled (#112).
+          dev=/dev/disk/by-partlabel/disk-main-luks
+          if [ -e "$dev" ]; then
+            if dump=$(sudo cryptsetup luksDump "$dev" 2>/dev/null); then
+              echo "  keyslots: $(printf '%s\n' "$dump" | sed -n '/^Keyslots:/,/^[A-Z]/p' | grep -c 'luks2')"
+              if printf '%s\n' "$dump" | grep -q systemd-tpm2; then
+                echo "  TPM2 token enrolled (disk unlocks without the install passphrase)"
+              else
+                echo "  no TPM2 token: disk still unlocks with the install passphrase"
+              fi
+            else
+              echo "  (needs root; run dawo-proof with sudo for keyslot state)"
+            fi
+          else
+            echo "  (no LUKS device with the standard layout)"
+          fi
         '';
       };
     in

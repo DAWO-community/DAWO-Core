@@ -34,10 +34,11 @@
               content = {
                 type = "luks";
                 name = "crypted-main";
-                # if you want to use the key for interactive login be sure
-                # there is no trailing newline. For example use
-                # `echo -n "password" > /tmp/secret.key`
-                passwordFile = "/tmp/secret.key"; # Interactive
+                # Path on THIS machine (the installer) holding the passphrase,
+                # created by the operator, 0600, no trailing newline
+                # (`printf %s '...' > file`), never passed as a shell argument
+                # (#112). disko reads it, then delete it.
+                passwordFile = "/tmp/secret.key";
                 settings = {
                   allowDiscards = true;
                 };
