@@ -12,6 +12,83 @@ Breaking in 0.2.0:
   vendor host moves the hardware module into its own overlay, or points the
   device at the generic host of the right CPU type. CI builds SBOMs for the
   generic hosts only (#171)
+- refactor(options)!: the `options` level is gone from every block, so
+  `dawo.ssh.maxAuthTries` rather than `dawo.ssh.options.maxAuthTries`. Six of
+  the eight blocks with settings never used that level, so the documented
+  convention was the minority practice. Two blocks whose path did not match
+  their subject moved as well: `dawo.gnomeHardening` is now
+  `dawo.desktop.gnome.hardening`, and `dawo.tools.diagnostics` is now
+  `dawo.diagnostics`. Every old name keeps working for one release and warns
+  with the new path.
+- fix(hardening)!: `dawo.pam.u2f` asks for the key and the password. It used
+  the nixpkgs default, `sufficient`, so the key replaced the password instead
+  of adding to it. `dawo.pam.u2f.mode = "passwordless"` keeps the old
+  behaviour. The recovery path for a lost key is written down in
+  docs/users.md (#108). **Breaking** for a device that already has u2f on:
+  its users now need both.
+- chore(flake)!: the `nixpkgs-unstable` input and the `pkgs.unstable` overlay
+  are gone; no module used them (#121). **Breaking for consumers** that
+  follow it. Their evaluation stops with `input 'nixpkgs-unstable' follows a
+  non-existent input 'dawo/nixpkgs-unstable'`; remove that follows line from
+  flake.nix, or declare your own input if you use `pkgs.unstable`.
+- feat(localization): `dawo.localization` replaces the two hard-wired locale
+  modules. The system language and the regional formats are now separate
+  options, the ten most spoken languages in Europe plus Dutch are generated on
+  the device so a user can switch the desktop language without a rebuild, and
+  each offered language gets its spell checker (#56). Consumers importing
+  `localization-nl_nl` or `localization-en_nl` switch to `localization-languages`;
+  the defaults reproduce the old Dutch behaviour. The legacy `nl_NL/ISO-8859-1`
+  locale is no longer generated.
+
+Security:
+
+- fix(hardening): auditd runs with real rules again. audit 4.2.1 loads what
+  4.1.2-unstable rejected, so `dawo.audit.enable` stops being a warning and
+  records account changes, commands run as root by a user, and kernel module
+  loads, with retention set to five files of 8 MiB. Selected at the hardened
+  level as `audit-privileged-actions`; forwarding is not decided yet (#109).
+- fix(desktop): KDE Connect is off behind
+  `dawo.desktop.plasma.kdeconnect.enable`: it listens on TCP and UDP 1714-1764
+  on all interfaces, and the bluetooth dbus policy loses `own="org.bluez"`,
+  which let any local user impersonate the Bluetooth daemon (#105).
+- fix(boot): a device without Secure Boot refuses TPM2 auto-unlock. PCR 7
+  only measures anything with Secure Boot on, so the TPM would otherwise
+  hand the disk key to whatever booted; the PCR 7 decision is written down in
+  docs/secureboot-tpm.md (#111).
+- fix(disko): the LUKS passphrase stays out of the store and the command
+  line. disko reads it from `dawo.diskEncryption.passwordFile` on the target,
+  imaging copies a 0600 tmpfile there with nixos-anywhere
+  `--disk-encryption-keys`, an assertion refuses a store path, and `dawo-proof`
+  reports whether the rotation away from the install passphrase has happened
+  (#112).
+- fix(deploy): a deploy verifies the host key against
+  `modules/hosts/known_hosts` before activating a root closure, and magic
+  rollback is back on: the new generation must report in over SSH before the
+  old one is dropped (#103).
+
+Hardening register:
+
+- refactor(hardening): the SSH floor lives in the register. Turning off
+  `ssh-no-root-login`, `ssh-key-only-auth` or `ssh-crypto-floor` now takes the
+  setting away as well; before, the switch changed the report and the block
+  kept forcing the value. The generated sshd_config is unchanged on every
+  host (#110).
+- refactor(hardening): the kernel and network sysctls live in the register,
+  as eight rules grouped by purpose; four of them are new, for the sixteen
+  values that had no rule and could not be turned off by name. Each rule reads
+  its values back from the running kernel. The generated sysctl.d file is
+  unchanged on every host (#110).
+
+CI and upkeep:
+
+- fix(firefox): the Plasma Integration extension is pinned to a fixed-hash
+  XPI from AMO rather than fetched live at build time (#166).
+- feat(ci): self-hosted renovate walks the pinned flake inputs and opens a PR
+  per input that moved, plus weekly flake.lock maintenance. Nothing
+  automerges; validate-nix runs on the PR and a person decides. Renovate is
+  pinned by our own flake.lock and runs on our runner, so no hosted bot and
+  no third-party token. Needs the RENOVATE_TOKEN secret, set once by an
+  admin (#170).
 
 ## 0.1.3 - security scan, first round
 
@@ -54,33 +131,6 @@ Fixes:
   (#95, #99)
 - fix(hardware): DisplayLink starts its manager and loads evdi under Wayland,
   not only under X11 (#96, #100)
-- fix(hardening): auditd runs with real rules again. audit 4.2.1 loads what
-  4.1.2-unstable rejected, so `dawo.audit.enable` stops being a warning and
-  records account changes, commands run as root by a user, and kernel module
-  loads, with retention set to five files of 8 MiB. Selected at the hardened
-  level as `audit-privileged-actions`; forwarding is not decided yet (#109).
-- fix(hardening)!: `dawo.pam.u2f` asks for the key and the password. It used
-  the nixpkgs default, `sufficient`, so the key replaced the password instead
-  of adding to it. `dawo.pam.u2f.mode = "passwordless"` keeps the old
-  behaviour. The recovery path for a lost key is written down in
-  docs/users.md (#108). **Breaking** for a device that already has u2f on:
-  its users now need both.
-- refactor(hardening): the SSH floor lives in the register. Turning off
-  `ssh-no-root-login`, `ssh-key-only-auth` or `ssh-crypto-floor` now takes the
-  setting away as well; before, the switch changed the report and the block
-  kept forcing the value. The generated sshd_config is unchanged on every
-  host (#110).
-- refactor(hardening): the kernel and network sysctls live in the register,
-  as eight rules grouped by purpose; four of them are new, for the sixteen
-  values that had no rule and could not be turned off by name. Each rule reads
-  its values back from the running kernel. The generated sysctl.d file is
-  unchanged on every host (#110).
-- chore(flake)!: the `nixpkgs-unstable` input and the `pkgs.unstable` overlay
-  are gone; no module used them (#121). **Breaking for consumers** that
-  follow it. Their evaluation stops with `input 'nixpkgs-unstable' follows a
-  non-existent input 'dawo/nixpkgs-unstable'`; remove that follows line from
-  flake.nix, or declare your own input if you use `pkgs.unstable`.
-
 - feat(update): `dawo-update-status` on every device - service state, last
   poll, last generation and whether a reboot is pending, without sudo. Reads
   comin's own socket where it answers and systemd plus the system profile
@@ -108,29 +158,6 @@ CI and upkeep:
 - docs: a handbook (#130), three ADRs (#132), and the traps that cost hours
   this round (#155)
 - chore(git): union merges for CHANGELOG.md and architecture.md (#157)
-  `dawo.autoUpdate.desktopNotifications.enable`.
-- feat(hardening): `dawo.hardening` selects security controls per rule instead
-  of per block: an ordered level (baseline, hardened, strict), a compliance
-  selection that cuts across it, and a switch per rule that wins over both. The
-  register also produces `dawo-verify`, which says on the device whether each
-  enabled rule holds and why each disabled one is off (#110). The first seven
-  rules carry checks only; configuration moves over one subject at a time.
-- feat(localization): `dawo.localization` replaces the two hard-wired locale
-  modules. The system language and the regional formats are now separate
-  options, the ten most spoken languages in Europe plus Dutch are generated on
-  the device so a user can switch the desktop language without a rebuild, and
-  each offered language gets its spell checker (#56). Consumers importing
-  `localization-nl_nl` or `localization-en_nl` switch to `localization-languages`;
-  the defaults reproduce the old Dutch behaviour. The legacy `nl_NL/ISO-8859-1`
-  locale is no longer generated.
-- refactor(options)!: the `options` level is gone from every block, so
-  `dawo.ssh.maxAuthTries` rather than `dawo.ssh.options.maxAuthTries`. Six of
-  the eight blocks with settings never used that level, so the documented
-  convention was the minority practice. Two blocks whose path did not match
-  their subject moved as well: `dawo.gnomeHardening` is now
-  `dawo.desktop.gnome.hardening`, and `dawo.tools.diagnostics` is now
-  `dawo.diagnostics`. Every old name keeps working for one release and warns
-  with the new path.
 
 ## 0.1.2 - the move, and the vulnerability backlog
 
