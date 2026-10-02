@@ -21,11 +21,25 @@
       faillock = "${pkgs.linux-pam}/lib/security/pam_faillock.so";
       pwquality = "${pkgs.libpwquality}/lib/security/pam_pwquality.so";
 
+      # A desktop-free host has no dawo.desktop at all, so the display-manager
+      # entries below read through this guard rather than through the option
+      # tree (see the services default).
+      desktopEnable =
+        name: (lib.attrByPath [ "dawo" "desktop" name "enable" ] false config);
+
       # Orders sit between the entries NixOS generates: preauth before the
       # password is checked (unix-early is 11700), authfail after the check and
       # before the final deny (unix 12900, deny 13700), and the account check
       # before account unix at 11000.
-      lockoutRules = {
+      #
+      # The authfail position is computed per service rather than fixed: a
+      # constant 13300 collided with the built-in sss rule, which NixOS also
+      # places at 13300 the moment services.sssd.enable is set, and the rules
+      # option's own documentation says to assign relative offsets rather than
+      # constants. faillockAuthfail must run after whatever checked the
+      # password, so it takes the sss position plus ten when the service has
+      # one, and the historic fixed position otherwise.
+      lockoutRules = svc: {
         account.faillock = {
           order = 10900;
           control = "required";
@@ -41,7 +55,14 @@
           ];
         };
         auth.faillockAuthfail = {
-          order = 13300;
+          # After the module that checked the password: relative to the sss
+          # rule when the service has one (SSSD-backed device login), and the
+          # historic fixed position when it does not. See the note above the
+          # rules for why this cannot be a constant.
+          order =
+            (lib.attrByPath [ "services" svc "rules" "auth" "sss" "order" ] 13300
+              config.security.pam)
+            + 10;
           control = "required";
           modulePath = faillock;
           args = [ "authfail" ];
@@ -82,8 +103,13 @@
               "su"
               "sudo"
             ]
-            ++ lib.optional config.dawo.desktop.plasma.enable "sddm"
-            ++ lib.optional config.dawo.desktop.gnome.enable "gdm-password";
+            # The desktop options are read through guarded paths: a host
+            # without any desktop module (the imaging station) has no
+            # dawo.desktop at all, and an unguarded read took the whole eval
+            # down with "attribute 'desktop' missing". A missing desktop
+            # simply contributes no display manager to the list.
+            ++ lib.optional (desktopEnable "plasma") "sddm"
+            ++ lib.optional (desktopEnable "gnome") "gdm-password";
             defaultText = lib.literalMD "the console, su, sudo, and whichever display manager is enabled";
             description = ''
               PAM services the lockout applies to. Every place a password can be
@@ -132,8 +158,8 @@
             silent
           '';
 
-          security.pam.services = lib.genAttrs cfg.lockout.services (_: {
-            rules = lockoutRules;
+          security.pam.services = lib.genAttrs cfg.lockout.services (svc: {
+            rules = lockoutRules svc;
           });
 
           environment.systemPackages = [ pkgs.linux-pam ]; # faillock(8), to see and clear a lock
