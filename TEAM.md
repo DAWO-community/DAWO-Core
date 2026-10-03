@@ -15,9 +15,9 @@ This comittee always needs an odd number of people to make majority decisions.
 
 | Name               | Languages | Role within SC      | Profile                                                    | Affiliation               |
 | ------------------ | --------- | ------------------- | ---------------------------------------------------------- | ------------------------- |
-| Bram Buijs         | :nl: :en: | Developer           | [codeberg](https://codeberg.org/brambuijs)                 | VNG / BB-Open             |
-| Rutger Putter      | :nl: :en: | Maintainer          | [codeberg](https://codeberg.org/rutgerputter)              | Citizen / Realiz-IT / TCS |
-| Victor Gevers      | :nl: :en: | Community Manager   | [codeberg](https://codeberg.org/cookiemonster)             | NL Government             |
+| Bram Buijs         | 🇳🇱 🇬🇧 | Developer           | [codeberg](https://codeberg.org/brambuijs)                 | VNG / BB-Open             |
+| Rutger Putter      | 🇳🇱 🇬🇧 | Maintainer          | [codeberg](https://codeberg.org/rutgerputter)              | Citizen / Realiz-IT / TCS |
+| Victor Gevers      | 🇳🇱 🇬🇧 | Community Manager   | [codeberg](https://codeberg.org/cookiemonster)             | NL Government             |
 
 ## Roles
 
