@@ -1,3 +1,4 @@
+{ inputs, ... }:
 {
   # Boot loader, with Secure Boot as an opt-in.
   #
@@ -14,7 +15,6 @@
       config,
       pkgs,
       lib,
-      inputs,
       ...
     }:
     let

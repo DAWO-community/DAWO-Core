@@ -1,6 +1,7 @@
+{ inputs, ... }:
 {
   flake.modules.nixos.hardware-lenovo-t495s =
-    { inputs, ... }:
+    { ... }:
     {
       # Model-specific only. The generic bits (firmware, fwupd, bluetooth,
       # initrd-systemd, platform) come from hardware-dawo-base via the profile.

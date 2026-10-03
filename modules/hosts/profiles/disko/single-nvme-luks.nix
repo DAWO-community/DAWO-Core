@@ -1,6 +1,7 @@
+{ inputs, ... }:
 {
   flake.modules.nixos.disko-single-nvme-luks =
-    { inputs, ... }:
+    { ... }:
     {
       imports = [
         inputs.disko.nixosModules.disko

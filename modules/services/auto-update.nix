@@ -1,3 +1,4 @@
+{ inputs, ... }:
 {
   # Fleet auto-update via comin (git-driven reconcile). Tracks a flake on
   # Codeberg and rebuilds the device when new commits land.
@@ -9,7 +10,6 @@
   flake.modules.nixos.services-auto-update =
     {
       config,
-      inputs,
       lib,
       ...
     }:
