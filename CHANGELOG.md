@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+Breaking:
+
+Due to #175, all downsteams should change their dawo inputs from `inputs` to `inputs.<dawo-input-name>.inputs`. (Example [here](https://forge.realiz-it.nl/Realiz-IT/DAWO-Realiz-IT/commit/cd3bb2cdca92db100e238fbd1ab6c3cd6e48b9db)). And only import DAWO-Core as input in their `flake.nix` file.
+
 ## 0.1.3 - security scan, first round
 
 The first half of the security scan of 3 September, plus what it took to make
