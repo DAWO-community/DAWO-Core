@@ -1,6 +1,7 @@
+{ inputs, ... }:
 {
   flake.modules.nixos.environment-dawo-pkgs =
-    { pkgs, inputs, ... }:
+    { pkgs, ... }:
     {
       imports = [
         # Import agenix NixOS module
