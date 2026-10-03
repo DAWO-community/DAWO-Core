@@ -15,9 +15,9 @@ This comittee always needs an odd number of people to make majority decisions.
 
 | Name               | Languages | Role within SC      | Profile                                                    | Affiliation               |
 | ------------------ | --------- | ------------------- | ---------------------------------------------------------- | ------------------------- |
-| Victor Gevers      | :nl: :en: | Project Lead MinBZK | [codeberg](https://codeberg.org/cookiemonster)             | MinBZK                    |
-| Rutger Putter      | :nl: :en: | Maintainer          | [codeberg](https://codeberg.org/rutgerputter)              | Citizen / Realiz-IT / TCS |
 | Bram Buijs         | :nl: :en: | Developer           | [codeberg](https://codeberg.org/brambuijs)                 | VNG / BB-Open             |
+| Rutger Putter      | :nl: :en: | Maintainer          | [codeberg](https://codeberg.org/rutgerputter)              | Citizen / Realiz-IT / TCS |
+| Victor Gevers      | :nl: :en: | Community Manager   | [codeberg](https://codeberg.org/cookiemonster)             | NL Government             |
 
 ## Roles
 
@@ -108,7 +108,4 @@ The Maintainer serves as the primary architect, technical authority, and communi
 
 **Resilience:** A high degree of emotional intelligence and patience for navigating the unique challenges of public, volunteer-driven development.
 
-### Project Lead MinBZK
-
-The project leads are formally responsible for DAWO-Core from a government perspective. In some cases they have final say in matters that directly involve the Dutch government.
 
