@@ -9,3 +9,6 @@
 
 # sbomnix writes its metadata cache into the working directory
 /http_cache.sqlite
+
+# disks for qemu vm's
+/dawo-*.qcow2

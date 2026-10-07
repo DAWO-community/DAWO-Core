@@ -20,6 +20,10 @@ To ensure every change is tracked and reviewed effectively, please follow this p
 4.  **Code-Only Discussions**: Please keep pull request discussions strictly focused on the code changes themselves. Structural debates, feature requests, or off-topic discussions should be moved back to the original issue or a new issue.
 5.  **Labelling**: Please attach all relevant labels to issues and pull requests.
 
+## 🤓 Development setup
+
+To try out your changes, deploy them to a test machine or [QEMU VM](./docs/qemu-vm.md)
+
 ## 📝 Commit Standards
 We follow the **Conventional Commits** specification. This allows us to automatically generate changelogs and keep our history clean.
 

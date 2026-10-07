@@ -21,6 +21,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md).
 - **Multi-Tenancy**: Specifically designed to handle diverse roles, from `desktops` to core `services`.
 
 ## Entry Points
+- [`docs/`](https://codeberg.org/DAWO/DAWO-Core/src/branch/main/docs) - browse various docs
 - [`flake.nix`](https://codeberg.org/DAWO/DAWO-Core/src/branch/main/flake.nix) - The primary build entry point and input definitions.
 - [`modules/`](https://codeberg.org/DAWO/DAWO-Core/src/branch/main/modules) - The directory containing all modular configurations.
 
