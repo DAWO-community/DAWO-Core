@@ -1,6 +1,7 @@
+{ inputs, ... }:
 {
   flake.modules.nixos.hardware-qemu =
-    { inputs, modulesPath, ... }:
+    { modulesPath, ... }:
     {
       imports = [
         inputs.nixos-hardware.nixosModules.common-pc-laptop
