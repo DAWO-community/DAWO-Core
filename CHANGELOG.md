@@ -1,10 +1,15 @@
 # Changelog
 
-## Unreleased
+## 0.2.0
 
 Breaking:
 
 Due to #175, all downsteams should change their dawo inputs from `inputs` to `inputs.<dawo-input-name>.inputs`. (Example [here](https://forge.realiz-it.nl/Realiz-IT/DAWO-Realiz-IT/commit/cd3bb2cdca92db100e238fbd1ab6c3cd6e48b9db)). And only import DAWO-Core as input in their `flake.nix` file.
+
+Other changes:
+
+- fix(firefox): pin Plasma Integration XPI #166 #168
+- docs(contributing): how to run in a QEMU VM #176 #184
 
 ## 0.1.3 - security scan, first round
 
