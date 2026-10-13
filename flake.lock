@@ -101,6 +101,25 @@
         "type": "github"
       }
     },
+    "disko_2": {
+      "inputs": {
+        "nixpkgs": "nixpkgs"
+      },
+      "locked": {
+        "lastModified": 1768920986,
+        "narHash": "sha256-CNzzBsRhq7gg4BMBuTDObiWDH/rFYHEuDRVOwCcwXw4=",
+        "owner": "nix-community",
+        "repo": "disko",
+        "rev": "de5708739256238fb912c62f03988815db89ec9a",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nix-community",
+        "ref": "latest",
+        "repo": "disko",
+        "type": "github"
+      }
+    },
     "flake-compat": {
       "flake": false,
       "locked": {
@@ -331,18 +350,37 @@
         "type": "github"
       }
     },
+    "nixos-installer": {
+      "inputs": {
+        "disko": "disko_2",
+        "nixpkgs": "nixpkgs_2"
+      },
+      "locked": {
+        "lastModified": 1792554425,
+        "narHash": "sha256-TNNGCeunXPx2hc8kPLlkAmhlMxSlq+0eXxUmol6Mxnw=",
+        "ref": "refs/heads/main",
+        "rev": "5e436067418a410b8265881005560691749ed60e",
+        "revCount": 100,
+        "type": "git",
+        "url": "https://codeberg.org/BerriJ/nixos-installer.git"
+      },
+      "original": {
+        "type": "git",
+        "url": "https://codeberg.org/BerriJ/nixos-installer.git"
+      }
+    },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1795258312,
-        "narHash": "sha256-IEuDsf80ubivfpidbRsIm30HVo7PZIdZt1stRsbaY4Y=",
-        "owner": "nixos",
+        "lastModified": 1768661221,
+        "narHash": "sha256-MJwOjrIISfOpdI9x4C+5WFQXvHtOuj5mqLZ4TMEtk1M=",
+        "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "94c3211b0ee8ba969a3f12eb4aff8ba0f72971dd",
+        "rev": "3327b113f2ef698d380df83fbccefad7e83d7769",
         "type": "github"
       },
       "original": {
-        "owner": "nixos",
-        "ref": "nixos-26.05",
+        "owner": "NixOS",
+        "ref": "nixpkgs-unstable",
         "repo": "nixpkgs",
         "type": "github"
       }
@@ -359,6 +397,38 @@
       "original": {
         "owner": "nixos",
         "ref": "nixos-unstable",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
+    "nixpkgs_2": {
+      "locked": {
+        "lastModified": 1792502884,
+        "narHash": "sha256-IoNisKcGbUjdd45qCqywGMCYmZ5EnkxezvLII0FWwNA=",
+        "owner": "nixos",
+        "repo": "nixpkgs",
+        "rev": "02c087f3fe673c9e317f206a627cb6b910336dbe",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nixos",
+        "ref": "nixos-unstable",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
+    "nixpkgs_3": {
+      "locked": {
+        "lastModified": 1795258312,
+        "narHash": "sha256-IEuDsf80ubivfpidbRsIm30HVo7PZIdZt1stRsbaY4Y=",
+        "owner": "nixos",
+        "repo": "nixpkgs",
+        "rev": "94c3211b0ee8ba969a3f12eb4aff8ba0f72971dd",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nixos",
+        "ref": "nixos-26.05",
         "repo": "nixpkgs",
         "type": "github"
       }
@@ -400,7 +470,8 @@
         "nix-flatpak": "nix-flatpak",
         "nix-maid": "nix-maid",
         "nixos-hardware": "nixos-hardware",
-        "nixpkgs": "nixpkgs",
+        "nixos-installer": "nixos-installer",
+        "nixpkgs": "nixpkgs_3",
         "nixpkgs-unstable": "nixpkgs-unstable",
         "rust-overlay": "rust-overlay",
         "treefmt-nix": "treefmt-nix_2"

@@ -74,6 +74,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.darwin.follows = "";
     };
+    nixos-installer.url = "git+https://codeberg.org/BerriJ/nixos-installer.git";
   };
   outputs = inputs: inputs.flake-parts.lib.mkFlake { inherit inputs; } (inputs.import-tree ./modules);
 }
