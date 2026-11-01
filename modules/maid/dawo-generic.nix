@@ -48,7 +48,7 @@
           Wallpaper = {
             "org.kde.image" = {
               General = {
-                Image = "/nix/store/vxchhzr0jkpz1gwcy7wm5kk4gvp6fhc9-wallpaper";
+                Image = "${wallpaper}";
               };
             };
           };
