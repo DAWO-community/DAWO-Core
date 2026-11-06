@@ -61,7 +61,8 @@
             gimp-with-plugins
             inkscape
             krita
-            penpot-desktop
+            # Disabed penpot because it uses an outdated version of electron
+            # penpot-desktop
           ];
         })
         (lib.mkIf cfg.media.enable {
