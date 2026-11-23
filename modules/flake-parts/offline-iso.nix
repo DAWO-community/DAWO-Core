@@ -129,6 +129,7 @@ let
   # the client if a declared disk device is not present on the machine.
   offlineTargets = [
     "dawo-generic-x86"
+    "dawo-generic-x86-gnome"
   ];
 
   installer = inputs.nixos-installer;
