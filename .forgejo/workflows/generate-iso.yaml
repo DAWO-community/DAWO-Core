@@ -25,7 +25,7 @@ jobs:
         run: |
           /run/current-system/sw/bin/nix build .#installer-iso-dawo-generic-x86 -o ./result-kde
           /run/current-system/sw/bin/mkdir -p /var/lib/dawo-iso/kde
-          /run/current-system/sw/bin/rm /var/lib/dawo-iso/kde/*
+          /run/current-system/sw/bin/rm -rf /var/lib/dawo-iso/kde/*
           /run/current-system/sw/bin/cp ./result-kde/iso/*.iso /var/lib/dawo-iso/kde/
 
       - name: Generate the Gnome ISO and Copy
@@ -34,6 +34,6 @@ jobs:
         run: |
           /run/current-system/sw/bin/nix build .#installer-iso-dawo-generic-x86-gnome -o ./result-gnome
           /run/current-system/sw/bin/mkdir -p /var/lib/dawo-iso/gnome
-          /run/current-system/sw/bin/rm /var/lib/dawo-iso/gnome/*
+          /run/current-system/sw/bin/rm -rf /var/lib/dawo-iso/gnome/*
           /run/current-system/sw/bin/cp ./result-gnome/iso/*.iso /var/lib/dawo-iso/gnome/
 
