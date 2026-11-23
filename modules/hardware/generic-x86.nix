@@ -14,7 +14,7 @@
   # ways to get a real one (nixos-hardware profile, common-* composition, or
   # nixos-facter detection at install time).
   flake.modules.nixos.hardware-generic-x86 =
-    { lib, ... }:
+    { lib, pkgs, ... }:
     {
       imports = [
         inputs.nixos-hardware.nixosModules.common-pc-laptop
@@ -29,6 +29,8 @@
       # redistributable-flagged, and a machine whose wifi does not come up
       # cannot be fixed remotely.
       hardware.enableAllFirmware = lib.mkDefault true;
+
+      boot.kernelPackages = pkgs.linuxPackages_latest;
 
       # Only what the common-* profiles do not already bring. ahci, nvme,
       # sd_mod, usbhid and xhci_pci are in the default set, so listing them

@@ -3,7 +3,7 @@
   ...
 }:
 {
-  flake.modules.nixos."hosts/hardware-generic-x86" =
+  flake.modules.nixos."hosts/dawo-generic-x86" =
     { ... }:
     {
       imports = with config.flake.modules.nixos; [
