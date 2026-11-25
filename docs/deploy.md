@@ -57,6 +57,10 @@ ssh-keygen -lf dawo-t495s.key
 cat dawo-t495s.key >> ~/.ssh/known_hosts
 ```
 
+After activation deploy-rs opens a second connection to confirm that the device
+is still reachable. If that confirmation does not arrive within 30 seconds, the
+device rolls back to the previous generation by itself (magic rollback).
+
 ## 3. Fleet
 
 One host file per device (`modules/hosts/clients/<name>.nix`) that imports a

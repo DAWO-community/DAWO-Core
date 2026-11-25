@@ -51,7 +51,11 @@
               sshUser = "deploy";
               user = "root";
               interactiveSudo = false;
-              magicRollback = false;
+              # Roll back when the new generation cannot be reached after
+              # activation. A laptop that loses its network on switch is the
+              # normal case this exists for, and the alternative is a device
+              # that has to be visited.
+              magicRollback = true;
               remoteBuild = false;
               confirmTimeout = 30;
               path = inputs.deploy-rs.lib.${system}.activate.nixos nixosConfiguration;

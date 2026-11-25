@@ -11,6 +11,11 @@ Breaking:
   /etc/ssh/ssh_host_ed25519_key.pub` read off the device itself, and only
   then append it to `known_hosts` (docs/deploy.md) #103 #125
 
+Other changes:
+
+- fix(deploy): magic rollback is on. A device that cannot be reached after
+  activation rolls back by itself #103 #125
+
 ## 0.2.0
 
 Breaking:
