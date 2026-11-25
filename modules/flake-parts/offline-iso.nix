@@ -139,7 +139,7 @@ let
   # flake wraps as nixosModules.isoOffline; we wrap it ourselves only
   # so the live disko CLI comes from OUR disko pin instead of theirs.
   installerModule = import "${installer}/iso" {
-    disko = inputs.disko;
+    inherit (inputs) disko;
     offline = true;
   };
 
