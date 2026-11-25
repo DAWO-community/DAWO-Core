@@ -30,11 +30,23 @@
           value = {
             inherit hostname;
             fastConnection = true;
-            sshOpts = [
-              "-o BatchMode=yes"
-              "-o StrictHostKeyChecking=no"
-              "-o UserKnownHostsFile=/dev/null"
-            ];
+            # BatchMode only: never prompt, and fail rather than ask. The two
+            # options that used to sit here, StrictHostKeyChecking=no and
+            # UserKnownHostsFile=/dev/null, accepted whatever host key answered
+            # while pushing a closure that is then activated as root. That is
+            # the same trust-on-first-use the auto-update block refuses for
+            # comin, on a path with more privilege.
+            #
+            # A host key that is not yet known now stops the deploy. Add it
+            # deliberately, and compare before trusting it: scan the key to a
+            # file, compare its fingerprint with what the device itself shows,
+            # and only then append it to known_hosts:
+            #
+            #   ssh-keyscan -t ed25519 <host> > host.key
+            #   ssh-keygen -lf host.key
+            #   # on the device: ssh-keygen -lf /etc/ssh/ssh_host_ed25519_key.pub
+            #   cat host.key >> ~/.ssh/known_hosts   # only if they match
+            sshOpts = [ "-o BatchMode=yes" ];
             profiles.system = {
               sshUser = "deploy";
               user = "root";

@@ -1,5 +1,16 @@
 # Changelog
 
+## Unreleased
+
+Breaking:
+
+- fix(deploy): deploy-rs verifies host keys. A deploy to a device whose key
+  is not in the operator's `known_hosts` stops with `Host key verification
+  failed`. Add the key deliberately: scan it (`ssh-keyscan -t ed25519
+  <host>`), compare its fingerprint with `ssh-keygen -lf
+  /etc/ssh/ssh_host_ed25519_key.pub` read off the device itself, and only
+  then append it to `known_hosts` (docs/deploy.md) #103 #125
+
 ## 0.2.0
 
 Breaking:

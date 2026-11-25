@@ -42,6 +42,21 @@ nix develop          # provides deploy-rs in the shell
 deploy .#dawo-t495s  # builds and activates remotely
 ```
 
+deploy-rs checks the device's SSH host key and stops when it is not known.
+Before the first deploy to a device, add its key deliberately. Check the
+fingerprint against the device itself rather than against the network, and
+do that before the key goes into `known_hosts`, not after:
+
+```bash
+# 1. on the device, read its fingerprint
+ssh-keygen -lf /etc/ssh/ssh_host_ed25519_key.pub
+# 2. on your machine, scan the key and show its fingerprint, without trusting it yet
+ssh-keyscan -t ed25519 dawo-t495s > dawo-t495s.key
+ssh-keygen -lf dawo-t495s.key
+# 3. only if both fingerprints match
+cat dawo-t495s.key >> ~/.ssh/known_hosts
+```
+
 ## 3. Fleet
 
 One host file per device (`modules/hosts/clients/<name>.nix`) that imports a
