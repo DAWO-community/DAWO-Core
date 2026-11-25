@@ -21,6 +21,10 @@
       faillock = "${pkgs.linux-pam}/lib/security/pam_faillock.so";
       pwquality = "${pkgs.libpwquality}/lib/security/pam_pwquality.so";
 
+      # A host without a desktop module has no dawo.desktop at all, so the
+      # services default reads the desktop options through this guard.
+      desktopEnable = name: lib.attrByPath [ "dawo" "desktop" name "enable" ] false config;
+
       # Orders sit between the entries NixOS generates: preauth before the
       # password is checked (unix-early is 11700), authfail after the check and
       # before the final deny (unix 12900, deny 13700), and the account check
@@ -82,8 +86,8 @@
               "su"
               "sudo"
             ]
-            ++ lib.optional config.dawo.desktop.plasma.enable "sddm"
-            ++ lib.optional config.dawo.desktop.gnome.enable "gdm-password";
+            ++ lib.optional (desktopEnable "plasma") "sddm"
+            ++ lib.optional (desktopEnable "gnome") "gdm-password";
             defaultText = lib.literalMD "the console, su, sudo, and whichever display manager is enabled";
             description = ''
               PAM services the lockout applies to. Every place a password can be
