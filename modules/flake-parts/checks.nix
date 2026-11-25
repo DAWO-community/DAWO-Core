@@ -107,6 +107,76 @@
         }
       ];
 
+      # The lockout's rules sit among rules NixOS generates, and which ones a
+      # stack holds depends on the host. Checked on each host and once more
+      # with SSSD on, the composition that broke it twice: a shared order that
+      # failed the eval, and an account phase that ended before faillock.
+      pamHosts = hosts // {
+        plasma-sssd = hosts.plasma.extendModules { modules = [ { services.sssd.enable = true; } ]; };
+      };
+      lockout =
+        name: cfg:
+        let
+          listed = cfg.config.dawo.pam.lockout.services;
+          rules =
+            svc: type:
+            lib.filterAttrs (_: r: r.enable) (cfg.config.security.pam.services.${svc}.rules.${type} or { });
+          orders =
+            svc: type: control:
+            lib.mapAttrsToList (_: r: r.order) (lib.filterAttrs (_: r: r.control == control) (rules svc type));
+          auth = svc: rules svc "auth";
+          includes =
+            svc:
+            lib.concatMap
+              (
+                type:
+                lib.mapAttrsToList (_: r: r.modulePath) (
+                  lib.filterAttrs (
+                    _: r:
+                    lib.elem r.control [
+                      "include"
+                      "substack"
+                    ]
+                  ) (rules svc type)
+                )
+              )
+              [
+                "account"
+                "auth"
+                "password"
+                "session"
+              ];
+          perService = svc: [
+            {
+              n = "${name}: ${svc} counts a failure after every password check";
+              ok = lib.all (o: o < (auth svc).faillockAuthfail.order) (orders svc "auth" "sufficient");
+            }
+            {
+              n = "${name}: ${svc} counts a failure before the final deny";
+              ok = !(auth svc ? deny) || (auth svc).faillockAuthfail.order < (auth svc).deny.order;
+            }
+            {
+              n = "${name}: ${svc} clears the count before the account phase can end";
+              ok = lib.all (o: (rules svc "account").faillock.order < o) (orders svc "account" "sufficient");
+            }
+            {
+              n = "${name}: ${svc} does not include a service the lockout already guards";
+              ok = !lib.any (m: lib.elem m listed) (includes svc);
+            }
+          ];
+        in
+        [
+          {
+            n = "${name}: lockout covers polkit";
+            ok = lib.elem "polkit-1" listed;
+          }
+          {
+            n = "${name}: lockout covers the Plasma screen locker";
+            ok = !cfg.config.services.desktopManager.plasma6.enable || lib.elem "kde" listed;
+          }
+        ]
+        ++ lib.concatMap perService listed;
+
       # A rule nobody can check is a claim, not a control. This is the gate that
       # keeps the register honest as it grows.
       registerIsHonest = lib.mapAttrsToList (id: rule: {
@@ -116,7 +186,9 @@
 
       claims = name: cfg: works name cfg ++ refuses name cfg;
       fails = lib.filter (c: !c.ok) (
-        lib.concatLists (lib.mapAttrsToList claims hosts) ++ registerIsHonest
+        lib.concatLists (lib.mapAttrsToList claims hosts)
+        ++ lib.concatLists (lib.mapAttrsToList lockout pamHosts)
+        ++ registerIsHonest
       );
     in
     {
