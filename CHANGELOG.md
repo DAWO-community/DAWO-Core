@@ -8,6 +8,8 @@
 - fix(hardening): the lockout no longer counts a good SDDM or GDM login as a
   failure. Overlays that list `sddm` or `gdm-password` in
   `dawo.pam.lockout.services` should drop them #178 #179
+- fix(hardening): the lockout also covers polkit and the Plasma screen locker,
+  which ask for a password without going through login #178 #179
 
 ## 0.2.0
 

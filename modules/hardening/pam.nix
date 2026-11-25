@@ -92,17 +92,21 @@
 
           services = lib.mkOption {
             type = lib.types.listOf lib.types.str;
-            # No display manager: sddm and gdm-password authenticate with
+            # Every service here has a password check of its own. The display
+            # managers are not listed: sddm and gdm-password authenticate with
             # `substack login`, so login's rules already guard them, and
             # listing them ran faillock a second time after the substack,
             # where authfail runs on every attempt and counted each good
-            # login as a failure.
+            # login as a failure. The Plasma screen locker (kde) and polkit
+            # do not include login and are listed for that reason.
             default = [
               "login"
               "su"
               "sudo"
-            ];
-            defaultText = lib.literalMD "the console (which covers SDDM and GDM), su and sudo";
+            ]
+            ++ lib.optional (desktopEnable "plasma") "kde"
+            ++ lib.optional config.security.polkit.enable "polkit-1";
+            defaultText = lib.literalMD "the console (which covers SDDM and GDM), su, sudo, polkit, and the Plasma screen locker";
             description = ''
               PAM services the lockout applies to. Every place a password can be
               typed belongs here, directly or through a listed service its stack
