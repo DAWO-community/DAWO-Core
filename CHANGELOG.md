@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+- feat(services): `dawo.tailscale`, an opt-in Tailscale client joined to the
+  organisation's tailnet (usually Headscale). The coordination server must be
+  named, and upstream logging to Tailscale Inc is off
+
 ## 0.2.0
 
 Breaking:
