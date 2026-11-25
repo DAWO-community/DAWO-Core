@@ -5,6 +5,9 @@
 - fix(hardening): the lockout places its rules relative to the stack it joins.
   With SSSD on, evaluation no longer fails on a shared order, and a good login
   clears a directory user's failure count again #178 #179
+- fix(hardening): the lockout no longer counts a good SDDM or GDM login as a
+  failure. Overlays that list `sddm` or `gdm-password` in
+  `dawo.pam.lockout.services` should drop them #178 #179
 
 ## 0.2.0
 

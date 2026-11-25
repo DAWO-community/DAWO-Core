@@ -92,17 +92,23 @@
 
           services = lib.mkOption {
             type = lib.types.listOf lib.types.str;
+            # No display manager: sddm and gdm-password authenticate with
+            # `substack login`, so login's rules already guard them, and
+            # listing them ran faillock a second time after the substack,
+            # where authfail runs on every attempt and counted each good
+            # login as a failure.
             default = [
               "login"
               "su"
               "sudo"
-            ]
-            ++ lib.optional (desktopEnable "plasma") "sddm"
-            ++ lib.optional (desktopEnable "gnome") "gdm-password";
-            defaultText = lib.literalMD "the console, su, sudo, and whichever display manager is enabled";
+            ];
+            defaultText = lib.literalMD "the console (which covers SDDM and GDM), su and sudo";
             description = ''
               PAM services the lockout applies to. Every place a password can be
-              typed belongs here; a service left out is a way around it.
+              typed belongs here, directly or through a listed service its stack
+              includes; a service left out is a way around it. A service that
+              includes or substacks a listed one must not be listed itself, or a
+              good password counts as a failure.
             '';
           };
         };

@@ -81,9 +81,12 @@ a train into a day without a laptop. To see or clear one by hand:
     faillock --user <name>
     sudo faillock --user <name> --reset
 
-The lockout applies to the console, `su`, `sudo` and whichever display manager
-is enabled. A place where a password can be typed and that is not in
-`dawo.pam.lockout.services` is a way around it.
+The lockout applies to the console, `su` and `sudo`. SDDM and GDM are covered
+through the console: both check the password with `substack login`, so they are
+deliberately not listed themselves (listed, faillock ran twice and every good
+login counted as a failure). A place where a password can be typed and that is
+not in `dawo.pam.lockout.services`, directly or through a listed service its
+stack includes, is a way around it.
 
 `dawo.pam.u2f.enable` puts a hardware key in front of login and sudo. It is off,
 and it should stay off until every user of that device has an enrolled key and a
