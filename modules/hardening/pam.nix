@@ -25,13 +25,24 @@
       # services default reads the desktop options through this guard.
       desktopEnable = name: lib.attrByPath [ "dawo" "desktop" name "enable" ] false config;
 
-      # Orders sit between the entries NixOS generates: preauth before the
-      # password is checked (unix-early is 11700), authfail after the check and
-      # before the final deny (unix 12900, deny 13700), and the account check
-      # before account unix at 11000.
-      lockoutRules = {
+      # Where the rules go, relative to the rules NixOS generates for a
+      # service rather than at fixed numbers: which modules a stack holds, and
+      # so their orders, depends on what else the host enables (SSSD puts its
+      # auth rule at 13300, Kerberos and LDAP add their own).
+      #
+      #  - account faillock goes in front of every generated account rule
+      #    (they start at 10100). The first `sufficient` account module ends
+      #    the phase, and this is the call that clears the failure count after
+      #    a good login; behind pam_sss it never ran for a directory user.
+      #  - preauth goes before the password is checked (unix-early is 11700).
+      #  - authfail goes right before the final deny, so after every module
+      #    that can check the password, whichever those are.
+      orderBeforeDeny =
+        svc: lib.attrByPath [ "services" svc "rules" "auth" "deny" "order" ] 13700 config.security.pam - 10;
+
+      lockoutRules = svc: {
         account.faillock = {
-          order = 10900;
+          order = 10000;
           control = "required";
           modulePath = faillock;
         };
@@ -45,7 +56,7 @@
           ];
         };
         auth.faillockAuthfail = {
-          order = 13300;
+          order = orderBeforeDeny svc;
           control = "required";
           modulePath = faillock;
           args = [ "authfail" ];
@@ -136,8 +147,8 @@
             silent
           '';
 
-          security.pam.services = lib.genAttrs cfg.lockout.services (_: {
-            rules = lockoutRules;
+          security.pam.services = lib.genAttrs cfg.lockout.services (svc: {
+            rules = lockoutRules svc;
           });
 
           environment.systemPackages = [ pkgs.linux-pam ]; # faillock(8), to see and clear a lock

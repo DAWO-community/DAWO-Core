@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+- fix(hardening): the lockout places its rules relative to the stack it joins.
+  With SSSD on, evaluation no longer fails on a shared order, and a good login
+  clears a directory user's failure count again #178 #179
+
 ## 0.2.0
 
 Breaking:
