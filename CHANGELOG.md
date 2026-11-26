@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- fix(hardening): the lockout now applies the policy in
+  /etc/security/faillock.conf. pam_faillock looked for its config in the Nix
+  store, so devices locked after three failures instead of
+  `dawo.pam.lockout.attempts` #178 #179
 - fix(hardening): the lockout places its rules relative to the stack it joins.
   With SSSD on, evaluation no longer fails on a shared order, and a good login
   clears a directory user's failure count again #178 #179

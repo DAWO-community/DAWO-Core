@@ -21,6 +21,11 @@
       faillock = "${pkgs.linux-pam}/lib/security/pam_faillock.so";
       pwquality = "${pkgs.libpwquality}/lib/security/pam_pwquality.so";
 
+      # pam_faillock looks for its config under its own prefix in the Nix
+      # store, not in /etc, so without this argument every call ignores the
+      # policy below and runs on the built-in defaults (three attempts).
+      faillockConf = "conf=/etc/security/faillock.conf";
+
       # A host without a desktop module has no dawo.desktop at all, so the
       # services default reads the desktop options through this guard.
       desktopEnable = name: lib.attrByPath [ "dawo" "desktop" name "enable" ] false config;
@@ -45,6 +50,7 @@
           order = 10000;
           control = "required";
           modulePath = faillock;
+          args = [ faillockConf ];
         };
         auth.faillockPreauth = {
           order = 11500;
@@ -53,13 +59,17 @@
           args = [
             "preauth"
             "silent"
+            faillockConf
           ];
         };
         auth.faillockAuthfail = {
           order = orderBeforeDeny svc;
           control = "required";
           modulePath = faillock;
-          args = [ "authfail" ];
+          args = [
+            "authfail"
+            faillockConf
+          ];
         };
       };
     in
@@ -145,9 +155,10 @@
 
       config = lib.mkMerge [
         (lib.mkIf cfg.lockout.enable {
-          # pam_faillock reads its numbers here rather than from the module
-          # arguments, so one file answers "what is the policy" for every
-          # service it is wired into.
+          # pam_faillock reads its numbers here (every rule points it at this
+          # file with conf=) rather than from the module arguments, so one
+          # file answers "what is the policy" for every service it is wired
+          # into.
           environment.etc."security/faillock.conf".text = ''
             deny = ${toString cfg.lockout.attempts}
             unlock_time = ${toString cfg.lockout.unlockSeconds}

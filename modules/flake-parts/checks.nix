@@ -148,6 +148,14 @@
               ];
           perService = svc: [
             {
+              n = "${name}: ${svc} points faillock at the policy in /etc";
+              ok = lib.all (r: lib.elem "conf=/etc/security/faillock.conf" (r.args or [ ])) [
+                (rules svc "account").faillock
+                (auth svc).faillockPreauth
+                (auth svc).faillockAuthfail
+              ];
+            }
+            {
               n = "${name}: ${svc} counts a failure after every password check";
               ok = lib.all (o: o < (auth svc).faillockAuthfail.order) (orders svc "auth" "sufficient");
             }
