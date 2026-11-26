@@ -1,0 +1,69 @@
+# The deploy flake an operator would run, for the deploy-rs VM test in
+# ../deploy.nix. Three generations of one small profile, with the settings
+# every core node gets (settings.json). It has no inputs, so it evaluates
+# offline; the store paths below are already on both machines.
+{
+  outputs =
+    { self }:
+    let
+      settings = builtins.fromJSON (builtins.readFile ./settings.json);
+      generation =
+        n: script:
+        derivation {
+          name = "generation-${toString n}";
+          system = "@system@";
+          builder = "@bash@/bin/bash";
+          PATH = "@coreutils@/bin";
+          activateScript = ''
+            #!@bash@/bin/bash
+            set -eu
+            echo ${toString n} > /run/generation
+            ${script}
+          '';
+          activateRs = ''
+            #!@bash@/bin/bash
+            exec @activate@/bin/activate "$@"
+          '';
+          args = [
+            "-c"
+            ''
+              mkdir -p $out
+              printf '%s' "$activateScript" > $out/deploy-rs-activate
+              printf '%s' "$activateRs" > $out/activate-rs
+              chmod +x $out/deploy-rs-activate $out/activate-rs
+            ''
+          ];
+        };
+      node = n: script: {
+        hostname = "device";
+        inherit (settings) fastConnection sshOpts;
+        profiles.test = {
+          inherit (settings)
+            sshUser
+            user
+            interactiveSudo
+            magicRollback
+            confirmTimeout
+            ;
+          path = generation n script;
+        };
+      };
+    in
+    {
+      deploy.nodes = {
+        gen1 = node 1 "true";
+        gen2 = node 2 "true";
+        # Drops every new connection to sshd over IPv4 and IPv6, the
+        # confirmation included, while the session that is activating
+        # carries on.
+        gen3 = node 3 (
+          builtins.concatStringsSep "\n" (
+            map (t: "@iptables@/bin/${t} -I INPUT -p tcp --dport 22 -m conntrack --ctstate NEW -j DROP") [
+              "iptables"
+              "ip6tables"
+            ]
+          )
+        );
+      };
+    };
+}
