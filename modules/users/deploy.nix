@@ -14,7 +14,12 @@
           # is a credential published to everyone who clones it.
           isSystemUser = true;
           isNormalUser = false;
-          # shell: default (bash). zsh is opt-in via dawo.zsh.enable.
+          # A system user gets nologin as its shell unless told otherwise,
+          # and deploy-rs reaches the device by running commands over SSH
+          # (nix-store --serve, then sudo). With nologin every deploy stops at
+          # the copy step. users.defaultUserShell is bash; zsh is opt-in via
+          # dawo.zsh.enable.
+          useDefaultShell = true;
           # wheel is required, not decorative: security.sudo.execWheelOnly is
           # forced on in hardening/sysctl-baseline.nix, so a non-wheel user
           # cannot run sudo at all, including the rule below.

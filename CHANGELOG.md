@@ -15,6 +15,9 @@ Other changes:
 
 - fix(deploy): magic rollback is on. A device that cannot be reached after
   activation rolls back by itself #103 #125
+- fix(users): the deploy account has a shell again. Since 0.1.1 it had
+  nologin, so deploy-rs could not reach a device unless an overlay set a
+  shell #125
 
 ## 0.2.0
 
