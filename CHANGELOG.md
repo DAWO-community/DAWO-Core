@@ -54,6 +54,11 @@ Breaking:
   sets `dawo.flatpak.autoUpdate`, or they stay at their installed version.
   Flatpaks users install themselves were never updated by this and are not
   affected. `dawo.flatpak.enable` turns the block off #116 #144
+Breaking:
+
+- feat(hardening): flashing firmware asks for an administrator (rule
+  `polkit-firmware-needs-admin`). Mounting removable media stays with the
+  active local user, as a recorded decision #115 #146
 
 ## 0.2.0
 
