@@ -37,6 +37,11 @@ Breaking:
   scripts must write it there, for nixos-anywhere with
   `--disk-encryption-keys /run/dawo-luks.key <file>`. The offline stick
   follows the option by itself #112 #148
+Breaking:
+
+- fix(boot): TPM2 unlock without Secure Boot is refused at build time. Turn on
+  `dawo.secureboot.enable`, or set
+  `dawo.diskUnlock.tpm2.allowWithoutSecureBoot` on a bench machine #111 #147
 
 ## 0.2.0
 
