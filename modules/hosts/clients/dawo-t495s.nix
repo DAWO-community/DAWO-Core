@@ -28,8 +28,8 @@
         # Mandatory hardening (ssh, sysctl, chrony, and the login policy) is
         # pulled in automatically by profiles-dawo-generic, which imports
         # profiles-dawo-core and forces those blocks on. usbguard and auditd are
-        # deliberately not in that list: the first is opt-in, the second is a
-        # no-op on nixpkgs 26.05. To turn on an opt-in block, import
+        # deliberately not in that list: both are selected at the hardened
+        # level of the register. To turn on an opt-in block, import
         # profiles-dawo-hardened and flip the one you want, e.g.:
         #   dawo.apparmor.enable = true;
       ];
