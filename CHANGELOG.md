@@ -64,6 +64,16 @@ Breaking:
   records account changes, commands run as root by a user, and kernel module
   loads, with retention set to five files of 8 MiB. Selected at the hardened
   level as `audit-privileged-actions`; forwarding is not decided yet #109 #165
+Breaking:
+
+- feat(localization): `dawo.localization` replaces the two hard-wired locale
+  modules. The system language and the regional formats are separate options,
+  the ten most spoken languages in Europe plus Dutch are generated on the
+  device so a user can switch the desktop language without a rebuild, and each
+  offered language gets its spell checker. Consumers importing
+  `localization-nl_nl` or `localization-en_nl` switch to
+  `localization-languages`; the defaults reproduce the old Dutch behaviour. The
+  legacy `nl_NL/ISO-8859-1` locale is no longer generated #56 #131
 
 ## 0.2.0
 
