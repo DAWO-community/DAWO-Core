@@ -39,9 +39,9 @@
 #
 # What OUR front end is: dawo-install, the one-command installer. It
 # asks exactly ONE question - the fleet LUKS passphrase, written mode
-# 600 to /tmp/secret.key (the fleet layout disko-single-nvme-luks reads
-# its install-time key from there; their script knows nothing about
-# LUKS keys) - then runs the whole install unattended from the baked
+# 600 to the path the host's layout reads its install-time key from
+# (dawo.disk.luks.passwordFile; their script knows nothing about LUKS
+# keys) - then runs the whole install unattended from the baked
 # store paths: checks every declared disk is present, a 5-second
 # Ctrl-C window, the verbatim diskoScript, nixos-install --system with
 # the baked toplevel. The same steps their install-host drives
@@ -62,8 +62,8 @@
 #   Install, one command:
 #     sudo dawo-install
 #   It asks exactly one question: the LUKS passphrase (install-time
-#   unlock key, NO trailing newline, written mode 600 to
-#   /tmp/secret.key; a pre-created non-empty file is used as-is, so
+#   unlock key, NO trailing newline, written mode 600 to the layout's
+#   key path; a pre-created non-empty file is used as-is, so
 #   scripted installs skip the prompt). Everything after runs
 #   unattended: declared-disk check, 5-second Ctrl-C window, the baked
 #   diskoScript (partition/format/mount), then nixos-install --system
@@ -139,7 +139,7 @@ let
   # flake wraps as nixosModules.isoOffline; we wrap it ourselves only
   # so the live disko CLI comes from OUR disko pin instead of theirs.
   installerModule = import "${installer}/iso" {
-    disko = inputs.disko;
+    inherit (inputs) disko;
     offline = true;
   };
 
@@ -171,6 +171,10 @@ let
       host = config.flake.nixosConfigurations.${hostName};
       topLevel = host.config.system.build.toplevel;
       diskoScript = host.config.system.build.diskoScript;
+      # Where the host's disk layout reads its install-time LUKS key. A
+      # layout without the option reads the historic /tmp/secret.key.
+      keyFile = lib.attrByPath [ "dawo" "disk" "luks" "passwordFile" ] "/tmp/secret.key" host.config;
+      keyArg = lib.escapeShellArg keyFile;
       diskLines = lib.concatStringsSep "\n" (
         lib.mapAttrsToList (name: d: "${name} ${d.device}") host.config.disko.devices.disk
       );
@@ -196,12 +200,12 @@ let
                 lsblk --nodeps --output NAME,SIZE,TYPE,MODEL 2>/dev/null || true
                 echo
 
-                # Fleet LUKS convention: the layout reads its install-time key from
-                # /tmp/secret.key; NO trailing newline (printf '%s'). An existing
-                # non-empty file is used as-is, so scripted installs can pre-create
-                # it instead of answering prompts.
-                if [ -s /tmp/secret.key ]; then
-                  echo "Using the existing /tmp/secret.key."
+                # The layout reads its install-time key from ${keyFile}; NO
+                # trailing newline (printf '%s'). An existing non-empty file is
+                # used as-is, so scripted installs can pre-create it instead of
+                # answering prompts.
+                if [ -s ${keyArg} ]; then
+                  echo "Using the existing "${keyArg}"."
                 else
                   umask 077
                   while true; do
@@ -217,7 +221,7 @@ let
                       echo "Passphrases differ; try again." >&2
                     fi
                   done
-                  printf '%s' "$pw1" > /tmp/secret.key
+                  printf '%s' "$pw1" > ${keyArg}
                   unset pw1 pw2
                 fi
                 echo

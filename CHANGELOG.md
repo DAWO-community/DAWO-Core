@@ -30,6 +30,13 @@ Other changes:
 - fix(users): the deploy account has a shell again. Since 0.1.1 it had
   nologin, so deploy-rs could not reach a device unless an overlay set a
   shell #125
+Breaking:
+
+- fix(disko): the install-time LUKS passphrase moves from `/tmp/secret.key`
+  to `/run/dawo-luks.key` (option `dawo.disk.luks.passwordFile`). Imaging
+  scripts must write it there, for nixos-anywhere with
+  `--disk-encryption-keys /run/dawo-luks.key <file>`. The offline stick
+  follows the option by itself #112 #148
 
 ## 0.2.0
 
