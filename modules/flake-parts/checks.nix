@@ -91,6 +91,18 @@
           ok = cfg.config.networking.firewall.enable;
         }
         {
+          n = "${name}: Flatpak does not update itself unless a deployment opts in";
+          ok =
+            !(cfg.config.services.flatpak.update.auto.enable or false)
+            && !(cfg.config.services.flatpak.update.onActivation or false);
+        }
+        {
+          n = "${name}: Flatpak applications get no X11 socket";
+          ok =
+            !cfg.config.services.flatpak.enable
+            || lib.elem "!x11" (cfg.config.services.flatpak.overrides.settings.global.Context.sockets or [ ]);
+        }
+        {
           n = "${name}: kernel pointers hidden";
           ok = sysctl cfg "kernel.kptr_restrict" == 2;
         }

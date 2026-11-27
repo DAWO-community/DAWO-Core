@@ -47,6 +47,13 @@ Breaking:
 - fix(plasma): KDE Connect is off by default; set
   `dawo.desktop.plasma.kdeconnect.enable` to get it back. Its BlueZ policy no
   longer lets the users group own `org.bluez` #105 #127
+Breaking:
+
+- feat(flatpak): Flatpak no longer updates its applications by itself. A
+  deployment that declares Flatpak applications in `services.flatpak.packages`
+  sets `dawo.flatpak.autoUpdate`, or they stay at their installed version.
+  Flatpaks users install themselves were never updated by this and are not
+  affected. `dawo.flatpak.enable` turns the block off #116 #144
 
 ## 0.2.0
 
