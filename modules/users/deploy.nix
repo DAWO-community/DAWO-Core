@@ -14,7 +14,12 @@
           # is a credential published to everyone who clones it.
           isSystemUser = true;
           isNormalUser = false;
-          # shell: default (bash). zsh is opt-in via dawo.zsh.enable.
+          # A system user gets nologin as its shell unless told otherwise,
+          # and deploy-rs reaches the device by running commands over SSH
+          # (nix-store --serve, then sudo). With nologin every deploy stops at
+          # the copy step. users.defaultUserShell is bash; zsh is opt-in via
+          # dawo.zsh.enable.
+          useDefaultShell = true;
           # wheel is required, not decorative: security.sudo.execWheelOnly is
           # forced on in hardening/sysctl-baseline.nix, so a non-wheel user
           # cannot run sudo at all, including the rule below.
@@ -53,6 +58,16 @@
         commands = [
           {
             command = "/nix/store/*/activate-rs";
+            options = [ "NOPASSWD" ];
+          }
+          # With magic rollback, deploy-rs confirms a deployment by running
+          # "sudo -u root rm <temp>/deploy-rs-canary-<hash>" (confirm_profile
+          # in src/deploy.rs). Without this rule the confirmation fails and the
+          # device rolls back after confirmTimeout. The path is matched by
+          # inode and the argument by a regular expression, so this allows
+          # removing that one file and nothing else.
+          {
+            command = "/run/current-system/sw/bin/rm ^/tmp/deploy-rs-canary-[0-9a-z]{32}$";
             options = [ "NOPASSWD" ];
           }
         ];

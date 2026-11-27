@@ -14,6 +14,22 @@
   `dawo.pam.lockout.services` should drop them #178 #179
 - fix(hardening): the lockout also covers polkit and the Plasma screen locker,
   which ask for a password without going through login #178 #179
+Breaking:
+
+- fix(deploy): deploy-rs verifies host keys. A deploy to a device whose key
+  is not in the operator's `known_hosts` stops with `Host key verification
+  failed`. Add the key deliberately: scan it (`ssh-keyscan -t ed25519
+  <host>`), compare its fingerprint with `ssh-keygen -lf
+  /etc/ssh/ssh_host_ed25519_key.pub` read off the device itself, and only
+  then append it to `known_hosts` (docs/deploy.md) #103 #125
+
+Other changes:
+
+- fix(deploy): magic rollback is on. A device that cannot be reached after
+  activation rolls back by itself #103 #125
+- fix(users): the deploy account has a shell again. Since 0.1.1 it had
+  nologin, so deploy-rs could not reach a device unless an overlay set a
+  shell #125
 
 ## 0.2.0
 
