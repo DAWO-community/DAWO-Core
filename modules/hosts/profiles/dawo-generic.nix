@@ -76,6 +76,7 @@
         services-flatpak
         services-printing
         services-scanning
+        services-tailscale
 
         # Users
         users-basics

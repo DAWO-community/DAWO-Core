@@ -74,6 +74,9 @@ Breaking:
   `localization-nl_nl` or `localization-en_nl` switch to
   `localization-languages`; the defaults reproduce the old Dutch behaviour. The
   legacy `nl_NL/ISO-8859-1` locale is no longer generated #56 #131
+- feat(services): `dawo.tailscale`, an opt-in Tailscale client joined to the
+  organisation's tailnet (usually Headscale). The coordination server must be
+  named, and upstream logging to Tailscale Inc is off
 
 ## 0.2.0
 
